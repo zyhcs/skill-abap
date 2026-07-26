@@ -52,6 +52,7 @@ ENDPOINTS = {
     "dynpro_import_from_json": {"path": "/dynpro/import_from_json", "mode": "write", "defaults": {}},
     "dynpro_import_custom_control": {"path": "/dynpro/import_custom_control", "mode": "write", "defaults": {}},
     "dynpro_import_layout": {"path": "/dynpro/import_layout", "mode": "write", "defaults": {}},
+    "transport_create": {"path": "/transport/create", "mode": "write", "defaults": {"type": "K"}},
 }
 
 PATH_TO_NAME = {spec["path"]: name for name, spec in ENDPOINTS.items()}

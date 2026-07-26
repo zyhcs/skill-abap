@@ -1,4 +1,4 @@
-﻿# Endpoints
+# Endpoints
 
 ## Base URL And Routing
 
@@ -48,6 +48,7 @@ http://<your-sap-host>:<port>/sap/bc/zai_mcp_rest/object/check?sap-client=100
 | `/dynpro/import_screen` | Create or update a generated normal Dynpro screen from JSON using only `screen_elements` and optional `flow_logic`; does not require or create table controls or custom controls. |
 | `/dynpro/import_custom_control` | Create or update a generated Dynpro screen from JSON with one or more Dynpro `CUST_CTRL` containers for OO ALV/custom controls. This is separate from `/dynpro/import_from_json` and does not create table controls. |
 | `/dynpro/import_layout` | Create or update a generated Dynpro screen from JSON with explicit `containers[]` plus `screen_elements[]`. Use this for layout containers such as `SUBSCREEN` and `STRIP_CTRL`/tabstrip structures without changing the normal, table-control, or custom-control import behavior. |
+| `/transport/create` | Create a new SAP Transport Request (TRKORR, Workbench/Customizing) |
 | `/run` | Combined DDIC create plus ABAP check/save/activate flow |
 | `/capabilities` | Return handler feature flags for capability-aware clients |
 | `/probe/run` | Run controlled probe checks. Supports whitelisted `ZSDRP_AI_MCP_*` runner reports and built-in `CLASS_ACTIVATION_CHECK` for class check-only activation diagnostics. |
