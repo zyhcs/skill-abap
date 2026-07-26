@@ -1,0 +1,21 @@
+# Sensitive configuration files containing passwords
+config/sap_environments.json
+
+# Python bytecode & cache
+__pycache__/
+*.pyc
+*.pyo
+
+# Log directories & work artifacts
+work/
+sap-runs/
+
+# Temporary payload files
+payloads/
+scratch/
+
+# IDE & OS files
+.DS_Store
+Thumbs.db
+.vscode/
+.idea/

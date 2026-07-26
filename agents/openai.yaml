@@ -1,0 +1,4 @@
+﻿interface:
+  display_name: "SAP AI MCP REST API"
+  short_description: "Use approved zai_mcp_rest REST endpoints for SAP ABAP/DDIC automation."
+  default_prompt: "Use $sap-ai-mcp-rest-api to create, validate, save, activate, and troubleshoot SAP ABAP/DDIC objects through approved zai_mcp_rest REST endpoints."

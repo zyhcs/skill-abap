@@ -1,0 +1,26 @@
+{
+  "default_profile": "dev",
+  "profiles": {
+    "dev": {
+      "description": "SAP Development System (Client 100) - Full Read/Write",
+      "base_url": "http://<your-sap-dev-host>:<port>/sap/bc/zai_mcp_rest?sap-client=100",
+      "user_env": "SAP_DEV_USER",
+      "password_env": "SAP_DEV_PASSWORD",
+      "allow_write": true
+    },
+    "qas": {
+      "description": "SAP Quality Assurance System (Client 200) - Controlled Testing",
+      "base_url": "http://<your-sap-qas-host>:<port>/sap/bc/zai_mcp_rest?sap-client=200",
+      "user_env": "SAP_QAS_USER",
+      "password_env": "SAP_QAS_PASSWORD",
+      "allow_write": false
+    },
+    "prd": {
+      "description": "SAP Production System (Client 800) - Strict Read-Only & Diagnostics",
+      "base_url": "https://<your-sap-prd-host>:<port>/sap/bc/zai_mcp_rest?sap-client=800",
+      "user_env": "SAP_PRD_USER",
+      "password_env": "SAP_PRD_PASSWORD",
+      "allow_write": false
+    }
+  }
+}

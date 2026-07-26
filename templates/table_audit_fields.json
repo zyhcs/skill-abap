@@ -1,0 +1,37 @@
+[
+  {
+    "name": "MANDT",
+    "data_element": "MANDT",
+    "key_flag": true,
+    "not_null": true,
+    "position": 1
+  },
+  {
+    "name": "CREATED_BY",
+    "data_element": "ERNAM",
+    "key_flag": false,
+    "not_null": false,
+    "position": 990
+  },
+  {
+    "name": "CREATED_AT",
+    "data_element": "ERDAT",
+    "key_flag": false,
+    "not_null": false,
+    "position": 991
+  },
+  {
+    "name": "LAST_CHANGED_BY",
+    "data_element": "AENAM",
+    "key_flag": false,
+    "not_null": false,
+    "position": 992
+  },
+  {
+    "name": "LAST_CHANGED_AT",
+    "data_element": "AEDAT",
+    "key_flag": false,
+    "not_null": false,
+    "position": 993
+  }
+]

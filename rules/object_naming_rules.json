@@ -1,0 +1,27 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "SAP Object Naming Rules",
+  "description": "定义 SAP 自定义对象（程序、类、函数、透明表、域等）的命名规范",
+  "global_prefix": "Z",
+  "module_prefixes": {
+    "SD": "ZSD",
+    "MM": "ZMM",
+    "FI": "ZFI",
+    "CO": "ZCO",
+    "PP": "ZPP",
+    "SYS": "ZSYS"
+  },
+  "object_patterns": {
+    "PROG": "{TAG}{MODULE}RP_{NAME}",
+    "CLAS": "ZCL_{NAME}",
+    "FUNC": "ZFM{MODULE}_{NAME}",
+    "FUGR": "ZFG{MODULE}_{NAME}",
+    "TABL": "ZT{MODULE}_{NAME}",
+    "DTEL": "ZDE_{NAME}",
+    "DOMA": "ZDO_{NAME}"
+  },
+  "rules_notes": [
+    "1. 所有自定义对象名必须以 Z 开头 (系统硬性防护)。",
+    "2. 建议根据业务模块填充 {MODULE} 前缀，具体细则待用户补充规则后启用。"
+  ]
+}

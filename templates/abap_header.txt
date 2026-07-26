@@ -1,0 +1,13 @@
+*&---------------------------------------------------------------------*
+*& Program / Class : {OBJECT_NAME}
+*& Author          : {AUTHOR}
+*& Create Date     : {DATE}
+*& Description     : {DESCRIPTION}
+*& Module          : {MODULE}
+*& Requirement ID  : {REQUIREMENT_ID}
+*&---------------------------------------------------------------------*
+*& Change History  :
+*& Date       Author      Transport      Description
+*& ---------- ----------- -------------- ------------------------------*
+*& {DATE}     {AUTHOR}    {TRANSPORT}    Initial Creation
+*&---------------------------------------------------------------------*
