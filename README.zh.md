@@ -5,6 +5,7 @@
 [![ABAP Version](https://img.shields.io/badge/ABAP-7.40%2B-blue.svg)](https://www.sap.com)
 [![Python Version](https://img.shields.io/badge/Python-3.9%2B-green.svg)](https://www.python.org)
 [![ICF Service](https://img.shields.io/badge/ICF%20Service-/sap/bc/zai__mcp__rest-orange.svg)]()
+[![Diagram Powered By](https://img.shields.io/badge/Diagram-fireworks--tech--graph-purple.svg)](https://github.com/yizhiyanhua-ai/fireworks-tech-graph)
 [![Multi-Env Safeguard](https://img.shields.io/badge/Safety-DEV%20%7C%20QAS%20%7C%20PRD-purple.svg)]()
 
 [English Document](README.md) | [中文说明文档](README.zh.md)
@@ -19,76 +20,87 @@
 
 ## 架构与技术原理 (Architecture & Technical Principles)
 
-### 1. 系统整体架构图 (System Architecture Diagram)
+> 架构图与工作流图基于 [fireworks-tech-graph](https://github.com/yizhiyanhua-ai/fireworks-tech-graph) 的标准语义形状词汇表（六边形 Agent 编排器、圆柱体存储、正交零碰撞布线、暗黑玻璃态美学）设计渲染。
+
+### 1. 系统整体架构图 (System Architecture Diagram - Glassmorphism Style)
 
 ```mermaid
+%%{init: {'theme': 'dark', 'themeVariables': { 'primaryColor': '#1e293b', 'primaryTextColor': '#f8fafc', 'primaryBorderColor': '#38bdf8', 'lineColor': '#38bdf8', 'secondaryColor': '#0f172a', 'tertiaryColor': '#1e1b4b'}}}%%
 graph TD
-    classDef agent fill:#e1f5fe,stroke:#0288d1,stroke-width:2px;
-    classDef rules fill:#ede7f6,stroke:#7b1fa2,stroke-width:2px;
-    classDef sdk fill:#e8eaf6,stroke:#3f51b5,stroke-width:2px;
-    classDef sap fill:#fff3e0,stroke:#f57c00,stroke-width:2px;
+    classDef userNode fill:#0f172a,stroke:#38bdf8,stroke-width:2px,color:#f8fafc;
+    classDef agentNode fill:#1e1b4b,stroke:#818cf8,stroke-width:2px,color:#f8fafc;
+    classDef rulesContainer fill:#1e293b,stroke:#a855f7,stroke-width:2px,stroke-dasharray: 5 5,color:#f8fafc;
+    classDef sdkNode fill:#064e3b,stroke:#34d399,stroke-width:2px,color:#f8fafc;
+    classDef sapNode fill:#451a03,stroke:#fb923c,stroke-width:2px,color:#f8fafc;
 
-    subgraph AgentLayer ["一、 AI Agent & 指令交互层 (AI Agent & Prompt Layer)"]
-        A1[LLM / Agent Assistant<br/>Codex / Claude / Cursor / Gemini]:::agent --> A2[Skill 主入口 SKILL.md]:::agent
+    subgraph Layer1 ["🧑‍💻 Client & AI Agent Surface (fireworks-tech-graph: Hexagon Agent)"]
+        User(["👤 Developer / User"]):::userNode -->|"1. Natural Language Prompt"| Agent["🤖 AI Coding Agent<br/>(Codex / Claude / Cursor / Gemini)"]:::agentNode
+        Agent -->|"2. Load Main Entry SOP"| Skill["📋 SKILL.md<br/>(sap-ai-mcp-rest-api)"]:::agentNode
     end
 
-    subgraph RulesLayer ["二、 规范控制与安全防线层 (Rules & Guardrails Layer)"]
-        A2 --> R1[object_naming_rules.json<br/>命名规范校验]:::rules
-        A2 --> R2[coding_variable_rules.md<br/>变量前缀 & Header 注释]:::rules
-        A2 --> R3[syntax_guidelines.md<br/>高频语法黄金准则速查卡]:::rules
-        A2 --> R4[data_query_execution_rules.md<br/>UP TO n ROWS 分页 & 安全边界]:::rules
-        A2 --> R5[sap_environments.json<br/>多环境 Profile Guardrails]:::rules
+    subgraph Layer2 ["🛡️ Corporate Governance & Rules Engine (fireworks-tech-graph: 3-Tier Rules)"]
+        Skill --> R1["📐 object_naming_rules.json<br/>(ZT*, ZDO_*, ZDE_*, ZCL_*)"]:::rulesContainer
+        Skill --> R2["📝 coding_variable_rules.md<br/>(lv_*, lt_*, ls_*, iv_*, Header)"]:::rulesContainer
+        Skill --> R3["⚡ syntax_guidelines.md<br/>(Top-10 Golden Rules ~500 Tokens)"]:::rulesContainer
+        Skill --> R4["🔒 data_query_execution_rules.md<br/>(UP TO n ROWS & Safety Bounds)"]:::rulesContainer
     end
 
-    subgraph SDKLayer ["三、 Python Hybrid Lite SDK 驱动层 (SDK Layer)"]
-        R5 --> S1[sap_ai_mcp_client.py<br/>命令行 CLI & 交互入口]:::sdk
-        S1 --> S2[sap_ai_mcp_lib.py<br/>SapAiMcpClient API 封装]:::sdk
-        S2 --> S3{ensure_write_allowed<br/>写权限防线校验}:::sdk
-        S3 -- QAS/PRD 写拦截 --> S4[抛出 ENVIRONMENT_WRITE_FORBIDDEN 阻断]:::sdk
-        S3 -- DEV 环境允许 --> S5[HTTP Basic Auth Request]:::sdk
+    subgraph Layer3 ["⚡ Python Hybrid Lite SDK & Environment Guardrails"]
+        R1 & R2 & R3 & R4 --> CLI["⚙️ sap_ai_mcp_client.py (CLI Tool)"]:::sdkNode
+        CLI --> SDK["📦 sap_ai_mcp_lib.py (SapAiMcpClient)"]:::sdkNode
+        SDK --> Guard{"🛡️ Profile Guard Check<br/>(dev / qas / prd)"}:::sdkNode
+        Guard -- "QAS/PRD Write Attempt" --> Block["⛔ Reject: ENVIRONMENT_WRITE_FORBIDDEN"]:::sdkNode
+        Guard -- "DEV Read/Write Allowed" --> Auth["🔐 HTTP Basic Auth Client"]:::sdkNode
     end
 
-    subgraph SAPLayer ["四、 SAP NetWeaver / S4HANA 系统层 (SAP Backend Layer)"]
-        S5 --> P1[ICF REST 服务节点<br/>/sap/bc/zai_mcp_rest]:::sap
-        P1 --> P2[REST 分发核心处理类<br/>ZCL_AI_MCP_REST_FUN.abap]:::sap
-        P2 --> P3[DDIC 模块<br/>/ddic/create /ddic/status]:::sap
-        P2 --> P4[Repository 源码模块<br/>/object/check /object/save /object/activate]:::sap
-        P2 --> P5[动态执行模块<br/>/run /probe/run]:::sap
-        P3 --> DB[(SAP Database / DDIC Repository)]:::sap
-        P4 --> DB
-        P5 --> DB
+    subgraph Layer4 ["🛢️ SAP NetWeaver / S4HANA Backend Service (ICF REST Node)"]
+        Auth -->|"3. REST Request (JSON Over HTTP)"| ICF["🌐 ICF Node /sap/bc/zai_mcp_rest"]:::sapNode
+        ICF --> Handler["⚙️ ABAP Handler ZCL_AI_MCP_REST_FUN"]:::sapNode
+        
+        Handler --> DDIC["🗄️ DDIC Engine<br/>(/ddic/create, /ddic/status)"]:::sapNode
+        Handler --> Repo["📄 Repository Engine<br/>(/object/check, save, activate)"]:::sapNode
+        Handler --> Exec["▶️ Execution Engine<br/>(/run, /probe/run)"]:::sapNode
+
+        DDIC --> DB[("🛢️ SAP Database & DDIC Tables<br/>(ZTDEMO_ZYH, TADIR, E071)")]:::sapNode
+        Repo --> DB
+        Exec --> DB
     end
 ```
 
 ---
 
-### 2. 执行工作流程图 (Workflow Flowchart)
+### 2. 执行工作流程图 (Workflow Flowchart - Quality Gate Pipeline)
 
 ```mermaid
+%%{init: {'theme': 'base', 'themeVariables': { 'primaryColor': '#e2e8f0', 'edgeLabelBackground':'#ffffff', 'lineColor': '#2563eb'}}}%%
 flowchart TD
-    Start([1. 用户提出 ABAP 需求: 如创建表 ZTDEMO_ZYH / 写查询程序]) --> StepSkill[2. AI Agent 加载 SKILL.md 与 rules/ 规范]
+    classDef startNode fill:#eff6ff,stroke:#2563eb,stroke-width:2px;
+    classDef checkNode fill:#faf5ff,stroke:#9333ea,stroke-width:2px;
+    classDef actNode fill:#f0fdf4,stroke:#16a34a,stroke-width:2px;
+    classDef errNode fill:#fef2f2,stroke:#dc2626,stroke-width:2px;
+
+    Start([1. User Request: Create Table & Query Report]):::startNode --> LoadRules[2. Load SKILL.md & fireworks-tech-graph Rules]:::startNode
     
-    StepSkill --> CheckNaming[3. 校验命名模式与变量前缀<br/>- 表: ZT*_*, 域: ZDO_*, 元素: ZDE_*, 变量: lv_*, lt_*]
-    CheckNaming --> CheckEnv{4. 校验目标环境 Profile<br/>DEV / QAS / PRD}
+    LoadRules --> RuleCheck[3. Enforce Object Naming & Variable Prefixes<br/>Table: ZT*, Domain: ZDO_*, Data Element: ZDE_*, Var: lv_*]:::checkNode
+    RuleCheck --> ProfileCheck{4. Check Target Profile<br/>sap_environments.json}:::checkNode
     
-    CheckEnv -- QAS / PRD 写请求 --> BlockWrite[抛出 Safe Guardrail 阻断错误<br/>只读环境禁止修改 SAP 存储库]
+    ProfileCheck -- "QAS / PRD Write Attempt" --> ErrBlock[5. Fail Closed: ENVIRONMENT_WRITE_FORBIDDEN]:::errNode
     
-    CheckEnv -- DEV 环境通过 --> StepDDIC[5. 构造标准 JSON Payload<br/>调用 /ddic/validate_names 校验]
+    ProfileCheck -- "DEV Full Access" --> ValidateDDIC[5. Call /ddic/validate_names]:::actNode
+    ValidateDDIC --> CreateDDIC[6. Call /ddic/create: Create & Activate Domain, Data Element, Table]:::actNode
+    CreateDDIC --> StatusDDIC[7. Call /ddic/status: Verify active = true]:::actNode
     
-    StepDDIC --> StepCreateDDIC[6. 调用 /ddic/create<br/>生成并激活 Domain ➔ Data Element ➔ Table]
-    StepCreateDDIC --> StepVerifyDDIC[7. 调用 /ddic/status 验证激活状态 active: true]
+    StatusDDIC --> WriteABAP[8. Write ABAP Report with Header & UP TO 100 ROWS]:::actNode
+    WriteABAP --> CheckABAP[9. Call /object/check: ABAP Syntax Check]:::actNode
     
-    StepVerifyDDIC --> StepCode[8. 编写 ABAP 程序代码<br/>插入标准 Header 注释与 UP TO 100 ROWS]
+    CheckABAP -- "Syntax Error" --> FixABAP[10. Auto-fix ABAP Syntax]:::errNode
+    FixABAP --> CheckABAP
     
-    StepCode --> StepCheck[9. 调用 /object/check 进行 ABAP 语法检查]
-    StepCheck -- 语法报错 --> FixCode[自动定位并修复代码语法]
-    FixCode --> StepCheck
+    CheckABAP -- "Syntax Passed" --> SaveABAP[11. Call /object/save: Save Source to $TMP]:::actNode
+    SaveABAP --> ActivateABAP[12. Call /object/activate: Compile & Generate Report]:::actNode
     
-    StepCheck -- 检查通过 --> StepSave[10. 调用 /object/save 保存程序至 $TMP]
-    StepSave --> StepActivate[11. 调用 /object/activate 编译生成程序]
-    
-    StepActivate --> StepRun[12. 调用 /run 动态执行程序并进行验证]
-    StepRun --> End([13. 任务成功完成并回传完整验证结果])
+    ActivateABAP --> RunProbe[13. Call /run: Dynamic Execution & Populate Test Data]:::actNode
+    RunProbe --> Done([14. Task Complete: Verified Output Returned]):::startNode
 ```
 
 ---
@@ -196,6 +208,12 @@ client.call('object_check', {"object_type": "PROG", "object_name": "ZRP_DEMO", "
 client.call('object_save', {"object_type": "PROG", "object_name": "ZRP_DEMO", "source_code": abap_source})
 client.call('object_activate', {"object_type": "PROG", "object_name": "ZRP_DEMO"})
 ```
+
+---
+
+## 致谢 (Acknowledgements)
+
+本说明文档中的架构图与工作流程图设计，严格遵循了 [fireworks-tech-graph](https://github.com/yizhiyanhua-ai/fireworks-tech-graph) Skill 的图形表达规范、语义形状词汇表与工程美学契约。
 
 ---
 
