@@ -1,11 +1,12 @@
-CLASS ZCL_AI_MCP_REST_FUN DEFINITION
+CLASS zcl_ai_mcp_rest_fun DEFINITION
   PUBLIC
   FINAL
-  CREATE PUBLIC.
+  CREATE PUBLIC .
 
   PUBLIC SECTION.
-    INTERFACES: if_http_extension.
 
+    INTERFACES if_http_extension .
+  PROTECTED SECTION.
   PRIVATE SECTION.
     TYPES: BEGIN OF ty_domain_value,
              low         TYPE string,
