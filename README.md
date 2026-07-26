@@ -20,88 +20,17 @@
 
 ## 架构与技术原理 (Architecture & Technical Principles)
 
-> 架构图与工作流图采用 [fireworks-tech-graph](https://github.com/yizhiyanhua-ai/fireworks-tech-graph) 标准语义形状词汇表与工程美学契约渲染。
+> 架构矢量图与工作流图均由 [fireworks-tech-graph](https://github.com/yizhiyanhua-ai/fireworks-tech-graph) 标准图形引擎全自动渲染输出。
 
 ### 1. 系统整体架构图 (System Architecture Diagram - Glassmorphism Style)
 
-```mermaid
-%%{init: {'theme': 'dark', 'themeVariables': { 'primaryColor': '#1e293b', 'primaryTextColor': '#f8fafc', 'primaryBorderColor': '#38bdf8', 'lineColor': '#38bdf8', 'secondaryColor': '#0f172a', 'tertiaryColor': '#1e1b4b'}}}%%
-graph TD
-    classDef userNode fill:#0f172a,stroke:#38bdf8,stroke-width:2px,color:#f8fafc;
-    classDef agentNode fill:#1e1b4b,stroke:#818cf8,stroke-width:2px,color:#f8fafc;
-    classDef rulesContainer fill:#1e293b,stroke:#a855f7,stroke-width:2px,stroke-dasharray: 5 5,color:#f8fafc;
-    classDef sdkNode fill:#064e3b,stroke:#34d399,stroke-width:2px,color:#f8fafc;
-    classDef sapNode fill:#451a03,stroke:#fb923c,stroke-width:2px,color:#f8fafc;
-
-    subgraph Layer1 ["🧑‍💻 Client & AI Agent Surface (fireworks-tech-graph: Hexagon Agent)"]
-        User(["👤 Developer / User"]):::userNode -->|"1. Natural Language Prompt"| Agent["🤖 AI Coding Agent<br/>(Codex / Claude / Cursor / Gemini)"]:::agentNode
-        Agent -->|"2. Load Main Entry SOP"| Skill["📋 SKILL.md<br/>(sap-ai-mcp-rest-api)"]:::agentNode
-    end
-
-    subgraph Layer2 ["🛡️ Corporate Governance & Rules Engine (fireworks-tech-graph: 3-Tier Rules)"]
-        Skill --> R1["📐 object_naming_rules.json<br/>(ZT*, ZDO_*, ZDE_*, ZCL_*)"]:::rulesContainer
-        Skill --> R2["📝 coding_variable_rules.md<br/>(lv_*, lt_*, ls_*, iv_*, Header)"]:::rulesContainer
-        Skill --> R3["⚡ syntax_guidelines.md<br/>(Top-10 Golden Rules ~500 Tokens)"]:::rulesContainer
-        Skill --> R4["🔒 data_query_execution_rules.md<br/>(UP TO n ROWS & Safety Bounds)"]:::rulesContainer
-    end
-
-    subgraph Layer3 ["⚡ Python Hybrid Lite SDK & Environment Guardrails"]
-        R1 & R2 & R3 & R4 --> CLI["⚙️ sap_ai_mcp_client.py (CLI Tool)"]:::sdkNode
-        CLI --> SDK["📦 sap_ai_mcp_lib.py (SapAiMcpClient)"]:::sdkNode
-        SDK --> Guard{"🛡️ Profile Guard Check<br/>(dev / qas / prd)"}:::sdkNode
-        Guard -- "QAS/PRD Write Attempt" --> Block["⛔ Reject: ENVIRONMENT_WRITE_FORBIDDEN"]:::sdkNode
-        Guard -- "DEV Read/Write Allowed" --> Auth["🔐 HTTP Basic Auth Client"]:::sdkNode
-    end
-
-    subgraph Layer4 ["🛢️ SAP NetWeaver / S4HANA Backend Service (ICF REST Node)"]
-        Auth -->|"3. REST Request (JSON Over HTTP)"| ICF["🌐 ICF Node /sap/bc/zai_mcp_rest"]:::sapNode
-        ICF --> Handler["⚙️ ABAP Handler ZCL_AI_MCP_REST_FUN"]:::sapNode
-        
-        Handler --> DDIC["🗄️ DDIC Engine<br/>(/ddic/create, /ddic/status)"]:::sapNode
-        Handler --> Repo["📄 Repository Engine<br/>(/object/check, save, activate)"]:::sapNode
-        Handler --> Exec["▶️ Execution Engine<br/>(/run, /probe/run)"]:::sapNode
-
-        DDIC --> DB[("🛢️ SAP Database & DDIC Tables<br/>(ZTDEMO_ZYH, TADIR, E071)")]:::sapNode
-        Repo --> DB
-        Exec --> DB
-    end
-```
+![SAP AI MCP REST API System Architecture](assets/sap-ai-mcp-architecture.svg)
 
 ---
 
-### 2. 执行工作流程图 (Workflow Flowchart - Quality Gate Pipeline)
+### 2. 执行工作流程图 (Workflow Flowchart - Blueprint Style)
 
-```mermaid
-%%{init: {'theme': 'base', 'themeVariables': { 'primaryColor': '#e2e8f0', 'edgeLabelBackground':'#ffffff', 'lineColor': '#2563eb'}}}%%
-flowchart TD
-    classDef startNode fill:#eff6ff,stroke:#2563eb,stroke-width:2px;
-    classDef checkNode fill:#faf5ff,stroke:#9333ea,stroke-width:2px;
-    classDef actNode fill:#f0fdf4,stroke:#16a34a,stroke-width:2px;
-    classDef errNode fill:#fef2f2,stroke:#dc2626,stroke-width:2px;
-
-    Start([1. User Request: Create Table & Query Report]):::startNode --> LoadRules[2. Load SKILL.md & fireworks-tech-graph Rules]:::startNode
-    
-    LoadRules --> RuleCheck[3. Enforce Object Naming & Variable Prefixes<br/>Table: ZT*, Domain: ZDO_*, Data Element: ZDE_*, Var: lv_*]:::checkNode
-    RuleCheck --> ProfileCheck{4. Check Target Profile<br/>sap_environments.json}:::checkNode
-    
-    ProfileCheck -- "QAS / PRD Write Attempt" --> ErrBlock[5. Fail Closed: ENVIRONMENT_WRITE_FORBIDDEN]:::errNode
-    
-    ProfileCheck -- "DEV Full Access" --> ValidateDDIC[5. Call /ddic/validate_names]:::actNode
-    ValidateDDIC --> CreateDDIC[6. Call /ddic/create: Create & Activate Domain, Data Element, Table]:::actNode
-    CreateDDIC --> StatusDDIC[7. Call /ddic/status: Verify active = true]:::actNode
-    
-    StatusDDIC --> WriteABAP[8. Write ABAP Report with Header & UP TO 100 ROWS]:::actNode
-    WriteABAP --> CheckABAP[9. Call /object/check: ABAP Syntax Check]:::actNode
-    
-    CheckABAP -- "Syntax Error" --> FixABAP[10. Auto-fix ABAP Syntax]:::errNode
-    FixABAP --> CheckABAP
-    
-    CheckABAP -- "Syntax Passed" --> SaveABAP[11. Call /object/save: Save Source to $TMP]:::actNode
-    SaveABAP --> ActivateABAP[12. Call /object/activate: Compile & Generate Report]:::actNode
-    
-    ActivateABAP --> RunProbe[13. Call /run: Dynamic Execution & Populate Test Data]:::actNode
-    RunProbe --> Done([14. Task Complete: Verified Output Returned]):::startNode
-```
+![SAP AI MCP REST API Execution Workflow](assets/sap-ai-mcp-workflow.svg)
 
 ---
 
@@ -136,6 +65,11 @@ abap-mcp-api/
 ├── SKILL.md                       # AI Agent Skill 主入口规范
 ├── README.md                      # 英文说明文档
 ├── README.zh.md                   # 中文说明文档 (本文件)
+├── assets/                        # fireworks-tech-graph 生成的无损 SVG/PNG 技术架构图
+│   ├── sap-ai-mcp-architecture.svg # 系统架构图 (Style 5 玻璃态)
+│   ├── sap-ai-mcp-architecture.png # 1920px 高清系统架构图
+│   ├── sap-ai-mcp-workflow.svg     # 执行流程图 (Style 3 蓝图)
+│   └── sap-ai-mcp-workflow.png     # 1920px 高清执行流程图
 ├── ZCL_AI_MCP_REST_FUN.abap       # Deployed SAP NetWeaver REST Handler Class (9,400+ 行)
 ├── config/
 │   ├── sap_environments.json      # 本地环境配置文件 (DEV, QAS, PRD Profiles)
@@ -213,7 +147,7 @@ client.call('object_activate', {"object_type": "PROG", "object_name": "ZRP_DEMO"
 
 ## Acknowledgements
 
-Architectural diagrams and flowcharts in this documentation are designed following the [fireworks-tech-graph](https://github.com/yizhiyanhua-ai/fireworks-tech-graph) skill specifications and aesthetic quality contracts.
+Architectural vector diagrams and flowcharts in this documentation are generated using the [fireworks-tech-graph](https://github.com/yizhiyanhua-ai/fireworks-tech-graph) skill engine.
 
 ---
 
