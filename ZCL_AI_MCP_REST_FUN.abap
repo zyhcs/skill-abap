@@ -9417,24 +9417,11 @@ CLASS ZCL_AI_MCP_REST_FUN IMPLEMENTATION.
     io_server->response->set_cdata( iv_json ).
   ENDMETHOD.
 
-
-* <SIGNATURE>---------------------------------------------------------------------------------------+
-* | Instance Private Method ZCL_AI_MCP_REST_FUN->HANDLE_TRANSPORT_CREATE
-* +-------------------------------------------------------------------------------------------------+
-* | [--->] IO_SERVER                      TYPE REF TO IF_HTTP_SERVER
-* +--------------------------------------------------------------------------------------</SIGNATURE>
   METHOD handle_transport_create.
     DATA(lv_result) = transport_create_from_json( io_server->request->get_cdata( ) ).
     write_json( io_server = io_server iv_status = 200 iv_json = lv_result ).
   ENDMETHOD.
 
-
-* <SIGNATURE>---------------------------------------------------------------------------------------+
-* | Instance Private Method ZCL_AI_MCP_REST_FUN->TRANSPORT_CREATE_FROM_JSON
-* +-------------------------------------------------------------------------------------------------+
-* | [--->] IV_JSON                        TYPE        STRING
-* | [<-()] RV_JSON                        TYPE        STRING
-* +--------------------------------------------------------------------------------------</SIGNATURE>
   METHOD transport_create_from_json.
     DATA ls_req TYPE ty_transport_create_request.
     DATA lv_trkorr TYPE trkorr.
