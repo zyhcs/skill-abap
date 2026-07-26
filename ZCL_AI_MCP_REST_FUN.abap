@@ -874,13 +874,7 @@ ENDCLASS.
 CLASS ZCL_AI_MCP_REST_FUN IMPLEMENTATION.
 
 
-* <SIGNATURE>---------------------------------------------------------------------------------------+
-* | Instance Private Method ZCL_AI_MCP_REST_FUN->ACTIVATE_CLASS
-* +-------------------------------------------------------------------------------------------------+
-* | [--->] IS_REQUEST                     TYPE        TY_ACTIVATE_REQUEST
-* | [<-()] RV_JSON                        TYPE        STRING
-* +--------------------------------------------------------------------------------------</SIGNATURE>
-  METHOD activate_class.
+METHOD activate_class.
     DATA lv_class TYPE seoclsname.
     DATA ls_clskey TYPE seoclskey.
     DATA ls_active_class TYPE vseoclass.
@@ -997,13 +991,7 @@ CLASS ZCL_AI_MCP_REST_FUN IMPLEMENTATION.
   ENDMETHOD.
 
 
-* <SIGNATURE>---------------------------------------------------------------------------------------+
-* | Instance Private Method ZCL_AI_MCP_REST_FUN->ACTIVATE_FROM_JSON
-* +-------------------------------------------------------------------------------------------------+
-* | [--->] IV_JSON                        TYPE        STRING
-* | [<-()] RV_JSON                        TYPE        STRING
-* +--------------------------------------------------------------------------------------</SIGNATURE>
-  METHOD activate_from_json.
+METHOD activate_from_json.
     DATA ls_request TYPE ty_activate_request.
     DATA lv_object_type TYPE string.
 
@@ -1029,13 +1017,7 @@ CLASS ZCL_AI_MCP_REST_FUN IMPLEMENTATION.
   ENDMETHOD.
 
 
-* <SIGNATURE>---------------------------------------------------------------------------------------+
-* | Instance Private Method ZCL_AI_MCP_REST_FUN->ACTIVATE_REPORT
-* +-------------------------------------------------------------------------------------------------+
-* | [--->] IS_REQUEST                     TYPE        TY_ACTIVATE_REQUEST
-* | [<-()] RV_JSON                        TYPE        STRING
-* +--------------------------------------------------------------------------------------</SIGNATURE>
-  METHOD activate_report.
+METHOD activate_report.
     DATA lv_program TYPE syrepid.
     DATA lv_message TYPE string.
     DATA lv_line TYPE i.
@@ -1060,11 +1042,7 @@ CLASS ZCL_AI_MCP_REST_FUN IMPLEMENTATION.
   ENDMETHOD.
 
 
-* <SIGNATURE>---------------------------------------------------------------------------------------+
-* | Instance Private Method ZCL_AI_MCP_REST_FUN->APPEND_BDC_FIELD
-* +-------------------------------------------------------------------------------------------------+
-* +--------------------------------------------------------------------------------------</SIGNATURE>
-  METHOD append_bdc_field.
+METHOD append_bdc_field.
     DATA ls_bdcdata TYPE bdcdata.
 
     CLEAR ls_bdcdata.
@@ -1080,15 +1058,7 @@ CLASS ZCL_AI_MCP_REST_FUN IMPLEMENTATION.
   ENDMETHOD.
 
 
-* <SIGNATURE>---------------------------------------------------------------------------------------+
-* | Instance Private Method ZCL_AI_MCP_REST_FUN->APPEND_CTS_OBJECT
-* +-------------------------------------------------------------------------------------------------+
-* | [--->] IV_OBJECT_TYPE                 TYPE        TROBJTYPE
-* | [--->] IV_OBJECT_NAME                 TYPE        CSEQUENCE
-* | [--->] IV_TRANSPORT                   TYPE        TRKORR
-* | [<-()] RV_JSON                        TYPE        STRING
-* +--------------------------------------------------------------------------------------</SIGNATURE>
-  METHOD append_cts_object.
+METHOD append_cts_object.
     DATA lv_object TYPE tadir-obj_name.
     DATA lv_object_type TYPE e071-object.
     DATA lv_transport TYPE e070-trkorr.
@@ -1148,13 +1118,7 @@ CLASS ZCL_AI_MCP_REST_FUN IMPLEMENTATION.
   ENDMETHOD.
 
 
-* <SIGNATURE>---------------------------------------------------------------------------------------+
-* | Instance Private Method ZCL_AI_MCP_REST_FUN->APPEND_RESULT
-* +-------------------------------------------------------------------------------------------------+
-* | [--->] IV_RESULT                      TYPE        STRING
-* | [<-->] CV_JSON                        TYPE        STRING
-* +--------------------------------------------------------------------------------------</SIGNATURE>
-  METHOD append_result.
+METHOD append_result.
     IF cv_json <> '['.
       cv_json = cv_json && ','.
     ENDIF.
@@ -1162,18 +1126,7 @@ CLASS ZCL_AI_MCP_REST_FUN IMPLEMENTATION.
   ENDMETHOD.
 
 
-* <SIGNATURE>---------------------------------------------------------------------------------------+
-* | Instance Private Method ZCL_AI_MCP_REST_FUN->BUILD_FM_ERROR_JSON
-* +-------------------------------------------------------------------------------------------------+
-* | [--->] IV_STAGE                       TYPE        STRING
-* | [--->] IV_OBJECT_TYPE                 TYPE        CSEQUENCE
-* | [--->] IV_OBJECT_NAME                 TYPE        CSEQUENCE
-* | [--->] IV_MESSAGE                     TYPE        STRING
-* | [--->] IV_SUBRC                       TYPE        I
-* | [--->] IV_SUGGESTION                  TYPE        STRING
-* | [<-()] RV_JSON                        TYPE        STRING
-* +--------------------------------------------------------------------------------------</SIGNATURE>
-  METHOD build_fm_error_json.
+METHOD build_fm_error_json.
     DATA lv_msgid LIKE sy-msgid.
     DATA lv_msgno LIKE sy-msgno.
     DATA lv_msgv1 LIKE sy-msgv1.
@@ -1205,13 +1158,7 @@ CLASS ZCL_AI_MCP_REST_FUN IMPLEMENTATION.
   ENDMETHOD.
 
 
-* <SIGNATURE>---------------------------------------------------------------------------------------+
-* | Instance Private Method ZCL_AI_MCP_REST_FUN->BUILD_SY_MESSAGE
-* +-------------------------------------------------------------------------------------------------+
-* | [--->] IV_FALLBACK                    TYPE        STRING
-* | [<-()] RV_MESSAGE                     TYPE        STRING
-* +--------------------------------------------------------------------------------------</SIGNATURE>
-  METHOD build_sy_message.
+METHOD build_sy_message.
     DATA lv_message TYPE string.
 
     IF sy-msgid IS INITIAL OR sy-msgno IS INITIAL.
@@ -1240,12 +1187,7 @@ CLASS ZCL_AI_MCP_REST_FUN IMPLEMENTATION.
   ENDMETHOD.
 
 
-* <SIGNATURE>---------------------------------------------------------------------------------------+
-* | Instance Private Method ZCL_AI_MCP_REST_FUN->CAPABILITIES_JSON
-* +-------------------------------------------------------------------------------------------------+
-* | [<-()] RV_JSON                        TYPE        STRING
-* +--------------------------------------------------------------------------------------</SIGNATURE>
-  METHOD capabilities_json.
+METHOD capabilities_json.
     rv_json = '{"status":"OK","handler":"ZCL_AI_MCP_REST_FUN",' &&
               '"features":{' &&
               '"object_read_string":true,' &&
@@ -1271,13 +1213,7 @@ CLASS ZCL_AI_MCP_REST_FUN IMPLEMENTATION.
   ENDMETHOD.
 
 
-* <SIGNATURE>---------------------------------------------------------------------------------------+
-* | Instance Private Method ZCL_AI_MCP_REST_FUN->CHECK_FROM_JSON
-* +-------------------------------------------------------------------------------------------------+
-* | [--->] IV_JSON                        TYPE        STRING
-* | [<-()] RV_JSON                        TYPE        STRING
-* +--------------------------------------------------------------------------------------</SIGNATURE>
-  METHOD check_from_json.
+METHOD check_from_json.
     DATA ls_request TYPE ty_check_request.
     DATA lv_object_type TYPE string.
 
@@ -1301,13 +1237,7 @@ CLASS ZCL_AI_MCP_REST_FUN IMPLEMENTATION.
   ENDMETHOD.
 
 
-* <SIGNATURE>---------------------------------------------------------------------------------------+
-* | Instance Private Method ZCL_AI_MCP_REST_FUN->CHECK_FUNCTION_FROM_JSON
-* +-------------------------------------------------------------------------------------------------+
-* | [--->] IV_JSON                        TYPE        STRING
-* | [<-()] RV_JSON                        TYPE        STRING
-* +--------------------------------------------------------------------------------------</SIGNATURE>
-  METHOD check_function_from_json.
+METHOD check_function_from_json.
     DATA ls_request TYPE ty_function_check_request.
     DATA lv_function_name TYPE rs38l-name.
     DATA lv_function_group TYPE rs38l-area.
@@ -1389,13 +1319,7 @@ CLASS ZCL_AI_MCP_REST_FUN IMPLEMENTATION.
   ENDMETHOD.
 
 
-* <SIGNATURE>---------------------------------------------------------------------------------------+
-* | Instance Private Method ZCL_AI_MCP_REST_FUN->CLASS_METHODS_FROM_JSON
-* +-------------------------------------------------------------------------------------------------+
-* | [--->] IV_JSON                        TYPE        STRING
-* | [<-()] RV_JSON                        TYPE        STRING
-* +--------------------------------------------------------------------------------------</SIGNATURE>
-  METHOD class_methods_from_json.
+METHOD class_methods_from_json.
     DATA ls_request TYPE ty_class_methods_request.
     DATA lv_class TYPE seoclsname.
     DATA lt_methods TYPE STANDARD TABLE OF vseomethod WITH EMPTY KEY.
@@ -1463,13 +1387,7 @@ CLASS ZCL_AI_MCP_REST_FUN IMPLEMENTATION.
   ENDMETHOD.
 
 
-* <SIGNATURE>---------------------------------------------------------------------------------------+
-* | Instance Private Method ZCL_AI_MCP_REST_FUN->CLASS_METHOD_READ_FROM_JSON
-* +-------------------------------------------------------------------------------------------------+
-* | [--->] IV_JSON                        TYPE        STRING
-* | [<-()] RV_JSON                        TYPE        STRING
-* +--------------------------------------------------------------------------------------</SIGNATURE>
-  METHOD class_method_read_from_json.
+METHOD class_method_read_from_json.
     DATA ls_request TYPE ty_class_method_read_request.
     DATA lv_class TYPE seoclsname.
     DATA lv_method TYPE seocmpname.
@@ -1669,15 +1587,7 @@ CLASS ZCL_AI_MCP_REST_FUN IMPLEMENTATION.
   ENDMETHOD.
 
 
-* <SIGNATURE>---------------------------------------------------------------------------------------+
-* | Instance Private Method ZCL_AI_MCP_REST_FUN->CREATE_DATA_ELEMENT
-* +-------------------------------------------------------------------------------------------------+
-* | [--->] IS_DATA_ELEMENT                TYPE        TY_DATA_ELEMENT
-* | [--->] IV_PACKAGE                     TYPE        DEVCLASS
-* | [--->] IV_TRANSPORT                   TYPE        TRKORR
-* | [<-()] RV_JSON                        TYPE        STRING
-* +--------------------------------------------------------------------------------------</SIGNATURE>
-  METHOD create_data_element.
+METHOD create_data_element.
     DATA ls_dd04v TYPE dd04v.
     DATA lv_dtel_name TYPE ddobjname.
     DATA lv_as4local TYPE dd04l-as4local.
@@ -1833,13 +1743,7 @@ CLASS ZCL_AI_MCP_REST_FUN IMPLEMENTATION.
   ENDMETHOD.
 
 
-* <SIGNATURE>---------------------------------------------------------------------------------------+
-* | Instance Private Method ZCL_AI_MCP_REST_FUN->CREATE_DDIC_FROM_JSON
-* +-------------------------------------------------------------------------------------------------+
-* | [--->] IV_JSON                        TYPE        STRING
-* | [<-()] RV_JSON                        TYPE        STRING
-* +--------------------------------------------------------------------------------------</SIGNATURE>
-  METHOD create_ddic_from_json.
+METHOD create_ddic_from_json.
     DATA ls_request TYPE ty_ddic_request.
     DATA lv_results TYPE string VALUE '['.
     DATA lv_result TYPE string.
@@ -1939,15 +1843,7 @@ CLASS ZCL_AI_MCP_REST_FUN IMPLEMENTATION.
   ENDMETHOD.
 
 
-* <SIGNATURE>---------------------------------------------------------------------------------------+
-* | Instance Private Method ZCL_AI_MCP_REST_FUN->CREATE_DOMAIN
-* +-------------------------------------------------------------------------------------------------+
-* | [--->] IS_DOMAIN                      TYPE        TY_DOMAIN
-* | [--->] IV_PACKAGE                     TYPE        DEVCLASS
-* | [--->] IV_TRANSPORT                   TYPE        TRKORR
-* | [<-()] RV_JSON                        TYPE        STRING
-* +--------------------------------------------------------------------------------------</SIGNATURE>
-  METHOD create_domain.
+METHOD create_domain.
     DATA ls_dd01v TYPE dd01v.
     DATA lt_dd07v TYPE STANDARD TABLE OF dd07v WITH EMPTY KEY.
     DATA lv_as4local TYPE dd01l-as4local.
@@ -2044,13 +1940,7 @@ CLASS ZCL_AI_MCP_REST_FUN IMPLEMENTATION.
   ENDMETHOD.
 
 
-* <SIGNATURE>---------------------------------------------------------------------------------------+
-* | Instance Private Method ZCL_AI_MCP_REST_FUN->CREATE_FUNCTION_FROM_JSON
-* +-------------------------------------------------------------------------------------------------+
-* | [--->] IV_JSON                        TYPE        STRING
-* | [<-()] RV_JSON                        TYPE        STRING
-* +--------------------------------------------------------------------------------------</SIGNATURE>
-  METHOD create_function_from_json.
+METHOD create_function_from_json.
     DATA ls_request TYPE ty_function_request.
     DATA lv_function_group TYPE rs38l-area.
     DATA lv_function_name TYPE rs38l-name.
@@ -2457,15 +2347,7 @@ CLASS ZCL_AI_MCP_REST_FUN IMPLEMENTATION.
   ENDMETHOD.
 
 
-* <SIGNATURE>---------------------------------------------------------------------------------------+
-* | Instance Private Method ZCL_AI_MCP_REST_FUN->CREATE_TABLE
-* +-------------------------------------------------------------------------------------------------+
-* | [--->] IS_TABLE                       TYPE        TY_TABLE
-* | [--->] IV_PACKAGE                     TYPE        DEVCLASS
-* | [--->] IV_TRANSPORT                   TYPE        TRKORR
-* | [<-()] RV_JSON                        TYPE        STRING
-* +--------------------------------------------------------------------------------------</SIGNATURE>
-  METHOD create_table.
+METHOD create_table.
     DATA ls_dd02v TYPE dd02v.
     DATA ls_dd09l TYPE dd09l.
     DATA lt_dd03p TYPE STANDARD TABLE OF dd03p WITH EMPTY KEY.
@@ -2625,13 +2507,7 @@ CLASS ZCL_AI_MCP_REST_FUN IMPLEMENTATION.
   ENDMETHOD.
 
 
-* <SIGNATURE>---------------------------------------------------------------------------------------+
-* | Instance Private Method ZCL_AI_MCP_REST_FUN->DATA_ELEMENT_EXISTS
-* +-------------------------------------------------------------------------------------------------+
-* | [--->] IV_NAME                        TYPE        STRING
-* | [<-()] RV_EXISTS                      TYPE        ABAP_BOOL
-* +--------------------------------------------------------------------------------------</SIGNATURE>
-  METHOD data_element_exists.
+METHOD data_element_exists.
     DATA lv_rollname TYPE dd04l-rollname.
 
     SELECT SINGLE rollname
@@ -2644,13 +2520,7 @@ CLASS ZCL_AI_MCP_REST_FUN IMPLEMENTATION.
   ENDMETHOD.
 
 
-* <SIGNATURE>---------------------------------------------------------------------------------------+
-* | Instance Private Method ZCL_AI_MCP_REST_FUN->DDIC_FIELDS_FROM_JSON
-* +-------------------------------------------------------------------------------------------------+
-* | [--->] IV_JSON                        TYPE        STRING
-* | [<-()] RV_JSON                        TYPE        STRING
-* +--------------------------------------------------------------------------------------</SIGNATURE>
-  METHOD ddic_fields_from_json.
+METHOD ddic_fields_from_json.
     DATA ls_request TYPE ty_ddic_fields_request.
     DATA lv_type_name TYPE dd03l-tabname.
     DATA lt_fields TYPE STANDARD TABLE OF dd03l WITH EMPTY KEY.
@@ -2699,13 +2569,7 @@ CLASS ZCL_AI_MCP_REST_FUN IMPLEMENTATION.
   ENDMETHOD.
 
 
-* <SIGNATURE>---------------------------------------------------------------------------------------+
-* | Instance Private Method ZCL_AI_MCP_REST_FUN->DDIC_TYPE_FROM_JSON
-* +-------------------------------------------------------------------------------------------------+
-* | [--->] IV_JSON                        TYPE        STRING
-* | [<-()] RV_JSON                        TYPE        STRING
-* +--------------------------------------------------------------------------------------</SIGNATURE>
-  METHOD ddic_type_from_json.
+METHOD ddic_type_from_json.
     DATA ls_request TYPE ty_ddic_type_request.
     DATA lv_type_name TYPE string.
     DATA lr_data TYPE REF TO data.
@@ -2761,13 +2625,7 @@ CLASS ZCL_AI_MCP_REST_FUN IMPLEMENTATION.
   ENDMETHOD.
 
 
-* <SIGNATURE>---------------------------------------------------------------------------------------+
-* | Instance Private Method ZCL_AI_MCP_REST_FUN->DOMAIN_EXISTS
-* +-------------------------------------------------------------------------------------------------+
-* | [--->] IV_NAME                        TYPE        STRING
-* | [<-()] RV_EXISTS                      TYPE        ABAP_BOOL
-* +--------------------------------------------------------------------------------------</SIGNATURE>
-  METHOD domain_exists.
+METHOD domain_exists.
     DATA lv_domname TYPE dd01l-domname.
 
     SELECT SINGLE domname
@@ -2780,11 +2638,7 @@ CLASS ZCL_AI_MCP_REST_FUN IMPLEMENTATION.
   ENDMETHOD.
 
 
-* <SIGNATURE>---------------------------------------------------------------------------------------+
-* | Instance Private Method ZCL_AI_MCP_REST_FUN->DOMAIN_UPDATE_VALUES_FROM_JSON
-* +-------------------------------------------------------------------------------------------------+
-* +--------------------------------------------------------------------------------------</SIGNATURE>
-  METHOD domain_update_values_from_json.
+METHOD domain_update_values_from_json.
     TYPES: BEGIN OF ty_domain_value_key,
              low  TYPE string,
              high TYPE string,
@@ -3067,13 +2921,7 @@ CLASS ZCL_AI_MCP_REST_FUN IMPLEMENTATION.
   ENDMETHOD.
 
 
-* <SIGNATURE>---------------------------------------------------------------------------------------+
-* | Instance Private Method ZCL_AI_MCP_REST_FUN->DOMAIN_VALUES_FROM_JSON
-* +-------------------------------------------------------------------------------------------------+
-* | [--->] IV_JSON                        TYPE        STRING
-* | [<-()] RV_JSON                        TYPE        STRING
-* +--------------------------------------------------------------------------------------</SIGNATURE>
-  METHOD domain_values_from_json.
+METHOD domain_values_from_json.
     DATA ls_request TYPE ty_domain_values_request.
     DATA lv_domain_name TYPE dd07v-domname.
     DATA lt_values TYPE STANDARD TABLE OF dd07v WITH EMPTY KEY.
@@ -3126,13 +2974,7 @@ CLASS ZCL_AI_MCP_REST_FUN IMPLEMENTATION.
   ENDMETHOD.
 
 
-* <SIGNATURE>---------------------------------------------------------------------------------------+
-* | Instance Private Method ZCL_AI_MCP_REST_FUN->DYNPRO_READ_JSON
-* +-------------------------------------------------------------------------------------------------+
-* | [--->] IV_JSON                        TYPE        STRING
-* | [<-()] RV_JSON                        TYPE        STRING
-* +--------------------------------------------------------------------------------------</SIGNATURE>
-  METHOD dynpro_read_json.
+METHOD dynpro_read_json.
     DATA ls_request TYPE ty_dynpro_read_request.
     DATA lv_program TYPE d020s-prog.
     DATA lv_screen TYPE d020s-dnum.
@@ -3374,13 +3216,7 @@ CLASS ZCL_AI_MCP_REST_FUN IMPLEMENTATION.
   ENDMETHOD.
 
 
-* <SIGNATURE>---------------------------------------------------------------------------------------+
-* | Instance Private Method ZCL_AI_MCP_REST_FUN->FM_INTERFACE_FROM_JSON
-* +-------------------------------------------------------------------------------------------------+
-* | [--->] IV_JSON                        TYPE        STRING
-* | [<-()] RV_JSON                        TYPE        STRING
-* +--------------------------------------------------------------------------------------</SIGNATURE>
-  METHOD fm_interface_from_json.
+METHOD fm_interface_from_json.
     DATA ls_request TYPE ty_fm_interface_request.
     DATA lv_funcname TYPE tfdir-funcname.
     DATA lt_params TYPE STANDARD TABLE OF fupararef WITH EMPTY KEY.
@@ -3460,13 +3296,7 @@ CLASS ZCL_AI_MCP_REST_FUN IMPLEMENTATION.
   ENDMETHOD.
 
 
-* <SIGNATURE>---------------------------------------------------------------------------------------+
-* | Instance Private Method ZCL_AI_MCP_REST_FUN->GET_DATA_ELEMENT_STATUS
-* +-------------------------------------------------------------------------------------------------+
-* | [--->] IV_NAME                        TYPE        STRING
-* | [<-()] RV_JSON                        TYPE        STRING
-* +--------------------------------------------------------------------------------------</SIGNATURE>
-  METHOD get_data_element_status.
+METHOD get_data_element_status.
     DATA lv_rollname TYPE dd04l-rollname.
     DATA lv_domname TYPE dd04l-domname.
     DATA lv_as4local TYPE dd04l-as4local.
@@ -3533,13 +3363,7 @@ CLASS ZCL_AI_MCP_REST_FUN IMPLEMENTATION.
   ENDMETHOD.
 
 
-* <SIGNATURE>---------------------------------------------------------------------------------------+
-* | Instance Private Method ZCL_AI_MCP_REST_FUN->GET_DOMAIN_STATUS
-* +-------------------------------------------------------------------------------------------------+
-* | [--->] IV_NAME                        TYPE        STRING
-* | [<-()] RV_JSON                        TYPE        STRING
-* +--------------------------------------------------------------------------------------</SIGNATURE>
-  METHOD get_domain_status.
+METHOD get_domain_status.
     DATA lv_domname TYPE dd01l-domname.
     DATA lv_as4local TYPE dd01l-as4local.
     DATA lv_reason TYPE string.
@@ -3578,13 +3402,7 @@ CLASS ZCL_AI_MCP_REST_FUN IMPLEMENTATION.
   ENDMETHOD.
 
 
-* <SIGNATURE>---------------------------------------------------------------------------------------+
-* | Instance Private Method ZCL_AI_MCP_REST_FUN->GET_TABLE_STATUS
-* +-------------------------------------------------------------------------------------------------+
-* | [--->] IV_NAME                        TYPE        STRING
-* | [<-()] RV_JSON                        TYPE        STRING
-* +--------------------------------------------------------------------------------------</SIGNATURE>
-  METHOD get_table_status.
+METHOD get_table_status.
     DATA lv_tabname TYPE dd02l-tabname.
     DATA lv_as4local TYPE dd02l-as4local.
     DATA lv_reason TYPE string.
@@ -3623,15 +3441,7 @@ CLASS ZCL_AI_MCP_REST_FUN IMPLEMENTATION.
   ENDMETHOD.
 
 
-* <SIGNATURE>---------------------------------------------------------------------------------------+
-* | Instance Private Method ZCL_AI_MCP_REST_FUN->GET_TADIR_JSON
-* +-------------------------------------------------------------------------------------------------+
-* | [--->] IV_PGMID                       TYPE        TADIR-PGMID
-* | [--->] IV_OBJECT_TYPE                 TYPE        TADIR-OBJECT
-* | [--->] IV_OBJECT_NAME                 TYPE        CSEQUENCE
-* | [<-()] RV_JSON                        TYPE        STRING
-* +--------------------------------------------------------------------------------------</SIGNATURE>
-  METHOD get_tadir_json.
+METHOD get_tadir_json.
     DATA lv_pgmid TYPE tadir-pgmid.
     DATA lv_object_type TYPE tadir-object.
     DATA lv_object TYPE tadir-obj_name.
@@ -3667,402 +3477,220 @@ CLASS ZCL_AI_MCP_REST_FUN IMPLEMENTATION.
   ENDMETHOD.
 
 
-* <SIGNATURE>---------------------------------------------------------------------------------------+
-* | Instance Private Method ZCL_AI_MCP_REST_FUN->HANDLE_ACTIVATE
-* +-------------------------------------------------------------------------------------------------+
-* | [--->] IO_SERVER                      TYPE REF TO IF_HTTP_SERVER
-* +--------------------------------------------------------------------------------------</SIGNATURE>
-  METHOD handle_activate.
+METHOD handle_activate.
     DATA(lv_result) = activate_from_json( io_server->request->get_cdata( ) ).
     write_json( io_server = io_server iv_status = 200 iv_json = lv_result ).
   ENDMETHOD.
 
 
-* <SIGNATURE>---------------------------------------------------------------------------------------+
-* | Instance Private Method ZCL_AI_MCP_REST_FUN->HANDLE_CAPABILITIES
-* +-------------------------------------------------------------------------------------------------+
-* | [--->] IO_SERVER                      TYPE REF TO IF_HTTP_SERVER
-* +--------------------------------------------------------------------------------------</SIGNATURE>
-  METHOD handle_capabilities.
+METHOD handle_capabilities.
     DATA(lv_result) = capabilities_json( ).
     write_json( io_server = io_server iv_status = 200 iv_json = lv_result ).
   ENDMETHOD.
 
 
-* <SIGNATURE>---------------------------------------------------------------------------------------+
-* | Instance Private Method ZCL_AI_MCP_REST_FUN->HANDLE_CHECK
-* +-------------------------------------------------------------------------------------------------+
-* | [--->] IO_SERVER                      TYPE REF TO IF_HTTP_SERVER
-* +--------------------------------------------------------------------------------------</SIGNATURE>
-  METHOD handle_check.
+METHOD handle_check.
     DATA(lv_result) = check_from_json( io_server->request->get_cdata( ) ).
     write_json( io_server = io_server iv_status = 200 iv_json = lv_result ).
   ENDMETHOD.
 
 
-* <SIGNATURE>---------------------------------------------------------------------------------------+
-* | Instance Private Method ZCL_AI_MCP_REST_FUN->HANDLE_CLASS_METHOD_READ
-* +-------------------------------------------------------------------------------------------------+
-* | [--->] IO_SERVER                      TYPE REF TO IF_HTTP_SERVER
-* +--------------------------------------------------------------------------------------</SIGNATURE>
-  METHOD handle_class_method_read.
+METHOD handle_class_method_read.
     DATA(lv_result) = class_method_read_from_json( io_server->request->get_cdata( ) ).
     write_json( io_server = io_server iv_status = 200 iv_json = lv_result ).
   ENDMETHOD.
 
 
-* <SIGNATURE>---------------------------------------------------------------------------------------+
-* | Instance Private Method ZCL_AI_MCP_REST_FUN->HANDLE_DDIC_CREATE
-* +-------------------------------------------------------------------------------------------------+
-* | [--->] IO_SERVER                      TYPE REF TO IF_HTTP_SERVER
-* +--------------------------------------------------------------------------------------</SIGNATURE>
-  METHOD handle_ddic_create.
+METHOD handle_ddic_create.
     DATA(lv_result) = create_ddic_from_json( io_server->request->get_cdata( ) ).
     write_json( io_server = io_server iv_status = 200 iv_json = lv_result ).
   ENDMETHOD.
 
 
-* <SIGNATURE>---------------------------------------------------------------------------------------+
-* | Instance Private Method ZCL_AI_MCP_REST_FUN->HANDLE_DDIC_STATUS
-* +-------------------------------------------------------------------------------------------------+
-* | [--->] IO_SERVER                      TYPE REF TO IF_HTTP_SERVER
-* +--------------------------------------------------------------------------------------</SIGNATURE>
-  METHOD handle_ddic_status.
+METHOD handle_ddic_status.
     DATA(lv_result) = status_from_json( io_server->request->get_cdata( ) ).
     write_json( io_server = io_server iv_status = 200 iv_json = lv_result ).
   ENDMETHOD.
 
 
-* <SIGNATURE>---------------------------------------------------------------------------------------+
-* | Instance Private Method ZCL_AI_MCP_REST_FUN->HANDLE_DDIC_VALIDATE_NAMES
-* +-------------------------------------------------------------------------------------------------+
-* | [--->] IO_SERVER                      TYPE REF TO IF_HTTP_SERVER
-* +--------------------------------------------------------------------------------------</SIGNATURE>
-  METHOD handle_ddic_validate_names.
+METHOD handle_ddic_validate_names.
     DATA(lv_result) = validate_names_from_json( io_server->request->get_cdata( ) ).
     write_json( io_server = io_server iv_status = 200 iv_json = lv_result ).
   ENDMETHOD.
 
 
-* <SIGNATURE>---------------------------------------------------------------------------------------+
-* | Instance Private Method ZCL_AI_MCP_REST_FUN->HANDLE_DEBUG_CLASS_METHODS
-* +-------------------------------------------------------------------------------------------------+
-* | [--->] IO_SERVER                      TYPE REF TO IF_HTTP_SERVER
-* +--------------------------------------------------------------------------------------</SIGNATURE>
-  METHOD handle_debug_class_methods.
+METHOD handle_debug_class_methods.
     DATA(lv_result) = class_methods_from_json( io_server->request->get_cdata( ) ).
     write_json( io_server = io_server iv_status = 200 iv_json = lv_result ).
   ENDMETHOD.
 
 
-* <SIGNATURE>---------------------------------------------------------------------------------------+
-* | Instance Private Method ZCL_AI_MCP_REST_FUN->HANDLE_DEBUG_DDIC_FIELDS
-* +-------------------------------------------------------------------------------------------------+
-* | [--->] IO_SERVER                      TYPE REF TO IF_HTTP_SERVER
-* +--------------------------------------------------------------------------------------</SIGNATURE>
-  METHOD handle_debug_ddic_fields.
+METHOD handle_debug_ddic_fields.
     DATA(lv_result) = ddic_fields_from_json( io_server->request->get_cdata( ) ).
     write_json( io_server = io_server iv_status = 200 iv_json = lv_result ).
   ENDMETHOD.
 
 
-* <SIGNATURE>---------------------------------------------------------------------------------------+
-* | Instance Private Method ZCL_AI_MCP_REST_FUN->HANDLE_DEBUG_DDIC_TYPE
-* +-------------------------------------------------------------------------------------------------+
-* | [--->] IO_SERVER                      TYPE REF TO IF_HTTP_SERVER
-* +--------------------------------------------------------------------------------------</SIGNATURE>
-  METHOD handle_debug_ddic_type.
+METHOD handle_debug_ddic_type.
     DATA(lv_result) = ddic_type_from_json( io_server->request->get_cdata( ) ).
     write_json( io_server = io_server iv_status = 200 iv_json = lv_result ).
   ENDMETHOD.
 
 
-* <SIGNATURE>---------------------------------------------------------------------------------------+
-* | Instance Private Method ZCL_AI_MCP_REST_FUN->HANDLE_DEBUG_DOMAIN_VALUES
-* +-------------------------------------------------------------------------------------------------+
-* | [--->] IO_SERVER                      TYPE REF TO IF_HTTP_SERVER
-* +--------------------------------------------------------------------------------------</SIGNATURE>
-  METHOD handle_debug_domain_values.
+METHOD handle_debug_domain_values.
     DATA(lv_result) = domain_values_from_json( io_server->request->get_cdata( ) ).
     write_json( io_server = io_server iv_status = 200 iv_json = lv_result ).
   ENDMETHOD.
 
 
-* <SIGNATURE>---------------------------------------------------------------------------------------+
-* | Instance Private Method ZCL_AI_MCP_REST_FUN->HANDLE_DEBUG_DYNPRO_READ
-* +-------------------------------------------------------------------------------------------------+
-* | [--->] IO_SERVER                      TYPE REF TO IF_HTTP_SERVER
-* +--------------------------------------------------------------------------------------</SIGNATURE>
-  METHOD handle_debug_dynpro_read.
+METHOD handle_debug_dynpro_read.
     DATA(lv_result) = dynpro_read_json( io_server->request->get_cdata( ) ).
     write_json( io_server = io_server iv_status = 200 iv_json = lv_result ).
   ENDMETHOD.
 
 
-* <SIGNATURE>---------------------------------------------------------------------------------------+
-* | Instance Private Method ZCL_AI_MCP_REST_FUN->HANDLE_DEBUG_FM_INTERFACE
-* +-------------------------------------------------------------------------------------------------+
-* | [--->] IO_SERVER                      TYPE REF TO IF_HTTP_SERVER
-* +--------------------------------------------------------------------------------------</SIGNATURE>
-  METHOD handle_debug_fm_interface.
+METHOD handle_debug_fm_interface.
     DATA(lv_result) = fm_interface_from_json( io_server->request->get_cdata( ) ).
     write_json( io_server = io_server iv_status = 200 iv_json = lv_result ).
   ENDMETHOD.
 
 
-* <SIGNATURE>---------------------------------------------------------------------------------------+
-* | Instance Private Method ZCL_AI_MCP_REST_FUN->HANDLE_DEBUG_LOCKS
-* +-------------------------------------------------------------------------------------------------+
-* | [--->] IO_SERVER                      TYPE REF TO IF_HTTP_SERVER
-* +--------------------------------------------------------------------------------------</SIGNATURE>
-  METHOD handle_debug_locks.
+METHOD handle_debug_locks.
     DATA(lv_result) = locks_from_json( io_server->request->get_cdata( ) ).
     write_json( io_server = io_server iv_status = 200 iv_json = lv_result ).
   ENDMETHOD.
 
 
-* <SIGNATURE>---------------------------------------------------------------------------------------+
-* | Instance Private Method ZCL_AI_MCP_REST_FUN->HANDLE_DOMA_VALUES_UPDATE
-* +-------------------------------------------------------------------------------------------------+
-* +--------------------------------------------------------------------------------------</SIGNATURE>
-  METHOD handle_doma_values_update.
+METHOD handle_doma_values_update.
     DATA(lv_result) = domain_update_values_from_json( io_server->request->get_cdata( ) ).
     write_json( io_server = io_server iv_status = 200 iv_json = lv_result ).
   ENDMETHOD.
 
 
-* <SIGNATURE>---------------------------------------------------------------------------------------+
-* | Instance Private Method ZCL_AI_MCP_REST_FUN->HANDLE_DYNPRO_IMPORT_JSON
-* +-------------------------------------------------------------------------------------------------+
-* | [--->] IO_SERVER                      TYPE REF TO IF_HTTP_SERVER
-* +--------------------------------------------------------------------------------------</SIGNATURE>
-  METHOD handle_dynpro_import_json.
+METHOD handle_dynpro_import_json.
     DATA(lv_result) = import_dynpro_from_json( io_server->request->get_cdata( ) ).
     write_json( io_server = io_server iv_status = 200 iv_json = lv_result ).
   ENDMETHOD.
 
-* <SIGNATURE>---------------------------------------------------------------------------------------+
-* | Instance Private Method ZCL_AI_MCP_REST_FUN->HANDLE_DYNPRO_IMPORT_SCREEN
-* +-------------------------------------------------------------------------------------------------+
-* | [--->] IO_SERVER                      TYPE REF TO IF_HTTP_SERVER
-* +--------------------------------------------------------------------------------------</SIGNATURE>
-  METHOD handle_dynpro_import_screen.
+METHOD handle_dynpro_import_screen.
     DATA(lv_result) = import_dynpro_screen_json( io_server->request->get_cdata( ) ).
     write_json( io_server = io_server iv_status = 200 iv_json = lv_result ).
   ENDMETHOD.
 
-* <SIGNATURE>---------------------------------------------------------------------------------------+
-* | Instance Private Method ZCL_AI_MCP_REST_FUN->HANDLE_DYNPRO_IMPORT_CCTRL
-* +-------------------------------------------------------------------------------------------------+
-* | [--->] IO_SERVER                      TYPE REF TO IF_HTTP_SERVER
-* +--------------------------------------------------------------------------------------</SIGNATURE>
-  METHOD handle_dynpro_import_cctrl.
+METHOD handle_dynpro_import_cctrl.
     DATA(lv_result) = import_dynpro_cctrl_json( io_server->request->get_cdata( ) ).
     write_json( io_server = io_server iv_status = 200 iv_json = lv_result ).
   ENDMETHOD.
 
-* <SIGNATURE>---------------------------------------------------------------------------------------+
-* | Instance Private Method ZCL_AI_MCP_REST_FUN->HANDLE_DYNPRO_IMPORT_LAYOUT
-* +-------------------------------------------------------------------------------------------------+
-* | [--->] IO_SERVER                      TYPE REF TO IF_HTTP_SERVER
-* +--------------------------------------------------------------------------------------</SIGNATURE>
-  METHOD handle_dynpro_import_layout.
+METHOD handle_dynpro_import_layout.
     DATA(lv_result) = import_dynpro_layout_json( io_server->request->get_cdata( ) ).
     write_json( io_server = io_server iv_status = 200 iv_json = lv_result ).
   ENDMETHOD.
 
 
-* <SIGNATURE>---------------------------------------------------------------------------------------+
-* | Instance Private Method ZCL_AI_MCP_REST_FUN->HANDLE_DYNPRO_IMPORT_MINIMAL
-* +-------------------------------------------------------------------------------------------------+
-* | [--->] IO_SERVER                      TYPE REF TO IF_HTTP_SERVER
-* +--------------------------------------------------------------------------------------</SIGNATURE>
-  METHOD handle_dynpro_import_minimal.
+METHOD handle_dynpro_import_minimal.
     DATA(lv_result) = import_min_dynpro_json( io_server->request->get_cdata( ) ).
     write_json( io_server = io_server iv_status = 200 iv_json = lv_result ).
   ENDMETHOD.
 
 
-* <SIGNATURE>---------------------------------------------------------------------------------------+
-* | Instance Private Method ZCL_AI_MCP_REST_FUN->HANDLE_DYNPRO_IMPORT_TC_MIN
-* +-------------------------------------------------------------------------------------------------+
-* | [--->] IO_SERVER                      TYPE REF TO IF_HTTP_SERVER
-* +--------------------------------------------------------------------------------------</SIGNATURE>
-  METHOD handle_dynpro_import_tc_min.
+METHOD handle_dynpro_import_tc_min.
     DATA(lv_result) = import_tc_min_dynpro_json( io_server->request->get_cdata( ) ).
     write_json( io_server = io_server iv_status = 200 iv_json = lv_result ).
   ENDMETHOD.
 
 
-* <SIGNATURE>---------------------------------------------------------------------------------------+
-* | Instance Private Method ZCL_AI_MCP_REST_FUN->HANDLE_FUGR_MAIN_SOURCE_SAVE
-* +-------------------------------------------------------------------------------------------------+
-* | [--->] IO_SERVER                      TYPE REF TO IF_HTTP_SERVER
-* +--------------------------------------------------------------------------------------</SIGNATURE>
-  METHOD handle_fugr_main_source_save.
+METHOD handle_fugr_main_source_save.
     DATA(lv_result) = save_fugr_main_source_json( io_server->request->get_cdata( ) ).
     write_json( io_server = io_server iv_status = 200 iv_json = lv_result ).
   ENDMETHOD.
 
 
-* <SIGNATURE>---------------------------------------------------------------------------------------+
-* | Instance Private Method ZCL_AI_MCP_REST_FUN->HANDLE_FUNCTION_CHECK
-* +-------------------------------------------------------------------------------------------------+
-* | [--->] IO_SERVER                      TYPE REF TO IF_HTTP_SERVER
-* +--------------------------------------------------------------------------------------</SIGNATURE>
-  METHOD handle_function_check.
+METHOD handle_function_check.
     DATA(lv_result) = check_function_from_json( io_server->request->get_cdata( ) ).
     write_json( io_server = io_server iv_status = 200 iv_json = lv_result ).
   ENDMETHOD.
 
 
-* <SIGNATURE>---------------------------------------------------------------------------------------+
-* | Instance Private Method ZCL_AI_MCP_REST_FUN->HANDLE_FUNCTION_CREATE
-* +-------------------------------------------------------------------------------------------------+
-* | [--->] IO_SERVER                      TYPE REF TO IF_HTTP_SERVER
-* +--------------------------------------------------------------------------------------</SIGNATURE>
-  METHOD handle_function_create.
+METHOD handle_function_create.
     DATA(lv_result) = create_function_from_json( io_server->request->get_cdata( ) ).
     write_json( io_server = io_server iv_status = 200 iv_json = lv_result ).
   ENDMETHOD.
 
 
-* <SIGNATURE>---------------------------------------------------------------------------------------+
-* | Instance Private Method ZCL_AI_MCP_REST_FUN->HANDLE_FUNCTION_GROUP_READ
-* +-------------------------------------------------------------------------------------------------+
-* | [--->] IO_SERVER                      TYPE REF TO IF_HTTP_SERVER
-* +--------------------------------------------------------------------------------------</SIGNATURE>
-  METHOD handle_function_group_read.
+METHOD handle_function_group_read.
     DATA(lv_result) = read_function_group_from_json( io_server->request->get_cdata( ) ).
     write_json( io_server = io_server iv_status = 200 iv_json = lv_result ).
   ENDMETHOD.
 
 
-* <SIGNATURE>---------------------------------------------------------------------------------------+
-* | Instance Private Method ZCL_AI_MCP_REST_FUN->HANDLE_FUNCTION_READ
-* +-------------------------------------------------------------------------------------------------+
-* | [--->] IO_SERVER                      TYPE REF TO IF_HTTP_SERVER
-* +--------------------------------------------------------------------------------------</SIGNATURE>
-  METHOD handle_function_read.
+METHOD handle_function_read.
     DATA(lv_result) = read_function_from_json( io_server->request->get_cdata( ) ).
     write_json( io_server = io_server iv_status = 200 iv_json = lv_result ).
   ENDMETHOD.
 
 
-* <SIGNATURE>---------------------------------------------------------------------------------------+
-* | Instance Private Method ZCL_AI_MCP_REST_FUN->HANDLE_FUNCTION_SOURCE_SAVE
-* +-------------------------------------------------------------------------------------------------+
-* | [--->] IO_SERVER                      TYPE REF TO IF_HTTP_SERVER
-* +--------------------------------------------------------------------------------------</SIGNATURE>
-  METHOD handle_function_source_save.
+METHOD handle_function_source_save.
     DATA(lv_result) = save_function_source_from_json( io_server->request->get_cdata( ) ).
     write_json( io_server = io_server iv_status = 200 iv_json = lv_result ).
   ENDMETHOD.
 
 
-* <SIGNATURE>---------------------------------------------------------------------------------------+
-* | Instance Private Method ZCL_AI_MCP_REST_FUN->HANDLE_INCLUDE_SOURCE_SAVE
-* +-------------------------------------------------------------------------------------------------+
-* | [--->] IO_SERVER                      TYPE REF TO IF_HTTP_SERVER
-* +--------------------------------------------------------------------------------------</SIGNATURE>
-  METHOD handle_include_source_save.
+METHOD handle_include_source_save.
     DATA(lv_result) = save_include_source_from_json( io_server->request->get_cdata( ) ).
     write_json( io_server = io_server iv_status = 200 iv_json = lv_result ).
   ENDMETHOD.
 
 
-* <SIGNATURE>---------------------------------------------------------------------------------------+
-* | Instance Private Method ZCL_AI_MCP_REST_FUN->HANDLE_MESSAGE_SAVE
-* +-------------------------------------------------------------------------------------------------+
-* +--------------------------------------------------------------------------------------</SIGNATURE>
-  METHOD handle_message_save.
+METHOD handle_message_save.
     DATA(lv_result) = message_save_from_json( io_server->request->get_cdata( ) ).
     write_json( io_server = io_server iv_status = 200 iv_json = lv_result ).
   ENDMETHOD.
 
 
-* <SIGNATURE>---------------------------------------------------------------------------------------+
-* | Instance Private Method ZCL_AI_MCP_REST_FUN->HANDLE_OBJECT_LIFECYCLE
-* +-------------------------------------------------------------------------------------------------+
-* | [--->] IO_SERVER                      TYPE REF TO IF_HTTP_SERVER
-* +--------------------------------------------------------------------------------------</SIGNATURE>
-  METHOD handle_object_lifecycle.
+METHOD handle_object_lifecycle.
     DATA(lv_result) = object_lifecycle_from_json( io_server->request->get_cdata( ) ).
     write_json( io_server = io_server iv_status = 200 iv_json = lv_result ).
   ENDMETHOD.
 
 
-* <SIGNATURE>---------------------------------------------------------------------------------------+
-* | Instance Private Method ZCL_AI_MCP_REST_FUN->HANDLE_OBJECT_REPAIR
-* +-------------------------------------------------------------------------------------------------+
-* | [--->] IO_SERVER                      TYPE REF TO IF_HTTP_SERVER
-* +--------------------------------------------------------------------------------------</SIGNATURE>
-  METHOD handle_object_repair.
+METHOD handle_object_repair.
     DATA(lv_result) = object_repair_from_json( io_server->request->get_cdata( ) ).
     write_json( io_server = io_server iv_status = 200 iv_json = lv_result ).
   ENDMETHOD.
 
 
-* <SIGNATURE>---------------------------------------------------------------------------------------+
-* | Instance Private Method ZCL_AI_MCP_REST_FUN->HANDLE_PROBE_RUN
-* +-------------------------------------------------------------------------------------------------+
-* | [--->] IO_SERVER                      TYPE REF TO IF_HTTP_SERVER
-* +--------------------------------------------------------------------------------------</SIGNATURE>
-  METHOD handle_probe_run.
+METHOD handle_probe_run.
     DATA(lv_result) = probe_run_from_json( io_server->request->get_cdata( ) ).
     write_json( io_server = io_server iv_status = 200 iv_json = lv_result ).
   ENDMETHOD.
 
 
-* <SIGNATURE>---------------------------------------------------------------------------------------+
-* | Instance Private Method ZCL_AI_MCP_REST_FUN->HANDLE_READ
-* +-------------------------------------------------------------------------------------------------+
-* | [--->] IO_SERVER                      TYPE REF TO IF_HTTP_SERVER
-* +--------------------------------------------------------------------------------------</SIGNATURE>
-  METHOD handle_read.
+METHOD handle_read.
     DATA(lv_result) = read_object_from_json( io_server->request->get_cdata( ) ).
     write_json( io_server = io_server iv_status = 200 iv_json = lv_result ).
   ENDMETHOD.
 
 
-* <SIGNATURE>---------------------------------------------------------------------------------------+
-* | Instance Private Method ZCL_AI_MCP_REST_FUN->HANDLE_RUN
-* +-------------------------------------------------------------------------------------------------+
-* | [--->] IO_SERVER                      TYPE REF TO IF_HTTP_SERVER
-* +--------------------------------------------------------------------------------------</SIGNATURE>
-  METHOD handle_run.
+METHOD handle_run.
     DATA(lv_result) = run( io_server->request->get_cdata( ) ).
     write_json( io_server = io_server iv_status = 200 iv_json = lv_result ).
   ENDMETHOD.
 
 
-* <SIGNATURE>---------------------------------------------------------------------------------------+
-* | Instance Private Method ZCL_AI_MCP_REST_FUN->HANDLE_SAVE
-* +-------------------------------------------------------------------------------------------------+
-* | [--->] IO_SERVER                      TYPE REF TO IF_HTTP_SERVER
-* +--------------------------------------------------------------------------------------</SIGNATURE>
-  METHOD handle_save.
+METHOD handle_save.
     DATA(lv_result) = save_source_from_json( io_server->request->get_cdata( ) ).
     write_json( io_server = io_server iv_status = 200 iv_json = lv_result ).
   ENDMETHOD.
 
 
-* <SIGNATURE>---------------------------------------------------------------------------------------+
-* | Instance Private Method ZCL_AI_MCP_REST_FUN->HANDLE_TEXTPOOL_SAVE
-* +-------------------------------------------------------------------------------------------------+
-* +--------------------------------------------------------------------------------------</SIGNATURE>
-  METHOD handle_textpool_save.
+METHOD handle_textpool_save.
     DATA(lv_result) = textpool_save_from_json( io_server->request->get_cdata( ) ).
     write_json( io_server = io_server iv_status = 200 iv_json = lv_result ).
   ENDMETHOD.
 
 
-* <SIGNATURE>---------------------------------------------------------------------------------------+
-* | Instance Public Method ZCL_AI_MCP_REST_FUN->IF_HTTP_EXTENSION~HANDLE_REQUEST
-* +-------------------------------------------------------------------------------------------------+
-* | [--->] SERVER                         TYPE REF TO IF_HTTP_SERVER
-* +--------------------------------------------------------------------------------------</SIGNATURE>
-  METHOD if_http_extension~handle_request.
+METHOD if_http_extension~handle_request.
     DATA lv_method TYPE string.
     DATA lv_path TYPE string.
     DATA lv_error_json TYPE string.
@@ -4172,13 +3800,7 @@ CLASS ZCL_AI_MCP_REST_FUN IMPLEMENTATION.
   ENDMETHOD.
 
 
-* <SIGNATURE>---------------------------------------------------------------------------------------+
-* | Instance Private Method ZCL_AI_MCP_REST_FUN->IMPORT_DYNPRO_FROM_JSON
-* +-------------------------------------------------------------------------------------------------+
-* | [--->] IV_JSON                        TYPE        STRING
-* | [<-()] RV_JSON                        TYPE        STRING
-* +--------------------------------------------------------------------------------------</SIGNATURE>
-  METHOD import_dynpro_from_json.
+METHOD import_dynpro_from_json.
     DATA ls_request TYPE ty_dynpro_json_request.
     DATA lv_program TYPE d020s-prog.
     DATA lv_screen TYPE d020s-dnum.
@@ -4713,13 +4335,7 @@ CLASS ZCL_AI_MCP_REST_FUN IMPLEMENTATION.
     ENDIF.
   ENDMETHOD.
 
-* <SIGNATURE>---------------------------------------------------------------------------------------+
-* | Instance Private Method ZCL_AI_MCP_REST_FUN->IMPORT_DYNPRO_SCREEN_JSON
-* +-------------------------------------------------------------------------------------------------+
-* | [--->] IV_JSON                        TYPE        STRING
-* | [<-()] RV_JSON                        TYPE        STRING
-* +--------------------------------------------------------------------------------------</SIGNATURE>
-  METHOD import_dynpro_screen_json.
+METHOD import_dynpro_screen_json.
     DATA ls_request TYPE ty_dynpro_custom_request.
     DATA lv_program TYPE d020s-prog.
     DATA lv_screen TYPE d020s-dnum.
@@ -4959,13 +4575,7 @@ CLASS ZCL_AI_MCP_REST_FUN IMPLEMENTATION.
     ENDIF.
   ENDMETHOD.
 
-* <SIGNATURE>---------------------------------------------------------------------------------------+
-* | Instance Private Method ZCL_AI_MCP_REST_FUN->IMPORT_DYNPRO_CCTRL_JSON
-* +-------------------------------------------------------------------------------------------------+
-* | [--->] IV_JSON                        TYPE        STRING
-* | [<-()] RV_JSON                        TYPE        STRING
-* +--------------------------------------------------------------------------------------</SIGNATURE>
-  METHOD import_dynpro_cctrl_json.
+METHOD import_dynpro_cctrl_json.
     DATA ls_request TYPE ty_dynpro_custom_request.
     DATA lv_program TYPE d020s-prog.
     DATA lv_screen TYPE d020s-dnum.
@@ -5277,13 +4887,7 @@ CLASS ZCL_AI_MCP_REST_FUN IMPLEMENTATION.
 
 
 
-* <SIGNATURE>---------------------------------------------------------------------------------------+
-* | Instance Private Method ZCL_AI_MCP_REST_FUN->IMPORT_DYNPRO_LAYOUT_JSON
-* +-------------------------------------------------------------------------------------------------+
-* | [--->] IV_JSON                        TYPE        STRING
-* | [<-()] RV_JSON                        TYPE        STRING
-* +--------------------------------------------------------------------------------------</SIGNATURE>
-  METHOD import_dynpro_layout_json.
+METHOD import_dynpro_layout_json.
     DATA ls_request TYPE ty_dynpro_layout_request.
     DATA lv_program TYPE d020s-prog.
     DATA lv_screen TYPE d020s-dnum.
@@ -5624,13 +5228,7 @@ CLASS ZCL_AI_MCP_REST_FUN IMPLEMENTATION.
 
 
 
-* <SIGNATURE>---------------------------------------------------------------------------------------+
-* | Instance Private Method ZCL_AI_MCP_REST_FUN->IMPORT_MIN_DYNPRO_JSON
-* +-------------------------------------------------------------------------------------------------+
-* | [--->] IV_JSON                        TYPE        STRING
-* | [<-()] RV_JSON                        TYPE        STRING
-* +--------------------------------------------------------------------------------------</SIGNATURE>
-  METHOD import_min_dynpro_json.
+METHOD import_min_dynpro_json.
     DATA ls_request TYPE ty_dynpro_request.
     DATA lv_program TYPE d020s-prog.
     DATA lv_screen TYPE d020s-dnum.
@@ -5760,13 +5358,7 @@ CLASS ZCL_AI_MCP_REST_FUN IMPLEMENTATION.
   ENDMETHOD.
 
 
-* <SIGNATURE>---------------------------------------------------------------------------------------+
-* | Instance Private Method ZCL_AI_MCP_REST_FUN->IMPORT_TC_MIN_DYNPRO_JSON
-* +-------------------------------------------------------------------------------------------------+
-* | [--->] IV_JSON                        TYPE        STRING
-* | [<-()] RV_JSON                        TYPE        STRING
-* +--------------------------------------------------------------------------------------</SIGNATURE>
-  METHOD import_tc_min_dynpro_json.
+METHOD import_tc_min_dynpro_json.
     DATA ls_request TYPE ty_dynpro_request.
     DATA lv_program TYPE d020s-prog.
     DATA lv_screen TYPE d020s-dnum.
@@ -6012,13 +5604,7 @@ CLASS ZCL_AI_MCP_REST_FUN IMPLEMENTATION.
   ENDMETHOD.
 
 
-* <SIGNATURE>---------------------------------------------------------------------------------------+
-* | Instance Private Method ZCL_AI_MCP_REST_FUN->IS_Z_OBJECT_NAME
-* +-------------------------------------------------------------------------------------------------+
-* | [--->] IV_NAME                        TYPE        CSEQUENCE
-* | [<-()] RV_VALID                       TYPE        ABAP_BOOL
-* +--------------------------------------------------------------------------------------</SIGNATURE>
-  METHOD is_z_object_name.
+METHOD is_z_object_name.
     DATA lv_name TYPE string.
 
     lv_name = to_upper( iv_name ).
@@ -6026,13 +5612,7 @@ CLASS ZCL_AI_MCP_REST_FUN IMPLEMENTATION.
   ENDMETHOD.
 
 
-* <SIGNATURE>---------------------------------------------------------------------------------------+
-* | Instance Private Method ZCL_AI_MCP_REST_FUN->LOCKS_FROM_JSON
-* +-------------------------------------------------------------------------------------------------+
-* | [--->] IV_JSON                        TYPE        STRING
-* | [<-()] RV_JSON                        TYPE        STRING
-* +--------------------------------------------------------------------------------------</SIGNATURE>
-  METHOD locks_from_json.
+METHOD locks_from_json.
     DATA ls_request TYPE ty_lock_request.
     DATA lt_locks TYPE STANDARD TABLE OF seqg3 WITH EMPTY KEY.
     DATA lv_locks TYPE string VALUE '['.
@@ -6087,11 +5667,7 @@ CLASS ZCL_AI_MCP_REST_FUN IMPLEMENTATION.
   ENDMETHOD.
 
 
-* <SIGNATURE>---------------------------------------------------------------------------------------+
-* | Instance Private Method ZCL_AI_MCP_REST_FUN->MESSAGE_SAVE_FROM_JSON
-* +-------------------------------------------------------------------------------------------------+
-* +--------------------------------------------------------------------------------------</SIGNATURE>
-  METHOD message_save_from_json.
+METHOD message_save_from_json.
     TYPES: BEGIN OF ty_message_work,
              requested_number TYPE string,
              number           TYPE string,
@@ -6368,13 +5944,7 @@ CLASS ZCL_AI_MCP_REST_FUN IMPLEMENTATION.
   ENDMETHOD.
 
 
-* <SIGNATURE>---------------------------------------------------------------------------------------+
-* | Instance Private Method ZCL_AI_MCP_REST_FUN->OBJECT_LIFECYCLE_FROM_JSON
-* +-------------------------------------------------------------------------------------------------+
-* | [--->] IV_JSON                        TYPE        STRING
-* | [<-()] RV_JSON                        TYPE        STRING
-* +--------------------------------------------------------------------------------------</SIGNATURE>
-  METHOD object_lifecycle_from_json.
+METHOD object_lifecycle_from_json.
     DATA ls_request TYPE ty_lifecycle_request.
     DATA lv_object_type TYPE string.
     DATA lv_mode TYPE string.
@@ -6592,13 +6162,7 @@ CLASS ZCL_AI_MCP_REST_FUN IMPLEMENTATION.
   ENDMETHOD.
 
 
-* <SIGNATURE>---------------------------------------------------------------------------------------+
-* | Instance Private Method ZCL_AI_MCP_REST_FUN->OBJECT_REPAIR_FROM_JSON
-* +-------------------------------------------------------------------------------------------------+
-* | [--->] IV_JSON                        TYPE        STRING
-* | [<-()] RV_JSON                        TYPE        STRING
-* +--------------------------------------------------------------------------------------</SIGNATURE>
-  METHOD object_repair_from_json.
+METHOD object_repair_from_json.
     DATA ls_request TYPE ty_object_repair_request.
     DATA lv_object_type TYPE string.
     DATA lv_target_kind TYPE string.
@@ -6759,13 +6323,7 @@ CLASS ZCL_AI_MCP_REST_FUN IMPLEMENTATION.
   ENDMETHOD.
 
 
-* <SIGNATURE>---------------------------------------------------------------------------------------+
-* | Instance Private Method ZCL_AI_MCP_REST_FUN->PROBE_CLASS_ACTIVATION_CHECK
-* +-------------------------------------------------------------------------------------------------+
-* | [--->] IV_CLASS_NAME                  TYPE        STRING
-* | [<-()] RV_JSON                        TYPE        STRING
-* +--------------------------------------------------------------------------------------</SIGNATURE>
-  METHOD probe_class_activation_check.
+METHOD probe_class_activation_check.
     DATA lv_class TYPE seoclsname.
     DATA lt_objects TYPE STANDARD TABLE OF dwinactiv WITH EMPTY KEY.
     DATA ls_object TYPE dwinactiv.
@@ -7106,13 +6664,7 @@ CLASS ZCL_AI_MCP_REST_FUN IMPLEMENTATION.
   ENDMETHOD.
 
 
-* <SIGNATURE>---------------------------------------------------------------------------------------+
-* | Instance Private Method ZCL_AI_MCP_REST_FUN->PROBE_RUN_FROM_JSON
-* +-------------------------------------------------------------------------------------------------+
-* | [--->] IV_JSON                        TYPE        STRING
-* | [<-()] RV_JSON                        TYPE        STRING
-* +--------------------------------------------------------------------------------------</SIGNATURE>
-  METHOD probe_run_from_json.
+METHOD probe_run_from_json.
     DATA ls_request TYPE ty_probe_run_request.
     DATA lv_runner TYPE syrepid.
     DATA lv_memid TYPE c LENGTH 80.
@@ -7198,13 +6750,7 @@ CLASS ZCL_AI_MCP_REST_FUN IMPLEMENTATION.
   ENDMETHOD.
 
 
-* <SIGNATURE>---------------------------------------------------------------------------------------+
-* | Instance Private Method ZCL_AI_MCP_REST_FUN->READ_FUNCTION_FROM_JSON
-* +-------------------------------------------------------------------------------------------------+
-* | [--->] IV_JSON                        TYPE        STRING
-* | [<-()] RV_JSON                        TYPE        STRING
-* +--------------------------------------------------------------------------------------</SIGNATURE>
-  METHOD read_function_from_json.
+METHOD read_function_from_json.
     DATA ls_request TYPE ty_function_check_request.
     DATA lv_function_name TYPE rs38l-name.
     DATA lv_function_group TYPE rs38l-area.
@@ -7362,13 +6908,7 @@ CLASS ZCL_AI_MCP_REST_FUN IMPLEMENTATION.
   ENDMETHOD.
 
 
-* <SIGNATURE>---------------------------------------------------------------------------------------+
-* | Instance Private Method ZCL_AI_MCP_REST_FUN->READ_FUNCTION_GROUP_FROM_JSON
-* +-------------------------------------------------------------------------------------------------+
-* | [--->] IV_JSON                        TYPE        STRING
-* | [<-()] RV_JSON                        TYPE        STRING
-* +--------------------------------------------------------------------------------------</SIGNATURE>
-  METHOD read_function_group_from_json.
+METHOD read_function_group_from_json.
     DATA ls_request TYPE ty_function_group_read_request.
     DATA lv_function_group TYPE rs38l-area.
     DATA lv_program TYPE syrepid.
@@ -7590,13 +7130,7 @@ CLASS ZCL_AI_MCP_REST_FUN IMPLEMENTATION.
   ENDMETHOD.
 
 
-* <SIGNATURE>---------------------------------------------------------------------------------------+
-* | Instance Private Method ZCL_AI_MCP_REST_FUN->READ_OBJECT_FROM_JSON
-* +-------------------------------------------------------------------------------------------------+
-* | [--->] IV_JSON                        TYPE        STRING
-* | [<-()] RV_JSON                        TYPE        STRING
-* +--------------------------------------------------------------------------------------</SIGNATURE>
-  METHOD read_object_from_json.
+METHOD read_object_from_json.
     DATA ls_request TYPE ty_read_request.
     DATA lv_object_type TYPE string.
     DATA lv_program TYPE syrepid.
@@ -7827,14 +7361,7 @@ CLASS ZCL_AI_MCP_REST_FUN IMPLEMENTATION.
   ENDMETHOD.
 
 
-* <SIGNATURE>---------------------------------------------------------------------------------------+
-* | Instance Private Method ZCL_AI_MCP_REST_FUN->REGISTER_CLASS_TADIR_ENTRIES
-* +-------------------------------------------------------------------------------------------------+
-* | [--->] IV_CLASS_NAME                  TYPE        SEOCLSNAME
-* | [--->] IV_PACKAGE                     TYPE        DEVCLASS
-* | [<-()] RV_JSON                        TYPE        STRING
-* +--------------------------------------------------------------------------------------</SIGNATURE>
-  METHOD register_class_tadir_entries.
+METHOD register_class_tadir_entries.
     DATA lv_package TYPE devclass.
     DATA lv_class TYPE tadir-obj_name.
     DATA lv_result TYPE string.
@@ -7856,16 +7383,7 @@ CLASS ZCL_AI_MCP_REST_FUN IMPLEMENTATION.
   ENDMETHOD.
 
 
-* <SIGNATURE>---------------------------------------------------------------------------------------+
-* | Instance Private Method ZCL_AI_MCP_REST_FUN->REGISTER_CTS_OBJECT
-* +-------------------------------------------------------------------------------------------------+
-* | [--->] IV_OBJECT_TYPE                 TYPE        TROBJTYPE
-* | [--->] IV_OBJECT_NAME                 TYPE        CSEQUENCE
-* | [--->] IV_PACKAGE                     TYPE        DEVCLASS
-* | [--->] IV_TRANSPORT                   TYPE        TRKORR
-* | [<-()] RV_JSON                        TYPE        STRING
-* +--------------------------------------------------------------------------------------</SIGNATURE>
-  METHOD register_cts_object.
+METHOD register_cts_object.
     DATA lv_package TYPE devclass.
     DATA lv_transport TYPE trkorr.
     DATA lv_object TYPE tadir-obj_name.
@@ -7918,16 +7436,7 @@ CLASS ZCL_AI_MCP_REST_FUN IMPLEMENTATION.
   ENDMETHOD.
 
 
-* <SIGNATURE>---------------------------------------------------------------------------------------+
-* | Instance Private Method ZCL_AI_MCP_REST_FUN->REGISTER_TADIR_ENTRY
-* +-------------------------------------------------------------------------------------------------+
-* | [--->] IV_PGMID                       TYPE        TADIR-PGMID
-* | [--->] IV_OBJECT_TYPE                 TYPE        TADIR-OBJECT
-* | [--->] IV_OBJECT_NAME                 TYPE        CSEQUENCE
-* | [--->] IV_PACKAGE                     TYPE        DEVCLASS
-* | [<-()] RV_JSON                        TYPE        STRING
-* +--------------------------------------------------------------------------------------</SIGNATURE>
-  METHOD register_tadir_entry.
+METHOD register_tadir_entry.
     DATA lv_pgmid TYPE tadir-pgmid.
     DATA lv_object_type TYPE tadir-object.
     DATA lv_object TYPE tadir-obj_name.
@@ -7987,13 +7496,7 @@ CLASS ZCL_AI_MCP_REST_FUN IMPLEMENTATION.
   ENDMETHOD.
 
 
-* <SIGNATURE>---------------------------------------------------------------------------------------+
-* | Instance Private Method ZCL_AI_MCP_REST_FUN->RUN
-* +-------------------------------------------------------------------------------------------------+
-* | [--->] IV_JSON                        TYPE        STRING
-* | [<-()] RV_JSON                        TYPE        STRING
-* +--------------------------------------------------------------------------------------</SIGNATURE>
-  METHOD run.
+METHOD run.
     DATA(lv_ddic_result) = create_ddic_from_json( iv_json ).
     IF lv_ddic_result CS '"status":"ERROR"'.
       rv_json = |\{"status":"ERROR","stage":"DDIC_CREATE","ddic":{ lv_ddic_result },"message":"DDIC creation failed; source save and program check were skipped"\}|.
@@ -8021,13 +7524,7 @@ CLASS ZCL_AI_MCP_REST_FUN IMPLEMENTATION.
   ENDMETHOD.
 
 
-* <SIGNATURE>---------------------------------------------------------------------------------------+
-* | Instance Private Method ZCL_AI_MCP_REST_FUN->SAVE_CLASS
-* +-------------------------------------------------------------------------------------------------+
-* | [--->] IS_REQUEST                     TYPE        TY_SOURCE_REQUEST
-* | [<-()] RV_JSON                        TYPE        STRING
-* +--------------------------------------------------------------------------------------</SIGNATURE>
-  METHOD save_class.
+METHOD save_class.
     DATA lt_source TYPE STANDARD TABLE OF string WITH EMPTY KEY.
     DATA lv_class TYPE seoclsname.
     DATA lv_package TYPE devclass.
@@ -8350,13 +7847,7 @@ CLASS ZCL_AI_MCP_REST_FUN IMPLEMENTATION.
   ENDMETHOD.
 
 
-* <SIGNATURE>---------------------------------------------------------------------------------------+
-* | Instance Private Method ZCL_AI_MCP_REST_FUN->SAVE_FUGR_MAIN_SOURCE_JSON
-* +-------------------------------------------------------------------------------------------------+
-* | [--->] IV_JSON                        TYPE        STRING
-* | [<-()] RV_JSON                        TYPE        STRING
-* +--------------------------------------------------------------------------------------</SIGNATURE>
-  METHOD save_fugr_main_source_json.
+METHOD save_fugr_main_source_json.
     DATA ls_request TYPE ty_fugr_main_source_request.
     DATA lv_program TYPE syrepid.
     DATA lv_group TYPE string.
@@ -8450,13 +7941,7 @@ CLASS ZCL_AI_MCP_REST_FUN IMPLEMENTATION.
   ENDMETHOD.
 
 
-* <SIGNATURE>---------------------------------------------------------------------------------------+
-* | Instance Private Method ZCL_AI_MCP_REST_FUN->SAVE_FUNCTION_SOURCE_FROM_JSON
-* +-------------------------------------------------------------------------------------------------+
-* | [--->] IV_JSON                        TYPE        STRING
-* | [<-()] RV_JSON                        TYPE        STRING
-* +--------------------------------------------------------------------------------------</SIGNATURE>
-  METHOD save_function_source_from_json.
+METHOD save_function_source_from_json.
     DATA ls_request TYPE ty_function_source_request.
     DATA lv_function_name TYPE rs38l-name.
     DATA lv_function_group TYPE rs38l-area.
@@ -8539,13 +8024,7 @@ CLASS ZCL_AI_MCP_REST_FUN IMPLEMENTATION.
   ENDMETHOD.
 
 
-* <SIGNATURE>---------------------------------------------------------------------------------------+
-* | Instance Private Method ZCL_AI_MCP_REST_FUN->SAVE_INCLUDE_SOURCE_FROM_JSON
-* +-------------------------------------------------------------------------------------------------+
-* | [--->] IV_JSON                        TYPE        STRING
-* | [<-()] RV_JSON                        TYPE        STRING
-* +--------------------------------------------------------------------------------------</SIGNATURE>
-  METHOD save_include_source_from_json.
+METHOD save_include_source_from_json.
     DATA ls_request TYPE ty_include_source_request.
     DATA lv_function_group TYPE rs38l-area.
     DATA lv_include TYPE syrepid.
@@ -8617,13 +8096,7 @@ CLASS ZCL_AI_MCP_REST_FUN IMPLEMENTATION.
   ENDMETHOD.
 
 
-* <SIGNATURE>---------------------------------------------------------------------------------------+
-* | Instance Private Method ZCL_AI_MCP_REST_FUN->SAVE_REPORT
-* +-------------------------------------------------------------------------------------------------+
-* | [--->] IS_REQUEST                     TYPE        TY_SOURCE_REQUEST
-* | [<-()] RV_JSON                        TYPE        STRING
-* +--------------------------------------------------------------------------------------</SIGNATURE>
-  METHOD save_report.
+METHOD save_report.
     DATA lt_source TYPE STANDARD TABLE OF string WITH EMPTY KEY.
     DATA lv_program TYPE progname.
     DATA lv_package TYPE devclass.
@@ -8711,13 +8184,7 @@ CLASS ZCL_AI_MCP_REST_FUN IMPLEMENTATION.
   ENDMETHOD.
 
 
-* <SIGNATURE>---------------------------------------------------------------------------------------+
-* | Instance Private Method ZCL_AI_MCP_REST_FUN->SAVE_SOURCE_FROM_JSON
-* +-------------------------------------------------------------------------------------------------+
-* | [--->] IV_JSON                        TYPE        STRING
-* | [<-()] RV_JSON                        TYPE        STRING
-* +--------------------------------------------------------------------------------------</SIGNATURE>
-  METHOD save_source_from_json.
+METHOD save_source_from_json.
     DATA ls_request TYPE ty_source_request.
 
     /ui2/cl_json=>deserialize(
@@ -8740,13 +8207,7 @@ CLASS ZCL_AI_MCP_REST_FUN IMPLEMENTATION.
   ENDMETHOD.
 
 
-* <SIGNATURE>---------------------------------------------------------------------------------------+
-* | Instance Private Method ZCL_AI_MCP_REST_FUN->STATUS_FROM_JSON
-* +-------------------------------------------------------------------------------------------------+
-* | [--->] IV_JSON                        TYPE        STRING
-* | [<-()] RV_JSON                        TYPE        STRING
-* +--------------------------------------------------------------------------------------</SIGNATURE>
-  METHOD status_from_json.
+METHOD status_from_json.
     DATA ls_request TYPE ty_ddic_request.
     DATA lv_results TYPE string VALUE '['.
 
@@ -8783,13 +8244,7 @@ CLASS ZCL_AI_MCP_REST_FUN IMPLEMENTATION.
   ENDMETHOD.
 
 
-* <SIGNATURE>---------------------------------------------------------------------------------------+
-* | Instance Private Method ZCL_AI_MCP_REST_FUN->SYNTAX_CHECK_SOURCE
-* +-------------------------------------------------------------------------------------------------+
-* | [--->] IS_REQUEST                     TYPE        TY_CHECK_REQUEST
-* | [<-()] RV_JSON                        TYPE        STRING
-* +--------------------------------------------------------------------------------------</SIGNATURE>
-  METHOD syntax_check_source.
+METHOD syntax_check_source.
     DATA lt_source TYPE STANDARD TABLE OF string WITH EMPTY KEY.
     DATA lv_message TYPE string.
     DATA lv_line TYPE i.
@@ -8827,13 +8282,7 @@ CLASS ZCL_AI_MCP_REST_FUN IMPLEMENTATION.
   ENDMETHOD.
 
 
-* <SIGNATURE>---------------------------------------------------------------------------------------+
-* | Instance Private Method ZCL_AI_MCP_REST_FUN->TABLE_EXISTS
-* +-------------------------------------------------------------------------------------------------+
-* | [--->] IV_NAME                        TYPE        STRING
-* | [<-()] RV_EXISTS                      TYPE        ABAP_BOOL
-* +--------------------------------------------------------------------------------------</SIGNATURE>
-  METHOD table_exists.
+METHOD table_exists.
     DATA lv_tabname TYPE dd02l-tabname.
 
     SELECT SINGLE tabname
@@ -8846,11 +8295,7 @@ CLASS ZCL_AI_MCP_REST_FUN IMPLEMENTATION.
   ENDMETHOD.
 
 
-* <SIGNATURE>---------------------------------------------------------------------------------------+
-* | Instance Private Method ZCL_AI_MCP_REST_FUN->TEXTPOOL_SAVE_FROM_JSON
-* +-------------------------------------------------------------------------------------------------+
-* +--------------------------------------------------------------------------------------</SIGNATURE>
-  METHOD textpool_save_from_json.
+METHOD textpool_save_from_json.
     TYPES: BEGIN OF ty_textpool_work,
              requested_key TYPE string,
              id            TYPE string,
@@ -9178,11 +8623,7 @@ CLASS ZCL_AI_MCP_REST_FUN IMPLEMENTATION.
   ENDMETHOD.
 
 
-* <SIGNATURE>---------------------------------------------------------------------------------------+
-* | Instance Private Method ZCL_AI_MCP_REST_FUN->VALIDATE_FUGR_INCLUDE_WRITE
-* +-------------------------------------------------------------------------------------------------+
-* +--------------------------------------------------------------------------------------</SIGNATURE>
-  METHOD validate_fugr_include_write.
+METHOD validate_fugr_include_write.
     DATA lv_function_group TYPE string.
     DATA lv_include TYPE string.
     DATA lv_prefix TYPE string.
@@ -9243,13 +8684,7 @@ CLASS ZCL_AI_MCP_REST_FUN IMPLEMENTATION.
   ENDMETHOD.
 
 
-* <SIGNATURE>---------------------------------------------------------------------------------------+
-* | Instance Private Method ZCL_AI_MCP_REST_FUN->VALIDATE_NAMES
-* +-------------------------------------------------------------------------------------------------+
-* | [--->] IS_REQUEST                     TYPE        TY_DDIC_REQUEST
-* | [<-()] RV_JSON                        TYPE        STRING
-* +--------------------------------------------------------------------------------------</SIGNATURE>
-  METHOD validate_names.
+METHOD validate_names.
     DATA lv_messages TYPE string VALUE '['.
     DATA lt_domain_names TYPE STANDARD TABLE OF string WITH EMPTY KEY.
     DATA lt_dtel_names TYPE STANDARD TABLE OF string WITH EMPTY KEY.
@@ -9382,13 +8817,7 @@ CLASS ZCL_AI_MCP_REST_FUN IMPLEMENTATION.
   ENDMETHOD.
 
 
-* <SIGNATURE>---------------------------------------------------------------------------------------+
-* | Instance Private Method ZCL_AI_MCP_REST_FUN->VALIDATE_NAMES_FROM_JSON
-* +-------------------------------------------------------------------------------------------------+
-* | [--->] IV_JSON                        TYPE        STRING
-* | [<-()] RV_JSON                        TYPE        STRING
-* +--------------------------------------------------------------------------------------</SIGNATURE>
-  METHOD validate_names_from_json.
+METHOD validate_names_from_json.
     DATA ls_request TYPE ty_ddic_request.
 
     TRY.
@@ -9404,14 +8833,7 @@ CLASS ZCL_AI_MCP_REST_FUN IMPLEMENTATION.
   ENDMETHOD.
 
 
-* <SIGNATURE>---------------------------------------------------------------------------------------+
-* | Instance Private Method ZCL_AI_MCP_REST_FUN->WRITE_JSON
-* +-------------------------------------------------------------------------------------------------+
-* | [--->] IO_SERVER                      TYPE REF TO IF_HTTP_SERVER
-* | [--->] IV_STATUS                      TYPE        I
-* | [--->] IV_JSON                        TYPE        STRING
-* +--------------------------------------------------------------------------------------</SIGNATURE>
-  METHOD write_json.
+METHOD write_json.
     io_server->response->set_status( code = iv_status reason = 'OK' ).
     io_server->response->set_header_field( name = 'Content-Type' value = 'application/json; charset=utf-8' ).
     io_server->response->set_cdata( iv_json ).
