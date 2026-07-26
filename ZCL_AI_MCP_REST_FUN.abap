@@ -558,6 +558,19 @@ CLASS zcl_ai_mcp_rest_fun DEFINITION
     METHODS handle_dynpro_import_layout
       IMPORTING io_server TYPE REF TO if_http_server.
 
+    TYPES: BEGIN OF ty_transport_create_request,
+             description   TYPE string,
+             type          TYPE string,
+             target_system TYPE string,
+           END OF ty_transport_create_request.
+
+    METHODS handle_transport_create
+      IMPORTING io_server TYPE REF TO if_http_server.
+
+    METHODS transport_create_from_json
+      IMPORTING iv_json TYPE string
+      RETURNING VALUE(rv_json) TYPE string.
+
     METHODS run
       IMPORTING iv_json TYPE string
       RETURNING VALUE(rv_json) TYPE string.
@@ -4139,6 +4152,8 @@ CLASS ZCL_AI_MCP_REST_FUN IMPLEMENTATION.
             handle_dynpro_import_cctrl( server ).
           WHEN '/dynpro/import_layout'.
             handle_dynpro_import_layout( server ).
+          WHEN '/transport/create'.
+            handle_transport_create( server ).
           WHEN OTHERS.
             write_json(
               io_server = server
@@ -9400,5 +9415,70 @@ CLASS ZCL_AI_MCP_REST_FUN IMPLEMENTATION.
     io_server->response->set_status( code = iv_status reason = 'OK' ).
     io_server->response->set_header_field( name = 'Content-Type' value = 'application/json; charset=utf-8' ).
     io_server->response->set_cdata( iv_json ).
+  ENDMETHOD.
+
+
+* <SIGNATURE>---------------------------------------------------------------------------------------+
+* | Instance Private Method ZCL_AI_MCP_REST_FUN->HANDLE_TRANSPORT_CREATE
+* +-------------------------------------------------------------------------------------------------+
+* | [--->] IO_SERVER                      TYPE REF TO IF_HTTP_SERVER
+* +--------------------------------------------------------------------------------------</SIGNATURE>
+  METHOD handle_transport_create.
+    DATA(lv_result) = transport_create_from_json( io_server->request->get_cdata( ) ).
+    write_json( io_server = io_server iv_status = 200 iv_json = lv_result ).
+  ENDMETHOD.
+
+
+* <SIGNATURE>---------------------------------------------------------------------------------------+
+* | Instance Private Method ZCL_AI_MCP_REST_FUN->TRANSPORT_CREATE_FROM_JSON
+* +-------------------------------------------------------------------------------------------------+
+* | [--->] IV_JSON                        TYPE        STRING
+* | [<-()] RV_JSON                        TYPE        STRING
+* +--------------------------------------------------------------------------------------</SIGNATURE>
+  METHOD transport_create_from_json.
+    DATA ls_req TYPE ty_transport_create_request.
+    DATA lv_trkorr TYPE trkorr.
+    DATA lv_type TYPE trfunction VALUE 'K'.
+    DATA lv_text TYPE as4text.
+    DATA lv_target TYPE trtarget.
+
+    TRY.
+        /ui2/cl_json=>deserialize(
+          EXPORTING json = iv_json
+          CHANGING  data = ls_req ).
+      CATCH cx_root INTO DATA(lx_err).
+        rv_json = |\{"status":"ERROR","message":"JSON parse error: { escape( val = lx_err->get_text( ) format = cl_abap_format=>e_json_string ) }"\}|.
+        RETURN.
+    ENDTRY.
+
+    IF ls_req-description IS INITIAL.
+      rv_json = '{"status":"ERROR","message":"description is required"}'.
+      RETURN.
+    ENDIF.
+
+    lv_text = ls_req-description.
+    IF ls_req-type IS NOT INITIAL.
+      lv_type = to_upper( ls_req-type ).
+    ENDIF.
+    IF ls_req-target_system IS NOT INITIAL.
+      lv_target = to_upper( ls_req-target_system ).
+    ENDIF.
+
+    CALL FUNCTION 'TR_INSERT_REQUEST_WITH_TASKS'
+      EXPORTING
+        iv_type           = lv_type
+        iv_text           = lv_text
+        iv_owner          = sy-uname
+        iv_target         = lv_target
+      IMPORTING
+        ev_trkorr         = lv_trkorr
+      EXCEPTIONS
+        OTHERS            = 1.
+
+    IF sy-subrc = 0 AND lv_trkorr IS NOT INITIAL.
+      rv_json = |\{"status":"OK","trkorr":"{ lv_trkorr }","type":"{ lv_type }","description":"{ escape( val = lv_text format = cl_abap_format=>e_json_string ) }","owner":"{ sy-uname }"\}|.
+    ELSE.
+      rv_json = |\{"status":"ERROR","message":"Failed to create transport request in SAP, subrc={ sy-subrc }"\}|.
+    ENDIF.
   ENDMETHOD.
 ENDCLASS.
