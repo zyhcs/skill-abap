@@ -1,4 +1,8 @@
-﻿# Report Playbook
+# Report Playbook
+
+## Default Report Template
+
+When generating or creating new ABAP report programs, ALWAYS load and use `templates/report_standard_alv_template.abap` as the mandatory base template unless the user explicitly requests a different template or structure.
 
 ## Create Or Update Report
 
