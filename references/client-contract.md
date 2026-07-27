@@ -1,4 +1,4 @@
-﻿# SAP AI MCP Client Contract
+# SAP AI MCP Client Contract
 
 Use `scripts/sap_ai_mcp_client.py` as the default entrypoint for repeated SAP AI MCP REST operations. Keep `scripts/sap_ai_mcp_call.py` for raw HTTP debugging.
 Use `scripts/sap_ai_mcp_debug.py` for one-off read-only debug inspection. It must not expose write endpoints, must generate payloads internally from typed commands, and must print only compact summaries plus `log_dir` unless `--full-source` is supplied.
@@ -55,6 +55,12 @@ Use `scripts/sap_ai_mcp_debug.py` for one-off read-only debug inspection. It mus
 | `call dynpro_import_screen payload.json --allow-dangerous` | `/dynpro/import_screen`; creates or replaces a generated Dynpro screen from `screen_elements[]` plus optional `flow_logic`, without `table_control` or `custom_controls`; optional `screen_type = "I"` creates a true subscreen, omitted/default remains normal type `N` |
 | `call dynpro_import_custom_control payload.json --allow-dangerous` | `/dynpro/import_custom_control`; creates or replaces a generated Dynpro screen with Dynpro `CUST_CTRL` containers for OO ALV/custom controls without changing `/dynpro/import_from_json` table-control behavior; custom controls must not be duplicated in `screen_elements[]` |
 | `call dynpro_import_layout payload.json --allow-dangerous` | `/dynpro/import_layout`; creates or replaces a generated Dynpro screen with explicit `containers[]` and `screen_elements[]`, including `SUBSCREEN` and `STRIP_CTRL` tabstrip layouts, without changing existing Dynpro import endpoints; optional `screen_type = "I"` creates a true subscreen, omitted/default remains normal type `N` |
+| `call function_execute payload.json --allow-dangerous` | `/function/execute`; dynamically calls a Function Module with parameter deserialization and structured result |
+| `call transport_search payload.json` | `/transport/search`; searches unreleased TRs for user |
+| `call transport_create payload.json --allow-dangerous` | `/transport/create`; creates a new Workbench TR or Transport of Copies (TOC) |
+| `call transport_copy payload.json --allow-dangerous` | `/transport/copy`; copies physical objects from source TR into target TOC |
+| `call transport_release payload.json --allow-dangerous` | `/transport/release`; releases TR and auto-bypasses locking check for TOCs |
+| `call transport_import payload.json --allow-dangerous` | `/transport/import`; triggers TMS import into target system/client |
 
 
 Generated include save payloads must include `function_group`, `include_name`, and full `source_code`; pass `check_function` when a function group syntax check should run after saving. `/include/source_save` intentionally rejects `Uxx` includes so function module source changes keep using `/function/source_save` and its `function_name`-based validation.

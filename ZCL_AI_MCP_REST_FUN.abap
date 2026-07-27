@@ -1,12 +1,36 @@
-CLASS zcl_ai_mcp_rest_fun DEFINITION
+class-pool .
+*"* class pool for class ZCL_AI_MCP_REST_FUN
+
+*"* local type definitions
+include ZCL_AI_MCP_REST_FUN===========ccdef.
+* >>> BEGIN INCLUDE ZCL_AI_MCP_REST_FUN===========CCDEF
+*"* use this source file for any type of declarations (class
+*"* definitions, interfaces or type declarations) you need for
+*"* components in the private section
+
+* <<< END INCLUDE ZCL_AI_MCP_REST_FUN===========CCDEF
+
+*"* class ZCL_AI_MCP_REST_FUN definition
+*"* public declarations
+  include ZCL_AI_MCP_REST_FUN===========cu.
+* >>> BEGIN INCLUDE ZCL_AI_MCP_REST_FUN===========CU
+CLASS ZCL_AI_MCP_REST_FUN DEFINITION
   PUBLIC
   FINAL
-  CREATE PUBLIC .
+  CREATE PUBLIC.
 
   PUBLIC SECTION.
+    INTERFACES: if_http_extension.
 
-    INTERFACES if_http_extension .
-  PROTECTED SECTION.
+* <<< END INCLUDE ZCL_AI_MCP_REST_FUN===========CU
+*"* protected declarations
+  include ZCL_AI_MCP_REST_FUN===========co.
+* >>> BEGIN INCLUDE ZCL_AI_MCP_REST_FUN===========CO
+
+* <<< END INCLUDE ZCL_AI_MCP_REST_FUN===========CO
+*"* private declarations
+  include ZCL_AI_MCP_REST_FUN===========ci.
+* >>> BEGIN INCLUDE ZCL_AI_MCP_REST_FUN===========CI
   PRIVATE SECTION.
     TYPES: BEGIN OF ty_domain_value,
              low         TYPE string,
@@ -450,6 +474,20 @@ CLASS zcl_ai_mcp_rest_fun DEFINITION
              flow_logic              TYPE tt_dynpro_flow_lines,
            END OF ty_dynpro_layout_request.
 
+    TYPES: BEGIN OF ty_function_execute_req,
+             function_name TYPE string,
+             importing     TYPE REF TO data,
+             changing      TYPE REF TO data,
+             tables        TYPE REF TO data,
+           END OF ty_function_execute_req.
+
+    TYPES: BEGIN OF ty_function_execute_res,
+             status     TYPE string,
+             subrc      TYPE i,
+             message    TYPE string,
+             parameters TYPE abap_func_parmbind_tab,
+           END OF ty_function_execute_res.
+
     METHODS handle_run
       IMPORTING io_server TYPE REF TO if_http_server.
 
@@ -478,6 +516,9 @@ CLASS zcl_ai_mcp_rest_fun DEFINITION
       IMPORTING io_server TYPE REF TO if_http_server.
 
     METHODS handle_function_check
+      IMPORTING io_server TYPE REF TO if_http_server.
+
+    METHODS handle_function_execute
       IMPORTING io_server TYPE REF TO if_http_server.
 
     METHODS handle_function_read
@@ -558,19 +599,6 @@ CLASS zcl_ai_mcp_rest_fun DEFINITION
     METHODS handle_dynpro_import_layout
       IMPORTING io_server TYPE REF TO if_http_server.
 
-    TYPES: BEGIN OF ty_transport_create_request,
-             description   TYPE string,
-             type          TYPE string,
-             target_system TYPE string,
-           END OF ty_transport_create_request.
-
-    METHODS handle_transport_create
-      IMPORTING io_server TYPE REF TO if_http_server.
-
-    METHODS transport_create_from_json
-      IMPORTING iv_json TYPE string
-      RETURNING VALUE(rv_json) TYPE string.
-
     METHODS run
       IMPORTING iv_json TYPE string
       RETURNING VALUE(rv_json) TYPE string.
@@ -616,6 +644,10 @@ CLASS zcl_ai_mcp_rest_fun DEFINITION
       RETURNING VALUE(rv_json) TYPE string.
 
     METHODS check_function_from_json
+      IMPORTING iv_json TYPE string
+      RETURNING VALUE(rv_json) TYPE string.
+
+    METHODS function_execute_from_json
       IMPORTING iv_json TYPE string
       RETURNING VALUE(rv_json) TYPE string.
 
@@ -867,14 +899,36 @@ CLASS zcl_ai_mcp_rest_fun DEFINITION
         io_server TYPE REF TO if_http_server
         iv_status TYPE i
         iv_json   TYPE string.
-ENDCLASS.
+* <<< END INCLUDE ZCL_AI_MCP_REST_FUN===========CI
+endclass. "ZCL_AI_MCP_REST_FUN definition
 
+*"* macro definitions
+include ZCL_AI_MCP_REST_FUN===========ccmac.
+* >>> BEGIN INCLUDE ZCL_AI_MCP_REST_FUN===========CCMAC
+*"* use this source file for any macro definitions you need
+*"* in the implementation part of the class
 
+* <<< END INCLUDE ZCL_AI_MCP_REST_FUN===========CCMAC
+*"* local class implementation
+include ZCL_AI_MCP_REST_FUN===========ccimp.
+* >>> BEGIN INCLUDE ZCL_AI_MCP_REST_FUN===========CCIMP
+*"* use this source file for the definition and implementation of
+*"* local helper classes, interface definitions and type
+*"* declarations
 
-CLASS ZCL_AI_MCP_REST_FUN IMPLEMENTATION.
+* <<< END INCLUDE ZCL_AI_MCP_REST_FUN===========CCIMP
 
+*"* test class
+include ZCL_AI_MCP_REST_FUN===========ccau.
+* >>> BEGIN INCLUDE ZCL_AI_MCP_REST_FUN===========CCAU
+*"* use this source file for your ABAP unit test classes
+* <<< END INCLUDE ZCL_AI_MCP_REST_FUN===========CCAU
 
-METHOD activate_class.
+class ZCL_AI_MCP_REST_FUN implementation.
+*"* method's implementations
+  include methods.
+* >>> BEGIN METHOD INCLUDE ZCL_AI_MCP_REST_FUN===========CM001
+  METHOD activate_class.
     DATA lv_class TYPE seoclsname.
     DATA ls_clskey TYPE seoclskey.
     DATA ls_active_class TYPE vseoclass.
@@ -989,9 +1043,9 @@ METHOD activate_class.
 
     rv_json = |\{"status":"OK","object_type":"CLAS","object_name":"{ lv_class }","message":"Class activated"\}|.
   ENDMETHOD.
-
-
-METHOD activate_from_json.
+* <<< END METHOD INCLUDE ZCL_AI_MCP_REST_FUN===========CM001
+* >>> BEGIN METHOD INCLUDE ZCL_AI_MCP_REST_FUN===========CM002
+  METHOD activate_from_json.
     DATA ls_request TYPE ty_activate_request.
     DATA lv_object_type TYPE string.
 
@@ -1015,9 +1069,9 @@ METHOD activate_from_json.
                   |"message":"Only PROG/REPORT and CLAS/CLASS activation are implemented"\}|.
     ENDCASE.
   ENDMETHOD.
-
-
-METHOD activate_report.
+* <<< END METHOD INCLUDE ZCL_AI_MCP_REST_FUN===========CM002
+* >>> BEGIN METHOD INCLUDE ZCL_AI_MCP_REST_FUN===========CM003
+  METHOD activate_report.
     DATA lv_program TYPE syrepid.
     DATA lv_message TYPE string.
     DATA lv_line TYPE i.
@@ -1040,9 +1094,9 @@ METHOD activate_report.
                 |"suggestion":"Fix the report source and retry activation"\}|.
     ENDIF.
   ENDMETHOD.
-
-
-METHOD append_bdc_field.
+* <<< END METHOD INCLUDE ZCL_AI_MCP_REST_FUN===========CM003
+* >>> BEGIN METHOD INCLUDE ZCL_AI_MCP_REST_FUN===========CM004
+  METHOD append_bdc_field.
     DATA ls_bdcdata TYPE bdcdata.
 
     CLEAR ls_bdcdata.
@@ -1056,9 +1110,9 @@ METHOD append_bdc_field.
     ENDIF.
     APPEND ls_bdcdata TO ct_bdcdata.
   ENDMETHOD.
-
-
-METHOD append_cts_object.
+* <<< END METHOD INCLUDE ZCL_AI_MCP_REST_FUN===========CM004
+* >>> BEGIN METHOD INCLUDE ZCL_AI_MCP_REST_FUN===========CM005
+  METHOD append_cts_object.
     DATA lv_object TYPE tadir-obj_name.
     DATA lv_object_type TYPE e071-object.
     DATA lv_transport TYPE e070-trkorr.
@@ -1116,17 +1170,17 @@ METHOD append_cts_object.
 
     rv_json = |\{"status":"OK","object_type":"{ iv_object_type }","object_name":"{ lv_object }","transport":"{ iv_transport }","message":"Object appended to CTS"\}|.
   ENDMETHOD.
-
-
-METHOD append_result.
+* <<< END METHOD INCLUDE ZCL_AI_MCP_REST_FUN===========CM005
+* >>> BEGIN METHOD INCLUDE ZCL_AI_MCP_REST_FUN===========CM006
+  METHOD append_result.
     IF cv_json <> '['.
       cv_json = cv_json && ','.
     ENDIF.
     cv_json = cv_json && iv_result.
   ENDMETHOD.
-
-
-METHOD build_fm_error_json.
+* <<< END METHOD INCLUDE ZCL_AI_MCP_REST_FUN===========CM006
+* >>> BEGIN METHOD INCLUDE ZCL_AI_MCP_REST_FUN===========CM007
+  METHOD build_fm_error_json.
     DATA lv_msgid LIKE sy-msgid.
     DATA lv_msgno LIKE sy-msgno.
     DATA lv_msgv1 LIKE sy-msgv1.
@@ -1156,9 +1210,9 @@ METHOD build_fm_error_json.
               |"subrc":{ iv_subrc },| &&
               |"suggestion":"{ escape( val = iv_suggestion format = cl_abap_format=>e_json_string ) }"\}|.
   ENDMETHOD.
-
-
-METHOD build_sy_message.
+* <<< END METHOD INCLUDE ZCL_AI_MCP_REST_FUN===========CM007
+* >>> BEGIN METHOD INCLUDE ZCL_AI_MCP_REST_FUN===========CM008
+  METHOD build_sy_message.
     DATA lv_message TYPE string.
 
     IF sy-msgid IS INITIAL OR sy-msgno IS INITIAL.
@@ -1185,9 +1239,9 @@ METHOD build_sy_message.
       rv_message = iv_fallback.
     ENDIF.
   ENDMETHOD.
-
-
-METHOD capabilities_json.
+* <<< END METHOD INCLUDE ZCL_AI_MCP_REST_FUN===========CM008
+* >>> BEGIN METHOD INCLUDE ZCL_AI_MCP_REST_FUN===========CM009
+  METHOD capabilities_json.
     rv_json = '{"status":"OK","handler":"ZCL_AI_MCP_REST_FUN",' &&
               '"features":{' &&
               '"object_read_string":true,' &&
@@ -1211,9 +1265,9 @@ METHOD capabilities_json.
               '"analysis_only":false' &&
               '}}'.
   ENDMETHOD.
-
-
-METHOD check_from_json.
+* <<< END METHOD INCLUDE ZCL_AI_MCP_REST_FUN===========CM009
+* >>> BEGIN METHOD INCLUDE ZCL_AI_MCP_REST_FUN===========CM00A
+  METHOD check_from_json.
     DATA ls_request TYPE ty_check_request.
     DATA lv_object_type TYPE string.
 
@@ -1235,9 +1289,9 @@ METHOD check_from_json.
 
     rv_json = syntax_check_source( ls_request ).
   ENDMETHOD.
-
-
-METHOD check_function_from_json.
+* <<< END METHOD INCLUDE ZCL_AI_MCP_REST_FUN===========CM00A
+* >>> BEGIN METHOD INCLUDE ZCL_AI_MCP_REST_FUN===========CM00B
+  METHOD check_function_from_json.
     DATA ls_request TYPE ty_function_check_request.
     DATA lv_function_name TYPE rs38l-name.
     DATA lv_function_group TYPE rs38l-area.
@@ -1317,9 +1371,9 @@ METHOD check_function_from_json.
                 |"message":"{ escape( val = lv_message format = cl_abap_format=>e_json_string ) }"\}]\}\}|.
     ENDIF.
   ENDMETHOD.
-
-
-METHOD class_methods_from_json.
+* <<< END METHOD INCLUDE ZCL_AI_MCP_REST_FUN===========CM00B
+* >>> BEGIN METHOD INCLUDE ZCL_AI_MCP_REST_FUN===========CM00C
+  METHOD class_methods_from_json.
     DATA ls_request TYPE ty_class_methods_request.
     DATA lv_class TYPE seoclsname.
     DATA lt_methods TYPE STANDARD TABLE OF vseomethod WITH EMPTY KEY.
@@ -1385,9 +1439,9 @@ METHOD class_methods_from_json.
     lv_parameters = lv_parameters && ']'.
     rv_json = |\{"status":"OK","class_name":"{ lv_class }","methods":{ lv_methods },"parameters":{ lv_parameters }\}|.
   ENDMETHOD.
-
-
-METHOD class_method_read_from_json.
+* <<< END METHOD INCLUDE ZCL_AI_MCP_REST_FUN===========CM00C
+* >>> BEGIN METHOD INCLUDE ZCL_AI_MCP_REST_FUN===========CM00D
+  METHOD class_method_read_from_json.
     DATA ls_request TYPE ty_class_method_read_request.
     DATA lv_class TYPE seoclsname.
     DATA lv_method TYPE seocmpname.
@@ -1585,9 +1639,9 @@ METHOD class_method_read_from_json.
       rv_json = rv_json && |\}|.
     ENDIF.
   ENDMETHOD.
-
-
-METHOD create_data_element.
+* <<< END METHOD INCLUDE ZCL_AI_MCP_REST_FUN===========CM00D
+* >>> BEGIN METHOD INCLUDE ZCL_AI_MCP_REST_FUN===========CM00E
+  METHOD create_data_element.
     DATA ls_dd04v TYPE dd04v.
     DATA lv_dtel_name TYPE ddobjname.
     DATA lv_as4local TYPE dd04l-as4local.
@@ -1741,9 +1795,9 @@ METHOD create_data_element.
                 |"suggestion":"Activation returned without active DD04L version; inspect SAP activation log"\}|.
     ENDIF.
   ENDMETHOD.
-
-
-METHOD create_ddic_from_json.
+* <<< END METHOD INCLUDE ZCL_AI_MCP_REST_FUN===========CM00E
+* >>> BEGIN METHOD INCLUDE ZCL_AI_MCP_REST_FUN===========CM00F
+  METHOD create_ddic_from_json.
     DATA ls_request TYPE ty_ddic_request.
     DATA lv_results TYPE string VALUE '['.
     DATA lv_result TYPE string.
@@ -1841,9 +1895,9 @@ METHOD create_ddic_from_json.
     lv_results = lv_results && ']'.
     rv_json = |\{"status":"OK","results":{ lv_results }\}|.
   ENDMETHOD.
-
-
-METHOD create_domain.
+* <<< END METHOD INCLUDE ZCL_AI_MCP_REST_FUN===========CM00F
+* >>> BEGIN METHOD INCLUDE ZCL_AI_MCP_REST_FUN===========CM00G
+  METHOD create_domain.
     DATA ls_dd01v TYPE dd01v.
     DATA lt_dd07v TYPE STANDARD TABLE OF dd07v WITH EMPTY KEY.
     DATA lv_as4local TYPE dd01l-as4local.
@@ -1938,9 +1992,9 @@ METHOD create_domain.
                 |"suggestion":"Activation returned without active DD01L version; inspect SAP activation log"\}|.
     ENDIF.
   ENDMETHOD.
-
-
-METHOD create_function_from_json.
+* <<< END METHOD INCLUDE ZCL_AI_MCP_REST_FUN===========CM00G
+* >>> BEGIN METHOD INCLUDE ZCL_AI_MCP_REST_FUN===========CM00H
+  METHOD create_function_from_json.
     DATA ls_request TYPE ty_function_request.
     DATA lv_function_group TYPE rs38l-area.
     DATA lv_function_name TYPE rs38l-name.
@@ -2345,9 +2399,9 @@ METHOD create_function_from_json.
               |"pool_existed":{ lv_pool_existed },| &&
               |"message":"Function module created"\}|.
   ENDMETHOD.
-
-
-METHOD create_table.
+* <<< END METHOD INCLUDE ZCL_AI_MCP_REST_FUN===========CM00H
+* >>> BEGIN METHOD INCLUDE ZCL_AI_MCP_REST_FUN===========CM00I
+  METHOD create_table.
     DATA ls_dd02v TYPE dd02v.
     DATA ls_dd09l TYPE dd09l.
     DATA lt_dd03p TYPE STANDARD TABLE OF dd03p WITH EMPTY KEY.
@@ -2505,9 +2559,9 @@ METHOD create_table.
                 |"suggestion":"Activation returned without active DD02L version; inspect SAP activation log"\}|.
     ENDIF.
   ENDMETHOD.
-
-
-METHOD data_element_exists.
+* <<< END METHOD INCLUDE ZCL_AI_MCP_REST_FUN===========CM00I
+* >>> BEGIN METHOD INCLUDE ZCL_AI_MCP_REST_FUN===========CM00J
+  METHOD data_element_exists.
     DATA lv_rollname TYPE dd04l-rollname.
 
     SELECT SINGLE rollname
@@ -2518,9 +2572,9 @@ METHOD data_element_exists.
 
     rv_exists = xsdbool( sy-subrc = 0 ).
   ENDMETHOD.
-
-
-METHOD ddic_fields_from_json.
+* <<< END METHOD INCLUDE ZCL_AI_MCP_REST_FUN===========CM00J
+* >>> BEGIN METHOD INCLUDE ZCL_AI_MCP_REST_FUN===========CM00K
+  METHOD ddic_fields_from_json.
     DATA ls_request TYPE ty_ddic_fields_request.
     DATA lv_type_name TYPE dd03l-tabname.
     DATA lt_fields TYPE STANDARD TABLE OF dd03l WITH EMPTY KEY.
@@ -2567,9 +2621,9 @@ METHOD ddic_fields_from_json.
     lv_fields = lv_fields && ']'.
     rv_json = |\{"status":"OK","type_name":"{ lv_type_name }","fields":{ lv_fields }\}|.
   ENDMETHOD.
-
-
-METHOD ddic_type_from_json.
+* <<< END METHOD INCLUDE ZCL_AI_MCP_REST_FUN===========CM00K
+* >>> BEGIN METHOD INCLUDE ZCL_AI_MCP_REST_FUN===========CM00L
+  METHOD ddic_type_from_json.
     DATA ls_request TYPE ty_ddic_type_request.
     DATA lv_type_name TYPE string.
     DATA lr_data TYPE REF TO data.
@@ -2623,9 +2677,9 @@ METHOD ddic_type_from_json.
     lv_fields = lv_fields && ']'.
     rv_json = |\{"status":"OK","type_name":"{ lv_type_name }","kind":"{ lr_descr->kind }","fields":{ lv_fields }\}|.
   ENDMETHOD.
-
-
-METHOD domain_exists.
+* <<< END METHOD INCLUDE ZCL_AI_MCP_REST_FUN===========CM00L
+* >>> BEGIN METHOD INCLUDE ZCL_AI_MCP_REST_FUN===========CM00M
+  METHOD domain_exists.
     DATA lv_domname TYPE dd01l-domname.
 
     SELECT SINGLE domname
@@ -2636,9 +2690,9 @@ METHOD domain_exists.
 
     rv_exists = xsdbool( sy-subrc = 0 ).
   ENDMETHOD.
-
-
-METHOD domain_update_values_from_json.
+* <<< END METHOD INCLUDE ZCL_AI_MCP_REST_FUN===========CM00M
+* >>> BEGIN METHOD INCLUDE ZCL_AI_MCP_REST_FUN===========CM00N
+  METHOD domain_update_values_from_json.
     TYPES: BEGIN OF ty_domain_value_key,
              low  TYPE string,
              high TYPE string,
@@ -2919,9 +2973,9 @@ METHOD domain_update_values_from_json.
               |"active":{ COND string( WHEN sy-subrc = 0 AND lv_active = 'A' THEN 'true' ELSE 'false' ) },| &&
               |"cts":{ lv_cts_json },"values":{ lv_values_json }\}|.
   ENDMETHOD.
-
-
-METHOD domain_values_from_json.
+* <<< END METHOD INCLUDE ZCL_AI_MCP_REST_FUN===========CM00N
+* >>> BEGIN METHOD INCLUDE ZCL_AI_MCP_REST_FUN===========CM00O
+  METHOD domain_values_from_json.
     DATA ls_request TYPE ty_domain_values_request.
     DATA lv_domain_name TYPE dd07v-domname.
     DATA lt_values TYPE STANDARD TABLE OF dd07v WITH EMPTY KEY.
@@ -2972,9 +3026,9 @@ METHOD domain_values_from_json.
     lv_values = lv_values && ']'.
     rv_json = |\{"status":"OK","domain_name":"{ lv_domain_name }","values":{ lv_values }\}|.
   ENDMETHOD.
-
-
-METHOD dynpro_read_json.
+* <<< END METHOD INCLUDE ZCL_AI_MCP_REST_FUN===========CM00O
+* >>> BEGIN METHOD INCLUDE ZCL_AI_MCP_REST_FUN===========CM00P
+  METHOD dynpro_read_json.
     DATA ls_request TYPE ty_dynpro_read_request.
     DATA lv_program TYPE d020s-prog.
     DATA lv_screen TYPE d020s-dnum.
@@ -3214,9 +3268,9 @@ METHOD dynpro_read_json.
               |"fields_to_containers":{ lv_field_containers },| &&
               |"fields_list":{ lv_fields }\}|.
   ENDMETHOD.
-
-
-METHOD fm_interface_from_json.
+* <<< END METHOD INCLUDE ZCL_AI_MCP_REST_FUN===========CM00P
+* >>> BEGIN METHOD INCLUDE ZCL_AI_MCP_REST_FUN===========CM00Q
+  METHOD fm_interface_from_json.
     DATA ls_request TYPE ty_fm_interface_request.
     DATA lv_funcname TYPE tfdir-funcname.
     DATA lt_params TYPE STANDARD TABLE OF fupararef WITH EMPTY KEY.
@@ -3294,9 +3348,9 @@ METHOD fm_interface_from_json.
     lv_params = lv_params && ']'.
     rv_json = |\{"status":"OK","function_name":"{ lv_funcname }","parameters":{ lv_params }\}|.
   ENDMETHOD.
-
-
-METHOD get_data_element_status.
+* <<< END METHOD INCLUDE ZCL_AI_MCP_REST_FUN===========CM00Q
+* >>> BEGIN METHOD INCLUDE ZCL_AI_MCP_REST_FUN===========CM00R
+  METHOD get_data_element_status.
     DATA lv_rollname TYPE dd04l-rollname.
     DATA lv_domname TYPE dd04l-domname.
     DATA lv_as4local TYPE dd04l-as4local.
@@ -3361,9 +3415,9 @@ METHOD get_data_element_status.
                 |"message":"{ lv_reason }"\}|.
     ENDIF.
   ENDMETHOD.
-
-
-METHOD get_domain_status.
+* <<< END METHOD INCLUDE ZCL_AI_MCP_REST_FUN===========CM00R
+* >>> BEGIN METHOD INCLUDE ZCL_AI_MCP_REST_FUN===========CM00S
+  METHOD get_domain_status.
     DATA lv_domname TYPE dd01l-domname.
     DATA lv_as4local TYPE dd01l-as4local.
     DATA lv_reason TYPE string.
@@ -3400,9 +3454,9 @@ METHOD get_domain_status.
                 |"as4local":"{ lv_as4local }","tadir":{ lv_tadir_json },"message":"{ lv_reason }"\}|.
     ENDIF.
   ENDMETHOD.
-
-
-METHOD get_table_status.
+* <<< END METHOD INCLUDE ZCL_AI_MCP_REST_FUN===========CM00S
+* >>> BEGIN METHOD INCLUDE ZCL_AI_MCP_REST_FUN===========CM00T
+  METHOD get_table_status.
     DATA lv_tabname TYPE dd02l-tabname.
     DATA lv_as4local TYPE dd02l-as4local.
     DATA lv_reason TYPE string.
@@ -3439,9 +3493,9 @@ METHOD get_table_status.
                 |"as4local":"{ lv_as4local }","tadir":{ lv_tadir_json },"message":"{ lv_reason }"\}|.
     ENDIF.
   ENDMETHOD.
-
-
-METHOD get_tadir_json.
+* <<< END METHOD INCLUDE ZCL_AI_MCP_REST_FUN===========CM00T
+* >>> BEGIN METHOD INCLUDE ZCL_AI_MCP_REST_FUN===========CM00U
+  METHOD get_tadir_json.
     DATA lv_pgmid TYPE tadir-pgmid.
     DATA lv_object_type TYPE tadir-object.
     DATA lv_object TYPE tadir-obj_name.
@@ -3475,222 +3529,230 @@ METHOD get_tadir_json.
                 |"package":"","devclass":""\}|.
     ENDIF.
   ENDMETHOD.
-
-
-METHOD handle_activate.
+* <<< END METHOD INCLUDE ZCL_AI_MCP_REST_FUN===========CM00U
+* >>> BEGIN METHOD INCLUDE ZCL_AI_MCP_REST_FUN===========CM00V
+  METHOD handle_activate.
     DATA(lv_result) = activate_from_json( io_server->request->get_cdata( ) ).
     write_json( io_server = io_server iv_status = 200 iv_json = lv_result ).
   ENDMETHOD.
-
-
-METHOD handle_capabilities.
+* <<< END METHOD INCLUDE ZCL_AI_MCP_REST_FUN===========CM00V
+* >>> BEGIN METHOD INCLUDE ZCL_AI_MCP_REST_FUN===========CM00W
+  METHOD handle_capabilities.
     DATA(lv_result) = capabilities_json( ).
     write_json( io_server = io_server iv_status = 200 iv_json = lv_result ).
   ENDMETHOD.
-
-
-METHOD handle_check.
+* <<< END METHOD INCLUDE ZCL_AI_MCP_REST_FUN===========CM00W
+* >>> BEGIN METHOD INCLUDE ZCL_AI_MCP_REST_FUN===========CM00X
+  METHOD handle_check.
     DATA(lv_result) = check_from_json( io_server->request->get_cdata( ) ).
     write_json( io_server = io_server iv_status = 200 iv_json = lv_result ).
   ENDMETHOD.
-
-
-METHOD handle_class_method_read.
+* <<< END METHOD INCLUDE ZCL_AI_MCP_REST_FUN===========CM00X
+* >>> BEGIN METHOD INCLUDE ZCL_AI_MCP_REST_FUN===========CM00Y
+  METHOD handle_class_method_read.
     DATA(lv_result) = class_method_read_from_json( io_server->request->get_cdata( ) ).
     write_json( io_server = io_server iv_status = 200 iv_json = lv_result ).
   ENDMETHOD.
-
-
-METHOD handle_ddic_create.
+* <<< END METHOD INCLUDE ZCL_AI_MCP_REST_FUN===========CM00Y
+* >>> BEGIN METHOD INCLUDE ZCL_AI_MCP_REST_FUN===========CM00Z
+  METHOD handle_ddic_create.
     DATA(lv_result) = create_ddic_from_json( io_server->request->get_cdata( ) ).
     write_json( io_server = io_server iv_status = 200 iv_json = lv_result ).
   ENDMETHOD.
-
-
-METHOD handle_ddic_status.
+* <<< END METHOD INCLUDE ZCL_AI_MCP_REST_FUN===========CM00Z
+* >>> BEGIN METHOD INCLUDE ZCL_AI_MCP_REST_FUN===========CM010
+  METHOD handle_ddic_status.
     DATA(lv_result) = status_from_json( io_server->request->get_cdata( ) ).
     write_json( io_server = io_server iv_status = 200 iv_json = lv_result ).
   ENDMETHOD.
-
-
-METHOD handle_ddic_validate_names.
+* <<< END METHOD INCLUDE ZCL_AI_MCP_REST_FUN===========CM010
+* >>> BEGIN METHOD INCLUDE ZCL_AI_MCP_REST_FUN===========CM011
+  METHOD handle_ddic_validate_names.
     DATA(lv_result) = validate_names_from_json( io_server->request->get_cdata( ) ).
     write_json( io_server = io_server iv_status = 200 iv_json = lv_result ).
   ENDMETHOD.
-
-
-METHOD handle_debug_class_methods.
+* <<< END METHOD INCLUDE ZCL_AI_MCP_REST_FUN===========CM011
+* >>> BEGIN METHOD INCLUDE ZCL_AI_MCP_REST_FUN===========CM012
+  METHOD handle_debug_class_methods.
     DATA(lv_result) = class_methods_from_json( io_server->request->get_cdata( ) ).
     write_json( io_server = io_server iv_status = 200 iv_json = lv_result ).
   ENDMETHOD.
-
-
-METHOD handle_debug_ddic_fields.
+* <<< END METHOD INCLUDE ZCL_AI_MCP_REST_FUN===========CM012
+* >>> BEGIN METHOD INCLUDE ZCL_AI_MCP_REST_FUN===========CM013
+  METHOD handle_debug_ddic_fields.
     DATA(lv_result) = ddic_fields_from_json( io_server->request->get_cdata( ) ).
     write_json( io_server = io_server iv_status = 200 iv_json = lv_result ).
   ENDMETHOD.
-
-
-METHOD handle_debug_ddic_type.
+* <<< END METHOD INCLUDE ZCL_AI_MCP_REST_FUN===========CM013
+* >>> BEGIN METHOD INCLUDE ZCL_AI_MCP_REST_FUN===========CM014
+  METHOD handle_debug_ddic_type.
     DATA(lv_result) = ddic_type_from_json( io_server->request->get_cdata( ) ).
     write_json( io_server = io_server iv_status = 200 iv_json = lv_result ).
   ENDMETHOD.
-
-
-METHOD handle_debug_domain_values.
+* <<< END METHOD INCLUDE ZCL_AI_MCP_REST_FUN===========CM014
+* >>> BEGIN METHOD INCLUDE ZCL_AI_MCP_REST_FUN===========CM015
+  METHOD handle_debug_domain_values.
     DATA(lv_result) = domain_values_from_json( io_server->request->get_cdata( ) ).
     write_json( io_server = io_server iv_status = 200 iv_json = lv_result ).
   ENDMETHOD.
-
-
-METHOD handle_debug_dynpro_read.
+* <<< END METHOD INCLUDE ZCL_AI_MCP_REST_FUN===========CM015
+* >>> BEGIN METHOD INCLUDE ZCL_AI_MCP_REST_FUN===========CM016
+  METHOD handle_debug_dynpro_read.
     DATA(lv_result) = dynpro_read_json( io_server->request->get_cdata( ) ).
     write_json( io_server = io_server iv_status = 200 iv_json = lv_result ).
   ENDMETHOD.
-
-
-METHOD handle_debug_fm_interface.
+* <<< END METHOD INCLUDE ZCL_AI_MCP_REST_FUN===========CM016
+* >>> BEGIN METHOD INCLUDE ZCL_AI_MCP_REST_FUN===========CM017
+  METHOD handle_debug_fm_interface.
     DATA(lv_result) = fm_interface_from_json( io_server->request->get_cdata( ) ).
     write_json( io_server = io_server iv_status = 200 iv_json = lv_result ).
   ENDMETHOD.
-
-
-METHOD handle_debug_locks.
+* <<< END METHOD INCLUDE ZCL_AI_MCP_REST_FUN===========CM017
+* >>> BEGIN METHOD INCLUDE ZCL_AI_MCP_REST_FUN===========CM018
+  METHOD handle_debug_locks.
     DATA(lv_result) = locks_from_json( io_server->request->get_cdata( ) ).
     write_json( io_server = io_server iv_status = 200 iv_json = lv_result ).
   ENDMETHOD.
-
-
-METHOD handle_doma_values_update.
+* <<< END METHOD INCLUDE ZCL_AI_MCP_REST_FUN===========CM018
+* >>> BEGIN METHOD INCLUDE ZCL_AI_MCP_REST_FUN===========CM019
+  METHOD handle_doma_values_update.
     DATA(lv_result) = domain_update_values_from_json( io_server->request->get_cdata( ) ).
     write_json( io_server = io_server iv_status = 200 iv_json = lv_result ).
   ENDMETHOD.
-
-
-METHOD handle_dynpro_import_json.
-    DATA(lv_result) = import_dynpro_from_json( io_server->request->get_cdata( ) ).
-    write_json( io_server = io_server iv_status = 200 iv_json = lv_result ).
-  ENDMETHOD.
-
-METHOD handle_dynpro_import_screen.
-    DATA(lv_result) = import_dynpro_screen_json( io_server->request->get_cdata( ) ).
-    write_json( io_server = io_server iv_status = 200 iv_json = lv_result ).
-  ENDMETHOD.
-
-METHOD handle_dynpro_import_cctrl.
+* <<< END METHOD INCLUDE ZCL_AI_MCP_REST_FUN===========CM019
+* >>> BEGIN METHOD INCLUDE ZCL_AI_MCP_REST_FUN===========CM01A
+  METHOD handle_dynpro_import_cctrl.
     DATA(lv_result) = import_dynpro_cctrl_json( io_server->request->get_cdata( ) ).
     write_json( io_server = io_server iv_status = 200 iv_json = lv_result ).
   ENDMETHOD.
-
-METHOD handle_dynpro_import_layout.
+* <<< END METHOD INCLUDE ZCL_AI_MCP_REST_FUN===========CM01A
+* >>> BEGIN METHOD INCLUDE ZCL_AI_MCP_REST_FUN===========CM01B
+  METHOD handle_dynpro_import_json.
+    DATA(lv_result) = import_dynpro_from_json( io_server->request->get_cdata( ) ).
+    write_json( io_server = io_server iv_status = 200 iv_json = lv_result ).
+  ENDMETHOD.
+* <<< END METHOD INCLUDE ZCL_AI_MCP_REST_FUN===========CM01B
+* >>> BEGIN METHOD INCLUDE ZCL_AI_MCP_REST_FUN===========CM01C
+  METHOD handle_dynpro_import_layout.
     DATA(lv_result) = import_dynpro_layout_json( io_server->request->get_cdata( ) ).
     write_json( io_server = io_server iv_status = 200 iv_json = lv_result ).
   ENDMETHOD.
-
-
-METHOD handle_dynpro_import_minimal.
+* <<< END METHOD INCLUDE ZCL_AI_MCP_REST_FUN===========CM01C
+* >>> BEGIN METHOD INCLUDE ZCL_AI_MCP_REST_FUN===========CM01D
+  METHOD handle_dynpro_import_minimal.
     DATA(lv_result) = import_min_dynpro_json( io_server->request->get_cdata( ) ).
     write_json( io_server = io_server iv_status = 200 iv_json = lv_result ).
   ENDMETHOD.
-
-
-METHOD handle_dynpro_import_tc_min.
+* <<< END METHOD INCLUDE ZCL_AI_MCP_REST_FUN===========CM01D
+* >>> BEGIN METHOD INCLUDE ZCL_AI_MCP_REST_FUN===========CM01E
+  METHOD handle_dynpro_import_screen.
+    DATA(lv_result) = import_dynpro_screen_json( io_server->request->get_cdata( ) ).
+    write_json( io_server = io_server iv_status = 200 iv_json = lv_result ).
+  ENDMETHOD.
+* <<< END METHOD INCLUDE ZCL_AI_MCP_REST_FUN===========CM01E
+* >>> BEGIN METHOD INCLUDE ZCL_AI_MCP_REST_FUN===========CM01F
+  METHOD handle_dynpro_import_tc_min.
     DATA(lv_result) = import_tc_min_dynpro_json( io_server->request->get_cdata( ) ).
     write_json( io_server = io_server iv_status = 200 iv_json = lv_result ).
   ENDMETHOD.
-
-
-METHOD handle_fugr_main_source_save.
+* <<< END METHOD INCLUDE ZCL_AI_MCP_REST_FUN===========CM01F
+* >>> BEGIN METHOD INCLUDE ZCL_AI_MCP_REST_FUN===========CM01G
+  METHOD handle_fugr_main_source_save.
     DATA(lv_result) = save_fugr_main_source_json( io_server->request->get_cdata( ) ).
     write_json( io_server = io_server iv_status = 200 iv_json = lv_result ).
   ENDMETHOD.
-
-
-METHOD handle_function_check.
+* <<< END METHOD INCLUDE ZCL_AI_MCP_REST_FUN===========CM01G
+* >>> BEGIN METHOD INCLUDE ZCL_AI_MCP_REST_FUN===========CM01H
+  METHOD handle_function_check.
     DATA(lv_result) = check_function_from_json( io_server->request->get_cdata( ) ).
     write_json( io_server = io_server iv_status = 200 iv_json = lv_result ).
   ENDMETHOD.
-
-
-METHOD handle_function_create.
+* <<< END METHOD INCLUDE ZCL_AI_MCP_REST_FUN===========CM01H
+* >>> BEGIN METHOD INCLUDE ZCL_AI_MCP_REST_FUN===========CM01I
+  METHOD handle_function_create.
     DATA(lv_result) = create_function_from_json( io_server->request->get_cdata( ) ).
     write_json( io_server = io_server iv_status = 200 iv_json = lv_result ).
   ENDMETHOD.
-
-
-METHOD handle_function_group_read.
+* <<< END METHOD INCLUDE ZCL_AI_MCP_REST_FUN===========CM01I
+* >>> BEGIN METHOD INCLUDE ZCL_AI_MCP_REST_FUN===========CM01J
+  METHOD handle_function_group_read.
     DATA(lv_result) = read_function_group_from_json( io_server->request->get_cdata( ) ).
     write_json( io_server = io_server iv_status = 200 iv_json = lv_result ).
   ENDMETHOD.
-
-
-METHOD handle_function_read.
+* <<< END METHOD INCLUDE ZCL_AI_MCP_REST_FUN===========CM01J
+* >>> BEGIN METHOD INCLUDE ZCL_AI_MCP_REST_FUN===========CM01K
+  METHOD handle_function_read.
     DATA(lv_result) = read_function_from_json( io_server->request->get_cdata( ) ).
     write_json( io_server = io_server iv_status = 200 iv_json = lv_result ).
   ENDMETHOD.
-
-
-METHOD handle_function_source_save.
+* <<< END METHOD INCLUDE ZCL_AI_MCP_REST_FUN===========CM01K
+* >>> BEGIN METHOD INCLUDE ZCL_AI_MCP_REST_FUN===========CM01L
+  METHOD handle_function_source_save.
     DATA(lv_result) = save_function_source_from_json( io_server->request->get_cdata( ) ).
     write_json( io_server = io_server iv_status = 200 iv_json = lv_result ).
   ENDMETHOD.
-
-
-METHOD handle_include_source_save.
+* <<< END METHOD INCLUDE ZCL_AI_MCP_REST_FUN===========CM01L
+* >>> BEGIN METHOD INCLUDE ZCL_AI_MCP_REST_FUN===========CM01M
+  METHOD handle_include_source_save.
     DATA(lv_result) = save_include_source_from_json( io_server->request->get_cdata( ) ).
     write_json( io_server = io_server iv_status = 200 iv_json = lv_result ).
   ENDMETHOD.
-
-
-METHOD handle_message_save.
+* <<< END METHOD INCLUDE ZCL_AI_MCP_REST_FUN===========CM01M
+* >>> BEGIN METHOD INCLUDE ZCL_AI_MCP_REST_FUN===========CM01N
+  METHOD handle_message_save.
     DATA(lv_result) = message_save_from_json( io_server->request->get_cdata( ) ).
     write_json( io_server = io_server iv_status = 200 iv_json = lv_result ).
   ENDMETHOD.
-
-
-METHOD handle_object_lifecycle.
+* <<< END METHOD INCLUDE ZCL_AI_MCP_REST_FUN===========CM01N
+* >>> BEGIN METHOD INCLUDE ZCL_AI_MCP_REST_FUN===========CM01O
+  METHOD handle_object_lifecycle.
     DATA(lv_result) = object_lifecycle_from_json( io_server->request->get_cdata( ) ).
     write_json( io_server = io_server iv_status = 200 iv_json = lv_result ).
   ENDMETHOD.
-
-
-METHOD handle_object_repair.
+* <<< END METHOD INCLUDE ZCL_AI_MCP_REST_FUN===========CM01O
+* >>> BEGIN METHOD INCLUDE ZCL_AI_MCP_REST_FUN===========CM01P
+  METHOD handle_object_repair.
     DATA(lv_result) = object_repair_from_json( io_server->request->get_cdata( ) ).
     write_json( io_server = io_server iv_status = 200 iv_json = lv_result ).
   ENDMETHOD.
-
-
-METHOD handle_probe_run.
+* <<< END METHOD INCLUDE ZCL_AI_MCP_REST_FUN===========CM01P
+* >>> BEGIN METHOD INCLUDE ZCL_AI_MCP_REST_FUN===========CM01Q
+  METHOD handle_probe_run.
     DATA(lv_result) = probe_run_from_json( io_server->request->get_cdata( ) ).
     write_json( io_server = io_server iv_status = 200 iv_json = lv_result ).
   ENDMETHOD.
-
-
-METHOD handle_read.
+* <<< END METHOD INCLUDE ZCL_AI_MCP_REST_FUN===========CM01Q
+* >>> BEGIN METHOD INCLUDE ZCL_AI_MCP_REST_FUN===========CM01R
+  METHOD handle_read.
     DATA(lv_result) = read_object_from_json( io_server->request->get_cdata( ) ).
     write_json( io_server = io_server iv_status = 200 iv_json = lv_result ).
   ENDMETHOD.
-
-
-METHOD handle_run.
+* <<< END METHOD INCLUDE ZCL_AI_MCP_REST_FUN===========CM01R
+* >>> BEGIN METHOD INCLUDE ZCL_AI_MCP_REST_FUN===========CM01S
+  METHOD handle_run.
     DATA(lv_result) = run( io_server->request->get_cdata( ) ).
     write_json( io_server = io_server iv_status = 200 iv_json = lv_result ).
   ENDMETHOD.
-
-
-METHOD handle_save.
+* <<< END METHOD INCLUDE ZCL_AI_MCP_REST_FUN===========CM01S
+* >>> BEGIN METHOD INCLUDE ZCL_AI_MCP_REST_FUN===========CM01T
+  METHOD handle_save.
     DATA(lv_result) = save_source_from_json( io_server->request->get_cdata( ) ).
     write_json( io_server = io_server iv_status = 200 iv_json = lv_result ).
   ENDMETHOD.
+* <<< END METHOD INCLUDE ZCL_AI_MCP_REST_FUN===========CM01T
 
-
-METHOD handle_textpool_save.
+  METHOD handle_function_execute.
+    DATA(lv_result) = function_execute_from_json( io_server->request->get_cdata( ) ).
+    write_json( io_server = io_server iv_status = 200 iv_json = lv_result ).
+  ENDMETHOD.
+* >>> BEGIN METHOD INCLUDE ZCL_AI_MCP_REST_FUN===========CM01U
+  METHOD handle_textpool_save.
     DATA(lv_result) = textpool_save_from_json( io_server->request->get_cdata( ) ).
     write_json( io_server = io_server iv_status = 200 iv_json = lv_result ).
   ENDMETHOD.
-
-
-METHOD if_http_extension~handle_request.
+* <<< END METHOD INCLUDE ZCL_AI_MCP_REST_FUN===========CM01U
+* >>> BEGIN METHOD INCLUDE ZCL_AI_MCP_REST_FUN===========CM01V
+  METHOD if_http_extension~handle_request.
     DATA lv_method TYPE string.
     DATA lv_path TYPE string.
     DATA lv_error_json TYPE string.
@@ -3726,6 +3788,8 @@ METHOD if_http_extension~handle_request.
             handle_object_lifecycle( server ).
           WHEN '/function/create'.
             handle_function_create( server ).
+          WHEN '/function/execute'.
+            handle_function_execute( server ).
           WHEN '/function/check'.
             handle_function_check( server ).
           WHEN '/function/read'.
@@ -3780,8 +3844,6 @@ METHOD if_http_extension~handle_request.
             handle_dynpro_import_cctrl( server ).
           WHEN '/dynpro/import_layout'.
             handle_dynpro_import_layout( server ).
-          WHEN '/transport/create'.
-            handle_transport_create( server ).
           WHEN OTHERS.
             write_json(
               io_server = server
@@ -3798,9 +3860,320 @@ METHOD if_http_extension~handle_request.
         ENDIF.
     ENDTRY.
   ENDMETHOD.
+* <<< END METHOD INCLUDE ZCL_AI_MCP_REST_FUN===========CM01V
+* >>> BEGIN METHOD INCLUDE ZCL_AI_MCP_REST_FUN===========CM01W
+  METHOD import_dynpro_cctrl_json.
+    DATA ls_request TYPE ty_dynpro_custom_request.
+    DATA lv_program TYPE d020s-prog.
+    DATA lv_screen TYPE d020s-dnum.
+    DATA lv_language TYPE d020s-spra.
+    DATA lv_corrnum TYPE e071-trkorr.
+    DATA lv_ok_code TYPE string.
+    DATA lv_use_corrnum TYPE c LENGTH 1 VALUE space.
+    DATA lv_suppress_corr TYPE c LENGTH 1 VALUE 'X'.
+    DATA lv_suppress_exist TYPE c LENGTH 1 VALUE space.
+    DATA lv_suppress_generate TYPE c LENGTH 1 VALUE space.
+    DATA lv_suppress_dict TYPE c LENGTH 1 VALUE space.
+    DATA lv_suppress_extended TYPE c LENGTH 1 VALUE space.
+    DATA lv_suppress_commit TYPE c LENGTH 1 VALUE space.
+    DATA ls_header TYPE rpy_dyhead.
+    DATA lt_flow TYPE STANDARD TABLE OF rpy_dyflow.
+    DATA ls_flow TYPE rpy_dyflow.
+    DATA lt_params TYPE STANDARD TABLE OF rpy_dypara.
+    DATA lt_containers TYPE dycatt_tab.
+    DATA ls_container LIKE LINE OF lt_containers.
+    DATA lt_field_containers TYPE dyfatc_tab.
+    DATA ls_field_container LIKE LINE OF lt_field_containers.
+    DATA lv_message TYPE string.
+    DATA lv_line TYPE i.
+    DATA lv_word TYPE string.
 
+    TRY.
+        /ui2/cl_json=>deserialize(
+          EXPORTING json = iv_json
+          CHANGING  data = ls_request ).
+      CATCH cx_root INTO DATA(lx_dynpro_json).
+        rv_json =
+          |\{"status":"ERROR",| &&
+          |"stage":"DYNPRO_CUSTOM_JSON_PARSE",| &&
+          |"message":"| &&
+          escape(
+            val = lx_dynpro_json->get_text( )
+            format = cl_abap_format=>e_json_string ) &&
+          |"\}|.
+        RETURN.
+    ENDTRY.
 
-METHOD import_dynpro_from_json.
+    IF ls_request-program IS INITIAL OR ls_request-screen IS INITIAL.
+      rv_json =
+        '{"status":"ERROR",' &&
+        '"message":"program and screen are required"}'.
+      RETURN.
+    ENDIF.
+    IF ls_request-custom_controls IS INITIAL.
+      rv_json =
+        '{"status":"ERROR","message":"custom_controls are required"}'.
+      RETURN.
+    ENDIF.
+    IF ls_request-screen NP '9+++'.
+      rv_json =
+        '{"status":"ERROR",' &&
+        '"message":"screen must be a 4-digit number starting with 9"}'.
+      RETURN.
+    ENDIF.
+
+    lv_program = to_upper( ls_request-program ).
+    lv_screen = ls_request-screen.
+    lv_language = ls_request-language.
+    IF lv_language IS INITIAL.
+      lv_language = sy-langu.
+    ENDIF.
+    IF strlen( ls_request-request ) > 3.
+      lv_corrnum = to_upper( ls_request-request ).
+      lv_use_corrnum = 'X'.
+    ENDIF.
+    IF ls_request-replace_existing = abap_true.
+      lv_suppress_exist = 'X'.
+    ENDIF.
+
+    lv_ok_code = to_upper( ls_request-ok_code ).
+    IF lv_ok_code IS INITIAL.
+      lv_ok_code = 'OK_CODE'.
+    ENDIF.
+
+    CLEAR ls_header.
+    ls_header-program = lv_program.
+    ls_header-screen = lv_screen.
+    ls_header-language = lv_language.
+    IF ls_request-description IS INITIAL.
+      ls_header-descript = |AI_MCP custom control screen { lv_screen }|.
+    ELSE.
+      ls_header-descript = ls_request-description.
+    ENDIF.
+    ls_header-type = to_upper( ls_request-screen_type ).
+    IF ls_header-type <> 'I' AND ls_header-type <> 'N'.
+      ls_header-type = 'N'.
+    ENDIF.
+    IF ls_request-next_screen IS NOT INITIAL.
+      ls_header-nextscreen = ls_request-next_screen.
+    ELSE.
+      ls_header-nextscreen = lv_screen.
+    ENDIF.
+    IF ls_request-screen_lines > 0.
+      ls_header-lines = ls_request-screen_lines.
+    ELSE.
+      ls_header-lines = '24'.
+    ENDIF.
+    IF ls_request-screen_columns > 0.
+      ls_header-columns = ls_request-screen_columns.
+    ELSE.
+      ls_header-columns = '80'.
+    ENDIF.
+
+    CLEAR ls_container.
+    ls_container-type = 'SCREEN'.
+    ls_container-name = 'SCREEN'.
+    APPEND ls_container TO lt_containers.
+
+    LOOP AT ls_request-custom_controls INTO DATA(ls_custom_control).
+      IF ls_custom_control-name IS INITIAL.
+        rv_json =
+          '{"status":"ERROR",' &&
+          '"message":"custom control name is required"}'.
+        RETURN.
+      ENDIF.
+
+      CLEAR ls_container.
+      ls_container-type = 'CUST_CTRL'.
+      ls_container-name = to_upper( ls_custom_control-name ).
+      ls_container-element_of = 'SCREEN'.
+      ls_container-line = ls_custom_control-line.
+      ls_container-column = ls_custom_control-column.
+      ls_container-length = ls_custom_control-length.
+      ls_container-height = ls_custom_control-height.
+      IF ls_container-line <= 0.
+        ls_container-line = 3.
+      ENDIF.
+      IF ls_container-column <= 0.
+        ls_container-column = 1.
+      ENDIF.
+      IF ls_container-length <= 0.
+        ls_container-length = 60.
+      ENDIF.
+      IF ls_container-height <= 0.
+        ls_container-height = 8.
+      ENDIF.
+      IF ls_custom_control-resize_v = abap_true.
+        ls_container-c_resize_v = 'X'.
+      ENDIF.
+      IF ls_custom_control-resize_h = abap_true.
+        ls_container-c_resize_h = 'X'.
+      ENDIF.
+      APPEND ls_container TO lt_containers.
+    ENDLOOP.
+
+    LOOP AT ls_request-screen_elements INTO DATA(ls_element).
+      CLEAR ls_field_container.
+      ls_field_container-cont_type = 'SCREEN'.
+      ls_field_container-cont_name = 'SCREEN'.
+      ls_field_container-name = to_upper( ls_element-name ).
+      ls_field_container-type = to_upper( ls_element-type ).
+      ls_field_container-text = ls_element-text.
+      ls_field_container-line = ls_element-line.
+      ls_field_container-column = ls_element-column.
+      ls_field_container-length = ls_element-length.
+      IF ls_element-vislength > 0.
+        ls_field_container-vislength = ls_element-vislength.
+      ELSE.
+        ls_field_container-vislength = ls_element-length.
+      ENDIF.
+      IF ls_element-height > 0.
+        ls_field_container-height = ls_element-height.
+      ELSEIF ls_field_container-type = 'FRAME'.
+        ls_field_container-height = 20.
+      ELSE.
+        ls_field_container-height = 1.
+      ENDIF.
+      IF ls_element-format IS NOT INITIAL.
+        ls_field_container-format = to_upper( ls_element-format ).
+      ELSE.
+        ls_field_container-format = 'CHAR'.
+      ENDIF.
+      IF ls_element-input = abap_true.
+        ls_field_container-input_fld = 'X'.
+      ENDIF.
+      IF ls_element-output = abap_true.
+        ls_field_container-output_fld = 'X'.
+      ENDIF.
+      IF ls_element-invisible = abap_true.
+        ls_field_container-invisible = 'X'.
+      ENDIF.
+      IF ls_field_container-type = 'FRAME' AND
+         ls_field_container-text IS INITIAL.
+        CLEAR ls_field_container-text.
+        DO ls_field_container-length TIMES.
+          ls_field_container-text = ls_field_container-text && '_'.
+        ENDDO.
+      ENDIF.
+      IF ls_field_container-type = 'PUSH'.
+        ls_field_container-push_fcode = to_upper( ls_element-fcode ).
+      ENDIF.
+      IF ls_element-icon_name IS NOT INITIAL.
+        ls_field_container-icon_name = to_upper( ls_element-icon_name ).
+        ls_field_container-with_icon = 'X'.
+      ENDIF.
+      IF ls_element-icon_text IS NOT INITIAL.
+        ls_field_container-icon_qinfo = ls_element-icon_text.
+      ENDIF.
+      IF ls_element-group1 IS NOT INITIAL.
+        ls_field_container-group1 = to_upper( ls_element-group1 ).
+      ENDIF.
+      APPEND ls_field_container TO lt_field_containers.
+    ENDLOOP.
+
+    CLEAR ls_field_container.
+    ls_field_container-cont_type = 'SCREEN'.
+    ls_field_container-cont_name = 'SCREEN'.
+    ls_field_container-name = lv_ok_code.
+    ls_field_container-type = 'OKCODE'.
+    ls_field_container-text = '____________________'.
+    ls_field_container-line = '0'.
+    ls_field_container-column = '0'.
+    ls_field_container-length = '20'.
+    ls_field_container-height = 1.
+    ls_field_container-vislength = 20.
+    ls_field_container-input_fld = 'X'.
+    ls_field_container-format = 'CHAR'.
+    APPEND ls_field_container TO lt_field_containers.
+
+    IF ls_request-flow_logic IS NOT INITIAL.
+      LOOP AT ls_request-flow_logic INTO DATA(lv_flow_line).
+        CLEAR ls_flow.
+        ls_flow-line = lv_flow_line.
+        APPEND ls_flow TO lt_flow.
+      ENDLOOP.
+    ELSE.
+      CLEAR ls_flow.
+      ls_flow-line = 'PROCESS BEFORE OUTPUT.'.
+      APPEND ls_flow TO lt_flow.
+      CLEAR ls_flow.
+      ls_flow-line = 'PROCESS AFTER INPUT.'.
+      APPEND ls_flow TO lt_flow.
+    ENDIF.
+
+    CALL FUNCTION 'RPY_DYNPRO_INSERT'
+      EXPORTING
+        header                    = ls_header
+        corrnum                   = lv_corrnum
+        suppress_corr_checks      = lv_suppress_corr
+        suppress_exist_checks     = lv_suppress_exist
+        suppress_generate         = lv_suppress_generate
+        suppress_dict_support     = lv_suppress_dict
+        suppress_extended_checks  = lv_suppress_extended
+        use_corrnum_immediatedly  = lv_use_corrnum
+        suppress_commit_work      = lv_suppress_commit
+      TABLES
+        flow_logic                = lt_flow
+        params                    = lt_params
+        containers                = lt_containers
+        fields_to_containers      = lt_field_containers
+      EXCEPTIONS
+        cancelled                 = 1
+        already_exists            = 2
+        program_not_exists        = 3
+        not_executed              = 4
+        missing_required_field    = 5
+        illegal_field_value       = 6
+        field_not_allowed         = 7
+        not_generated             = 8
+        illegal_field_position    = 9
+        OTHERS                    = 10.
+
+    IF sy-subrc <> 0.
+      rv_json = build_fm_error_json(
+        iv_stage       = 'DYNPRO_CUSTOM_CONTROL_IMPORT'
+        iv_object_type = 'DYNP'
+        iv_object_name = |{ lv_program } { lv_screen }|
+        iv_message     = 'RPY_DYNPRO_INSERT custom import failed'
+        iv_subrc       = sy-subrc
+        iv_suggestion  = 'Check custom_controls and coordinates' ).
+      RETURN.
+    ENDIF.
+
+    GENERATE REPORT lv_program
+      MESSAGE lv_message
+      LINE lv_line
+      WORD lv_word.
+
+    IF sy-subrc = 0.
+      rv_json =
+        |\{"status":"OK","object_type":"DYNP",| &&
+        |"program":"{ lv_program }",| &&
+        |"screen":"{ lv_screen }",| &&
+        |"message":"Dynpro custom controls imported"\}|.
+    ELSE.
+      rv_json =
+        |\{"status":"ERROR",| &&
+        |"stage":"DYNPRO_CUSTOM_CONTROL_GENERATE",| &&
+        |"object_type":"DYNP",| &&
+        |"program":"{ lv_program }",| &&
+        |"screen":"{ lv_screen }",| &&
+                |"line":{ lv_line },| &&
+        |"word":"| &&
+        escape(
+          val = lv_word
+          format = cl_abap_format=>e_json_string ) &&
+        |",| &&
+        |"message":"| &&
+        escape(
+          val = lv_message
+          format = cl_abap_format=>e_json_string ) &&
+        |"\}|.
+    ENDIF.
+  ENDMETHOD.
+* <<< END METHOD INCLUDE ZCL_AI_MCP_REST_FUN===========CM01W
+* >>> BEGIN METHOD INCLUDE ZCL_AI_MCP_REST_FUN===========CM01X
+  METHOD import_dynpro_from_json.
     DATA ls_request TYPE ty_dynpro_json_request.
     DATA lv_program TYPE d020s-prog.
     DATA lv_screen TYPE d020s-dnum.
@@ -4334,560 +4707,9 @@ METHOD import_dynpro_from_json.
                 |"message":"{ escape( val = lv_message format = cl_abap_format=>e_json_string ) }"\}|.
     ENDIF.
   ENDMETHOD.
-
-METHOD import_dynpro_screen_json.
-    DATA ls_request TYPE ty_dynpro_custom_request.
-    DATA lv_program TYPE d020s-prog.
-    DATA lv_screen TYPE d020s-dnum.
-    DATA lv_language TYPE d020s-spra.
-    DATA lv_corrnum TYPE e071-trkorr.
-    DATA lv_ok_code TYPE string.
-    DATA lv_use_corrnum TYPE c LENGTH 1 VALUE space.
-    DATA lv_suppress_corr TYPE c LENGTH 1 VALUE 'X'.
-    DATA lv_suppress_exist TYPE c LENGTH 1 VALUE space.
-    DATA lv_suppress_generate TYPE c LENGTH 1 VALUE space.
-    DATA lv_suppress_dict TYPE c LENGTH 1 VALUE space.
-    DATA lv_suppress_extended TYPE c LENGTH 1 VALUE space.
-    DATA lv_suppress_commit TYPE c LENGTH 1 VALUE space.
-    DATA ls_header TYPE rpy_dyhead.
-    DATA lt_flow TYPE STANDARD TABLE OF rpy_dyflow.
-    DATA ls_flow TYPE rpy_dyflow.
-    DATA lt_params TYPE STANDARD TABLE OF rpy_dypara.
-    DATA lt_containers TYPE dycatt_tab.
-    DATA ls_container LIKE LINE OF lt_containers.
-    DATA lt_field_containers TYPE dyfatc_tab.
-    DATA ls_field_container LIKE LINE OF lt_field_containers.
-    DATA lv_message TYPE string.
-    DATA lv_line TYPE i.
-    DATA lv_word TYPE string.
-
-    TRY.
-        /ui2/cl_json=>deserialize(
-          EXPORTING json = iv_json
-          CHANGING  data = ls_request ).
-      CATCH cx_root INTO DATA(lx_dynpro_json).
-        rv_json = |\{"status":"ERROR","stage":"DYNPRO_SCREEN_JSON_PARSE","message":"{ escape( val = lx_dynpro_json->get_text( ) format = cl_abap_format=>e_json_string ) }"\}|.
-        RETURN.
-    ENDTRY.
-
-    IF ls_request-program IS INITIAL OR ls_request-screen IS INITIAL.
-      rv_json = '{"status":"ERROR","message":"program and screen are required"}'.
-      RETURN.
-    ENDIF.
-    IF ls_request-screen_elements IS INITIAL.
-      rv_json = '{"status":"ERROR","message":"screen_elements are required"}'.
-      RETURN.
-    ENDIF.
-    IF ls_request-screen NP '9+++'.
-      rv_json = '{"status":"ERROR","message":"screen must be a 4-digit number starting with 9"}'.
-      RETURN.
-    ENDIF.
-
-    lv_program = to_upper( ls_request-program ).
-    lv_screen = ls_request-screen.
-    lv_language = ls_request-language.
-    IF lv_language IS INITIAL.
-      lv_language = sy-langu.
-    ENDIF.
-    IF strlen( ls_request-request ) > 3.
-      lv_corrnum = to_upper( ls_request-request ).
-      lv_use_corrnum = 'X'.
-    ENDIF.
-    IF ls_request-replace_existing = abap_true.
-      lv_suppress_exist = 'X'.
-    ENDIF.
-
-    lv_ok_code = to_upper( ls_request-ok_code ).
-    IF lv_ok_code IS INITIAL.
-      lv_ok_code = 'OK_CODE'.
-    ENDIF.
-
-    CLEAR ls_header.
-    ls_header-program = lv_program.
-    ls_header-screen = lv_screen.
-    ls_header-language = lv_language.
-    IF ls_request-description IS INITIAL.
-      ls_header-descript = |AI_MCP generated screen { lv_screen }|.
-    ELSE.
-      ls_header-descript = ls_request-description.
-    ENDIF.
-    ls_header-type = to_upper( ls_request-screen_type ).
-    IF ls_header-type <> 'I' AND ls_header-type <> 'N'.
-      ls_header-type = 'N'.
-    ENDIF.
-    IF ls_request-next_screen IS NOT INITIAL.
-      ls_header-nextscreen = ls_request-next_screen.
-    ELSE.
-      ls_header-nextscreen = lv_screen.
-    ENDIF.
-    IF ls_request-screen_lines > 0.
-      ls_header-lines = ls_request-screen_lines.
-    ELSE.
-      ls_header-lines = '24'.
-    ENDIF.
-    IF ls_request-screen_columns > 0.
-      ls_header-columns = ls_request-screen_columns.
-    ELSE.
-      ls_header-columns = '80'.
-    ENDIF.
-
-    CLEAR ls_container.
-    ls_container-type = 'SCREEN'.
-    ls_container-name = 'SCREEN'.
-    APPEND ls_container TO lt_containers.
-
-    LOOP AT ls_request-screen_elements INTO DATA(ls_element).
-      CLEAR ls_field_container.
-      ls_field_container-cont_type = 'SCREEN'.
-      ls_field_container-cont_name = 'SCREEN'.
-      ls_field_container-name = to_upper( ls_element-name ).
-      ls_field_container-type = to_upper( ls_element-type ).
-      ls_field_container-text = ls_element-text.
-      ls_field_container-line = ls_element-line.
-      ls_field_container-column = ls_element-column.
-      ls_field_container-length = ls_element-length.
-      IF ls_element-vislength > 0.
-        ls_field_container-vislength = ls_element-vislength.
-      ELSE.
-        ls_field_container-vislength = ls_element-length.
-      ENDIF.
-      IF ls_element-height > 0.
-        ls_field_container-height = ls_element-height.
-      ELSEIF ls_field_container-type = 'FRAME'.
-        ls_field_container-height = 20.
-      ELSE.
-        ls_field_container-height = 1.
-      ENDIF.
-      IF ls_element-format IS NOT INITIAL.
-        ls_field_container-format = to_upper( ls_element-format ).
-      ELSE.
-        ls_field_container-format = 'CHAR'.
-      ENDIF.
-      IF ls_element-input = abap_true.
-        ls_field_container-input_fld = 'X'.
-      ENDIF.
-      IF ls_element-output = abap_true.
-        ls_field_container-output_fld = 'X'.
-      ENDIF.
-      IF ls_element-invisible = abap_true.
-        ls_field_container-invisible = 'X'.
-      ENDIF.
-      IF ls_field_container-type = 'FRAME' AND ls_field_container-text IS INITIAL.
-        CLEAR ls_field_container-text.
-        DO ls_field_container-length TIMES.
-          ls_field_container-text = ls_field_container-text && '_'.
-        ENDDO.
-      ENDIF.
-      IF ls_field_container-type = 'PUSH'.
-        ls_field_container-push_fcode = to_upper( ls_element-fcode ).
-      ENDIF.
-      IF ls_element-icon_name IS NOT INITIAL.
-        ls_field_container-icon_name = to_upper( ls_element-icon_name ).
-        ls_field_container-with_icon = 'X'.
-      ENDIF.
-      IF ls_element-icon_text IS NOT INITIAL.
-        ls_field_container-icon_qinfo = ls_element-icon_text.
-      ENDIF.
-      IF ls_element-group1 IS NOT INITIAL.
-        ls_field_container-group1 = to_upper( ls_element-group1 ).
-      ENDIF.
-      APPEND ls_field_container TO lt_field_containers.
-    ENDLOOP.
-
-    CLEAR ls_field_container.
-    ls_field_container-cont_type = 'SCREEN'.
-    ls_field_container-cont_name = 'SCREEN'.
-    ls_field_container-name = lv_ok_code.
-    ls_field_container-type = 'OKCODE'.
-    ls_field_container-text = '____________________'.
-    ls_field_container-line = '0'.
-    ls_field_container-column = '0'.
-    ls_field_container-length = '20'.
-    ls_field_container-height = 1.
-    ls_field_container-vislength = 20.
-    ls_field_container-input_fld = 'X'.
-    ls_field_container-format = 'CHAR'.
-    APPEND ls_field_container TO lt_field_containers.
-
-    IF ls_request-flow_logic IS NOT INITIAL.
-      LOOP AT ls_request-flow_logic INTO DATA(lv_flow_line).
-        CLEAR ls_flow.
-        ls_flow-line = lv_flow_line.
-        APPEND ls_flow TO lt_flow.
-      ENDLOOP.
-    ELSE.
-      CLEAR ls_flow.
-      ls_flow-line = 'PROCESS BEFORE OUTPUT.'.
-      APPEND ls_flow TO lt_flow.
-      CLEAR ls_flow.
-      ls_flow-line = 'PROCESS AFTER INPUT.'.
-      APPEND ls_flow TO lt_flow.
-    ENDIF.
-
-    CALL FUNCTION 'RPY_DYNPRO_INSERT'
-      EXPORTING
-        header                    = ls_header
-        corrnum                   = lv_corrnum
-        suppress_corr_checks      = lv_suppress_corr
-        suppress_exist_checks     = lv_suppress_exist
-        suppress_generate         = lv_suppress_generate
-        suppress_dict_support     = lv_suppress_dict
-        suppress_extended_checks  = lv_suppress_extended
-        use_corrnum_immediatedly  = lv_use_corrnum
-        suppress_commit_work      = lv_suppress_commit
-      TABLES
-        flow_logic                = lt_flow
-        params                    = lt_params
-        containers                = lt_containers
-        fields_to_containers      = lt_field_containers
-      EXCEPTIONS
-        cancelled                 = 1
-        already_exists            = 2
-        program_not_exists        = 3
-        not_executed              = 4
-        missing_required_field    = 5
-        illegal_field_value       = 6
-        field_not_allowed         = 7
-        not_generated             = 8
-        illegal_field_position    = 9
-        OTHERS                    = 10.
-
-    IF sy-subrc <> 0.
-      rv_json = build_fm_error_json(
-        iv_stage       = 'DYNPRO_SCREEN_IMPORT'
-        iv_object_type = 'DYNP'
-        iv_object_name = |{ lv_program } { lv_screen }|
-        iv_message     = 'RPY_DYNPRO_INSERT screen import failed'
-        iv_subrc       = sy-subrc
-        iv_suggestion  = 'Check screen_elements, field coordinates, field types, and flow_logic' ).
-      RETURN.
-    ENDIF.
-
-    GENERATE REPORT lv_program
-      MESSAGE lv_message
-      LINE lv_line
-      WORD lv_word.
-
-    IF sy-subrc = 0.
-      rv_json = |\{"status":"OK","object_type":"DYNP","program":"{ lv_program }","screen":"{ lv_screen }","message":"Dynpro screen imported"\}|.
-    ELSE.
-      rv_json = |\{"status":"ERROR","stage":"DYNPRO_SCREEN_GENERATE","object_type":"DYNP","program":"{ lv_program }","screen":"{ lv_screen }","line":{ lv_line },"word":"{ escape( val = lv_word format = cl_abap_format=>e_json_string ) }","message":"{ escape( val = lv_message format = cl_abap_format=>e_json_string ) }"\}|.
-    ENDIF.
-  ENDMETHOD.
-
-METHOD import_dynpro_cctrl_json.
-    DATA ls_request TYPE ty_dynpro_custom_request.
-    DATA lv_program TYPE d020s-prog.
-    DATA lv_screen TYPE d020s-dnum.
-    DATA lv_language TYPE d020s-spra.
-    DATA lv_corrnum TYPE e071-trkorr.
-    DATA lv_ok_code TYPE string.
-    DATA lv_use_corrnum TYPE c LENGTH 1 VALUE space.
-    DATA lv_suppress_corr TYPE c LENGTH 1 VALUE 'X'.
-    DATA lv_suppress_exist TYPE c LENGTH 1 VALUE space.
-    DATA lv_suppress_generate TYPE c LENGTH 1 VALUE space.
-    DATA lv_suppress_dict TYPE c LENGTH 1 VALUE space.
-    DATA lv_suppress_extended TYPE c LENGTH 1 VALUE space.
-    DATA lv_suppress_commit TYPE c LENGTH 1 VALUE space.
-    DATA ls_header TYPE rpy_dyhead.
-    DATA lt_flow TYPE STANDARD TABLE OF rpy_dyflow.
-    DATA ls_flow TYPE rpy_dyflow.
-    DATA lt_params TYPE STANDARD TABLE OF rpy_dypara.
-    DATA lt_containers TYPE dycatt_tab.
-    DATA ls_container LIKE LINE OF lt_containers.
-    DATA lt_field_containers TYPE dyfatc_tab.
-    DATA ls_field_container LIKE LINE OF lt_field_containers.
-    DATA lv_message TYPE string.
-    DATA lv_line TYPE i.
-    DATA lv_word TYPE string.
-
-    TRY.
-        /ui2/cl_json=>deserialize(
-          EXPORTING json = iv_json
-          CHANGING  data = ls_request ).
-      CATCH cx_root INTO DATA(lx_dynpro_json).
-        rv_json =
-          |\{"status":"ERROR",| &&
-          |"stage":"DYNPRO_CUSTOM_JSON_PARSE",| &&
-          |"message":"| &&
-          escape(
-            val = lx_dynpro_json->get_text( )
-            format = cl_abap_format=>e_json_string ) &&
-          |"\}|.
-        RETURN.
-    ENDTRY.
-
-    IF ls_request-program IS INITIAL OR ls_request-screen IS INITIAL.
-      rv_json =
-        '{"status":"ERROR",' &&
-        '"message":"program and screen are required"}'.
-      RETURN.
-    ENDIF.
-    IF ls_request-custom_controls IS INITIAL.
-      rv_json =
-        '{"status":"ERROR","message":"custom_controls are required"}'.
-      RETURN.
-    ENDIF.
-    IF ls_request-screen NP '9+++'.
-      rv_json =
-        '{"status":"ERROR",' &&
-        '"message":"screen must be a 4-digit number starting with 9"}'.
-      RETURN.
-    ENDIF.
-
-    lv_program = to_upper( ls_request-program ).
-    lv_screen = ls_request-screen.
-    lv_language = ls_request-language.
-    IF lv_language IS INITIAL.
-      lv_language = sy-langu.
-    ENDIF.
-    IF strlen( ls_request-request ) > 3.
-      lv_corrnum = to_upper( ls_request-request ).
-      lv_use_corrnum = 'X'.
-    ENDIF.
-    IF ls_request-replace_existing = abap_true.
-      lv_suppress_exist = 'X'.
-    ENDIF.
-
-    lv_ok_code = to_upper( ls_request-ok_code ).
-    IF lv_ok_code IS INITIAL.
-      lv_ok_code = 'OK_CODE'.
-    ENDIF.
-
-    CLEAR ls_header.
-    ls_header-program = lv_program.
-    ls_header-screen = lv_screen.
-    ls_header-language = lv_language.
-    IF ls_request-description IS INITIAL.
-      ls_header-descript = |AI_MCP custom control screen { lv_screen }|.
-    ELSE.
-      ls_header-descript = ls_request-description.
-    ENDIF.
-    ls_header-type = to_upper( ls_request-screen_type ).
-    IF ls_header-type <> 'I' AND ls_header-type <> 'N'.
-      ls_header-type = 'N'.
-    ENDIF.
-    IF ls_request-next_screen IS NOT INITIAL.
-      ls_header-nextscreen = ls_request-next_screen.
-    ELSE.
-      ls_header-nextscreen = lv_screen.
-    ENDIF.
-    IF ls_request-screen_lines > 0.
-      ls_header-lines = ls_request-screen_lines.
-    ELSE.
-      ls_header-lines = '24'.
-    ENDIF.
-    IF ls_request-screen_columns > 0.
-      ls_header-columns = ls_request-screen_columns.
-    ELSE.
-      ls_header-columns = '80'.
-    ENDIF.
-
-    CLEAR ls_container.
-    ls_container-type = 'SCREEN'.
-    ls_container-name = 'SCREEN'.
-    APPEND ls_container TO lt_containers.
-
-    LOOP AT ls_request-custom_controls INTO DATA(ls_custom_control).
-      IF ls_custom_control-name IS INITIAL.
-        rv_json =
-          '{"status":"ERROR",' &&
-          '"message":"custom control name is required"}'.
-        RETURN.
-      ENDIF.
-
-      CLEAR ls_container.
-      ls_container-type = 'CUST_CTRL'.
-      ls_container-name = to_upper( ls_custom_control-name ).
-      ls_container-element_of = 'SCREEN'.
-      ls_container-line = ls_custom_control-line.
-      ls_container-column = ls_custom_control-column.
-      ls_container-length = ls_custom_control-length.
-      ls_container-height = ls_custom_control-height.
-      IF ls_container-line <= 0.
-        ls_container-line = 3.
-      ENDIF.
-      IF ls_container-column <= 0.
-        ls_container-column = 1.
-      ENDIF.
-      IF ls_container-length <= 0.
-        ls_container-length = 60.
-      ENDIF.
-      IF ls_container-height <= 0.
-        ls_container-height = 8.
-      ENDIF.
-      IF ls_custom_control-resize_v = abap_true.
-        ls_container-c_resize_v = 'X'.
-      ENDIF.
-      IF ls_custom_control-resize_h = abap_true.
-        ls_container-c_resize_h = 'X'.
-      ENDIF.
-      APPEND ls_container TO lt_containers.
-    ENDLOOP.
-
-    LOOP AT ls_request-screen_elements INTO DATA(ls_element).
-      CLEAR ls_field_container.
-      ls_field_container-cont_type = 'SCREEN'.
-      ls_field_container-cont_name = 'SCREEN'.
-      ls_field_container-name = to_upper( ls_element-name ).
-      ls_field_container-type = to_upper( ls_element-type ).
-      ls_field_container-text = ls_element-text.
-      ls_field_container-line = ls_element-line.
-      ls_field_container-column = ls_element-column.
-      ls_field_container-length = ls_element-length.
-      IF ls_element-vislength > 0.
-        ls_field_container-vislength = ls_element-vislength.
-      ELSE.
-        ls_field_container-vislength = ls_element-length.
-      ENDIF.
-      IF ls_element-height > 0.
-        ls_field_container-height = ls_element-height.
-      ELSEIF ls_field_container-type = 'FRAME'.
-        ls_field_container-height = 20.
-      ELSE.
-        ls_field_container-height = 1.
-      ENDIF.
-      IF ls_element-format IS NOT INITIAL.
-        ls_field_container-format = to_upper( ls_element-format ).
-      ELSE.
-        ls_field_container-format = 'CHAR'.
-      ENDIF.
-      IF ls_element-input = abap_true.
-        ls_field_container-input_fld = 'X'.
-      ENDIF.
-      IF ls_element-output = abap_true.
-        ls_field_container-output_fld = 'X'.
-      ENDIF.
-      IF ls_element-invisible = abap_true.
-        ls_field_container-invisible = 'X'.
-      ENDIF.
-      IF ls_field_container-type = 'FRAME' AND
-         ls_field_container-text IS INITIAL.
-        CLEAR ls_field_container-text.
-        DO ls_field_container-length TIMES.
-          ls_field_container-text = ls_field_container-text && '_'.
-        ENDDO.
-      ENDIF.
-      IF ls_field_container-type = 'PUSH'.
-        ls_field_container-push_fcode = to_upper( ls_element-fcode ).
-      ENDIF.
-      IF ls_element-icon_name IS NOT INITIAL.
-        ls_field_container-icon_name = to_upper( ls_element-icon_name ).
-        ls_field_container-with_icon = 'X'.
-      ENDIF.
-      IF ls_element-icon_text IS NOT INITIAL.
-        ls_field_container-icon_qinfo = ls_element-icon_text.
-      ENDIF.
-      IF ls_element-group1 IS NOT INITIAL.
-        ls_field_container-group1 = to_upper( ls_element-group1 ).
-      ENDIF.
-      APPEND ls_field_container TO lt_field_containers.
-    ENDLOOP.
-
-    CLEAR ls_field_container.
-    ls_field_container-cont_type = 'SCREEN'.
-    ls_field_container-cont_name = 'SCREEN'.
-    ls_field_container-name = lv_ok_code.
-    ls_field_container-type = 'OKCODE'.
-    ls_field_container-text = '____________________'.
-    ls_field_container-line = '0'.
-    ls_field_container-column = '0'.
-    ls_field_container-length = '20'.
-    ls_field_container-height = 1.
-    ls_field_container-vislength = 20.
-    ls_field_container-input_fld = 'X'.
-    ls_field_container-format = 'CHAR'.
-    APPEND ls_field_container TO lt_field_containers.
-
-    IF ls_request-flow_logic IS NOT INITIAL.
-      LOOP AT ls_request-flow_logic INTO DATA(lv_flow_line).
-        CLEAR ls_flow.
-        ls_flow-line = lv_flow_line.
-        APPEND ls_flow TO lt_flow.
-      ENDLOOP.
-    ELSE.
-      CLEAR ls_flow.
-      ls_flow-line = 'PROCESS BEFORE OUTPUT.'.
-      APPEND ls_flow TO lt_flow.
-      CLEAR ls_flow.
-      ls_flow-line = 'PROCESS AFTER INPUT.'.
-      APPEND ls_flow TO lt_flow.
-    ENDIF.
-
-    CALL FUNCTION 'RPY_DYNPRO_INSERT'
-      EXPORTING
-        header                    = ls_header
-        corrnum                   = lv_corrnum
-        suppress_corr_checks      = lv_suppress_corr
-        suppress_exist_checks     = lv_suppress_exist
-        suppress_generate         = lv_suppress_generate
-        suppress_dict_support     = lv_suppress_dict
-        suppress_extended_checks  = lv_suppress_extended
-        use_corrnum_immediatedly  = lv_use_corrnum
-        suppress_commit_work      = lv_suppress_commit
-      TABLES
-        flow_logic                = lt_flow
-        params                    = lt_params
-        containers                = lt_containers
-        fields_to_containers      = lt_field_containers
-      EXCEPTIONS
-        cancelled                 = 1
-        already_exists            = 2
-        program_not_exists        = 3
-        not_executed              = 4
-        missing_required_field    = 5
-        illegal_field_value       = 6
-        field_not_allowed         = 7
-        not_generated             = 8
-        illegal_field_position    = 9
-        OTHERS                    = 10.
-
-    IF sy-subrc <> 0.
-      rv_json = build_fm_error_json(
-        iv_stage       = 'DYNPRO_CUSTOM_CONTROL_IMPORT'
-        iv_object_type = 'DYNP'
-        iv_object_name = |{ lv_program } { lv_screen }|
-        iv_message     = 'RPY_DYNPRO_INSERT custom import failed'
-        iv_subrc       = sy-subrc
-        iv_suggestion  = 'Check custom_controls and coordinates' ).
-      RETURN.
-    ENDIF.
-
-    GENERATE REPORT lv_program
-      MESSAGE lv_message
-      LINE lv_line
-      WORD lv_word.
-
-    IF sy-subrc = 0.
-      rv_json =
-        |\{"status":"OK","object_type":"DYNP",| &&
-        |"program":"{ lv_program }",| &&
-        |"screen":"{ lv_screen }",| &&
-        |"message":"Dynpro custom controls imported"\}|.
-    ELSE.
-      rv_json =
-        |\{"status":"ERROR",| &&
-        |"stage":"DYNPRO_CUSTOM_CONTROL_GENERATE",| &&
-        |"object_type":"DYNP",| &&
-        |"program":"{ lv_program }",| &&
-        |"screen":"{ lv_screen }",| &&
-                |"line":{ lv_line },| &&
-        |"word":"| &&
-        escape(
-          val = lv_word
-          format = cl_abap_format=>e_json_string ) &&
-        |",| &&
-        |"message":"| &&
-        escape(
-          val = lv_message
-          format = cl_abap_format=>e_json_string ) &&
-        |"\}|.
-    ENDIF.
-  ENDMETHOD.
-
-
-
-METHOD import_dynpro_layout_json.
+* <<< END METHOD INCLUDE ZCL_AI_MCP_REST_FUN===========CM01X
+* >>> BEGIN METHOD INCLUDE ZCL_AI_MCP_REST_FUN===========CM01Y
+  METHOD import_dynpro_layout_json.
     DATA ls_request TYPE ty_dynpro_layout_request.
     DATA lv_program TYPE d020s-prog.
     DATA lv_screen TYPE d020s-dnum.
@@ -5225,10 +5047,251 @@ METHOD import_dynpro_layout_json.
         |"message":"{ escape( val = lv_message format = cl_abap_format=>e_json_string ) }"\}|.
     ENDIF.
   ENDMETHOD.
+* <<< END METHOD INCLUDE ZCL_AI_MCP_REST_FUN===========CM01Y
+* >>> BEGIN METHOD INCLUDE ZCL_AI_MCP_REST_FUN===========CM01Z
+  METHOD import_dynpro_screen_json.
+    DATA ls_request TYPE ty_dynpro_custom_request.
+    DATA lv_program TYPE d020s-prog.
+    DATA lv_screen TYPE d020s-dnum.
+    DATA lv_language TYPE d020s-spra.
+    DATA lv_corrnum TYPE e071-trkorr.
+    DATA lv_ok_code TYPE string.
+    DATA lv_use_corrnum TYPE c LENGTH 1 VALUE space.
+    DATA lv_suppress_corr TYPE c LENGTH 1 VALUE 'X'.
+    DATA lv_suppress_exist TYPE c LENGTH 1 VALUE space.
+    DATA lv_suppress_generate TYPE c LENGTH 1 VALUE space.
+    DATA lv_suppress_dict TYPE c LENGTH 1 VALUE space.
+    DATA lv_suppress_extended TYPE c LENGTH 1 VALUE space.
+    DATA lv_suppress_commit TYPE c LENGTH 1 VALUE space.
+    DATA ls_header TYPE rpy_dyhead.
+    DATA lt_flow TYPE STANDARD TABLE OF rpy_dyflow.
+    DATA ls_flow TYPE rpy_dyflow.
+    DATA lt_params TYPE STANDARD TABLE OF rpy_dypara.
+    DATA lt_containers TYPE dycatt_tab.
+    DATA ls_container LIKE LINE OF lt_containers.
+    DATA lt_field_containers TYPE dyfatc_tab.
+    DATA ls_field_container LIKE LINE OF lt_field_containers.
+    DATA lv_message TYPE string.
+    DATA lv_line TYPE i.
+    DATA lv_word TYPE string.
 
+    TRY.
+        /ui2/cl_json=>deserialize(
+          EXPORTING json = iv_json
+          CHANGING  data = ls_request ).
+      CATCH cx_root INTO DATA(lx_dynpro_json).
+        rv_json = |\{"status":"ERROR","stage":"DYNPRO_SCREEN_JSON_PARSE","message":"{ escape( val = lx_dynpro_json->get_text( ) format = cl_abap_format=>e_json_string ) }"\}|.
+        RETURN.
+    ENDTRY.
 
+    IF ls_request-program IS INITIAL OR ls_request-screen IS INITIAL.
+      rv_json = '{"status":"ERROR","message":"program and screen are required"}'.
+      RETURN.
+    ENDIF.
+    IF ls_request-screen_elements IS INITIAL.
+      rv_json = '{"status":"ERROR","message":"screen_elements are required"}'.
+      RETURN.
+    ENDIF.
+    IF ls_request-screen NP '9+++'.
+      rv_json = '{"status":"ERROR","message":"screen must be a 4-digit number starting with 9"}'.
+      RETURN.
+    ENDIF.
 
-METHOD import_min_dynpro_json.
+    lv_program = to_upper( ls_request-program ).
+    lv_screen = ls_request-screen.
+    lv_language = ls_request-language.
+    IF lv_language IS INITIAL.
+      lv_language = sy-langu.
+    ENDIF.
+    IF strlen( ls_request-request ) > 3.
+      lv_corrnum = to_upper( ls_request-request ).
+      lv_use_corrnum = 'X'.
+    ENDIF.
+    IF ls_request-replace_existing = abap_true.
+      lv_suppress_exist = 'X'.
+    ENDIF.
+
+    lv_ok_code = to_upper( ls_request-ok_code ).
+    IF lv_ok_code IS INITIAL.
+      lv_ok_code = 'OK_CODE'.
+    ENDIF.
+
+    CLEAR ls_header.
+    ls_header-program = lv_program.
+    ls_header-screen = lv_screen.
+    ls_header-language = lv_language.
+    IF ls_request-description IS INITIAL.
+      ls_header-descript = |AI_MCP generated screen { lv_screen }|.
+    ELSE.
+      ls_header-descript = ls_request-description.
+    ENDIF.
+    ls_header-type = to_upper( ls_request-screen_type ).
+    IF ls_header-type <> 'I' AND ls_header-type <> 'N'.
+      ls_header-type = 'N'.
+    ENDIF.
+    IF ls_request-next_screen IS NOT INITIAL.
+      ls_header-nextscreen = ls_request-next_screen.
+    ELSE.
+      ls_header-nextscreen = lv_screen.
+    ENDIF.
+    IF ls_request-screen_lines > 0.
+      ls_header-lines = ls_request-screen_lines.
+    ELSE.
+      ls_header-lines = '24'.
+    ENDIF.
+    IF ls_request-screen_columns > 0.
+      ls_header-columns = ls_request-screen_columns.
+    ELSE.
+      ls_header-columns = '80'.
+    ENDIF.
+
+    CLEAR ls_container.
+    ls_container-type = 'SCREEN'.
+    ls_container-name = 'SCREEN'.
+    APPEND ls_container TO lt_containers.
+
+    LOOP AT ls_request-screen_elements INTO DATA(ls_element).
+      CLEAR ls_field_container.
+      ls_field_container-cont_type = 'SCREEN'.
+      ls_field_container-cont_name = 'SCREEN'.
+      ls_field_container-name = to_upper( ls_element-name ).
+      ls_field_container-type = to_upper( ls_element-type ).
+      ls_field_container-text = ls_element-text.
+      ls_field_container-line = ls_element-line.
+      ls_field_container-column = ls_element-column.
+      ls_field_container-length = ls_element-length.
+      IF ls_element-vislength > 0.
+        ls_field_container-vislength = ls_element-vislength.
+      ELSE.
+        ls_field_container-vislength = ls_element-length.
+      ENDIF.
+      IF ls_element-height > 0.
+        ls_field_container-height = ls_element-height.
+      ELSEIF ls_field_container-type = 'FRAME'.
+        ls_field_container-height = 20.
+      ELSE.
+        ls_field_container-height = 1.
+      ENDIF.
+      IF ls_element-format IS NOT INITIAL.
+        ls_field_container-format = to_upper( ls_element-format ).
+      ELSE.
+        ls_field_container-format = 'CHAR'.
+      ENDIF.
+      IF ls_element-input = abap_true.
+        ls_field_container-input_fld = 'X'.
+      ENDIF.
+      IF ls_element-output = abap_true.
+        ls_field_container-output_fld = 'X'.
+      ENDIF.
+      IF ls_element-invisible = abap_true.
+        ls_field_container-invisible = 'X'.
+      ENDIF.
+      IF ls_field_container-type = 'FRAME' AND ls_field_container-text IS INITIAL.
+        CLEAR ls_field_container-text.
+        DO ls_field_container-length TIMES.
+          ls_field_container-text = ls_field_container-text && '_'.
+        ENDDO.
+      ENDIF.
+      IF ls_field_container-type = 'PUSH'.
+        ls_field_container-push_fcode = to_upper( ls_element-fcode ).
+      ENDIF.
+      IF ls_element-icon_name IS NOT INITIAL.
+        ls_field_container-icon_name = to_upper( ls_element-icon_name ).
+        ls_field_container-with_icon = 'X'.
+      ENDIF.
+      IF ls_element-icon_text IS NOT INITIAL.
+        ls_field_container-icon_qinfo = ls_element-icon_text.
+      ENDIF.
+      IF ls_element-group1 IS NOT INITIAL.
+        ls_field_container-group1 = to_upper( ls_element-group1 ).
+      ENDIF.
+      APPEND ls_field_container TO lt_field_containers.
+    ENDLOOP.
+
+    CLEAR ls_field_container.
+    ls_field_container-cont_type = 'SCREEN'.
+    ls_field_container-cont_name = 'SCREEN'.
+    ls_field_container-name = lv_ok_code.
+    ls_field_container-type = 'OKCODE'.
+    ls_field_container-text = '____________________'.
+    ls_field_container-line = '0'.
+    ls_field_container-column = '0'.
+    ls_field_container-length = '20'.
+    ls_field_container-height = 1.
+    ls_field_container-vislength = 20.
+    ls_field_container-input_fld = 'X'.
+    ls_field_container-format = 'CHAR'.
+    APPEND ls_field_container TO lt_field_containers.
+
+    IF ls_request-flow_logic IS NOT INITIAL.
+      LOOP AT ls_request-flow_logic INTO DATA(lv_flow_line).
+        CLEAR ls_flow.
+        ls_flow-line = lv_flow_line.
+        APPEND ls_flow TO lt_flow.
+      ENDLOOP.
+    ELSE.
+      CLEAR ls_flow.
+      ls_flow-line = 'PROCESS BEFORE OUTPUT.'.
+      APPEND ls_flow TO lt_flow.
+      CLEAR ls_flow.
+      ls_flow-line = 'PROCESS AFTER INPUT.'.
+      APPEND ls_flow TO lt_flow.
+    ENDIF.
+
+    CALL FUNCTION 'RPY_DYNPRO_INSERT'
+      EXPORTING
+        header                    = ls_header
+        corrnum                   = lv_corrnum
+        suppress_corr_checks      = lv_suppress_corr
+        suppress_exist_checks     = lv_suppress_exist
+        suppress_generate         = lv_suppress_generate
+        suppress_dict_support     = lv_suppress_dict
+        suppress_extended_checks  = lv_suppress_extended
+        use_corrnum_immediatedly  = lv_use_corrnum
+        suppress_commit_work      = lv_suppress_commit
+      TABLES
+        flow_logic                = lt_flow
+        params                    = lt_params
+        containers                = lt_containers
+        fields_to_containers      = lt_field_containers
+      EXCEPTIONS
+        cancelled                 = 1
+        already_exists            = 2
+        program_not_exists        = 3
+        not_executed              = 4
+        missing_required_field    = 5
+        illegal_field_value       = 6
+        field_not_allowed         = 7
+        not_generated             = 8
+        illegal_field_position    = 9
+        OTHERS                    = 10.
+
+    IF sy-subrc <> 0.
+      rv_json = build_fm_error_json(
+        iv_stage       = 'DYNPRO_SCREEN_IMPORT'
+        iv_object_type = 'DYNP'
+        iv_object_name = |{ lv_program } { lv_screen }|
+        iv_message     = 'RPY_DYNPRO_INSERT screen import failed'
+        iv_subrc       = sy-subrc
+        iv_suggestion  = 'Check screen_elements, field coordinates, field types, and flow_logic' ).
+      RETURN.
+    ENDIF.
+
+    GENERATE REPORT lv_program
+      MESSAGE lv_message
+      LINE lv_line
+      WORD lv_word.
+
+    IF sy-subrc = 0.
+      rv_json = |\{"status":"OK","object_type":"DYNP","program":"{ lv_program }","screen":"{ lv_screen }","message":"Dynpro screen imported"\}|.
+    ELSE.
+      rv_json = |\{"status":"ERROR","stage":"DYNPRO_SCREEN_GENERATE","object_type":"DYNP","program":"{ lv_program }","screen":"{ lv_screen }","line":{ lv_line },"word":"{ escape( val = lv_word format = cl_abap_format=>e_json_string ) }","message":"{
+escape( val = lv_message format = cl_abap_format=>e_json_string ) }"\}|.
+    ENDIF.
+  ENDMETHOD.
+* <<< END METHOD INCLUDE ZCL_AI_MCP_REST_FUN===========CM01Z
+* >>> BEGIN METHOD INCLUDE ZCL_AI_MCP_REST_FUN===========CM020
+  METHOD import_min_dynpro_json.
     DATA ls_request TYPE ty_dynpro_request.
     DATA lv_program TYPE d020s-prog.
     DATA lv_screen TYPE d020s-dnum.
@@ -5356,9 +5419,9 @@ METHOD import_min_dynpro_json.
                 |"message":"{ escape( val = lv_message format = cl_abap_format=>e_json_string ) }"\}|.
     ENDIF.
   ENDMETHOD.
-
-
-METHOD import_tc_min_dynpro_json.
+* <<< END METHOD INCLUDE ZCL_AI_MCP_REST_FUN===========CM020
+* >>> BEGIN METHOD INCLUDE ZCL_AI_MCP_REST_FUN===========CM021
+  METHOD import_tc_min_dynpro_json.
     DATA ls_request TYPE ty_dynpro_request.
     DATA lv_program TYPE d020s-prog.
     DATA lv_screen TYPE d020s-dnum.
@@ -5602,17 +5665,17 @@ METHOD import_tc_min_dynpro_json.
                 |"message":"{ escape( val = lv_message format = cl_abap_format=>e_json_string ) }"\}|.
     ENDIF.
   ENDMETHOD.
-
-
-METHOD is_z_object_name.
+* <<< END METHOD INCLUDE ZCL_AI_MCP_REST_FUN===========CM021
+* >>> BEGIN METHOD INCLUDE ZCL_AI_MCP_REST_FUN===========CM022
+  METHOD is_z_object_name.
     DATA lv_name TYPE string.
 
     lv_name = to_upper( iv_name ).
     rv_valid = xsdbool( lv_name CP 'Z*' ).
   ENDMETHOD.
-
-
-METHOD locks_from_json.
+* <<< END METHOD INCLUDE ZCL_AI_MCP_REST_FUN===========CM022
+* >>> BEGIN METHOD INCLUDE ZCL_AI_MCP_REST_FUN===========CM023
+  METHOD locks_from_json.
     DATA ls_request TYPE ty_lock_request.
     DATA lt_locks TYPE STANDARD TABLE OF seqg3 WITH EMPTY KEY.
     DATA lv_locks TYPE string VALUE '['.
@@ -5665,9 +5728,9 @@ METHOD locks_from_json.
     lv_locks = lv_locks && ']'.
     rv_json = |\{"status":"OK","object_name":"{ lv_object_name }","lock_count":{ lv_number },"subrc":{ lv_subrc },"locks":{ lv_locks }\}|.
   ENDMETHOD.
-
-
-METHOD message_save_from_json.
+* <<< END METHOD INCLUDE ZCL_AI_MCP_REST_FUN===========CM023
+* >>> BEGIN METHOD INCLUDE ZCL_AI_MCP_REST_FUN===========CM024
+  METHOD message_save_from_json.
     TYPES: BEGIN OF ty_message_work,
              requested_number TYPE string,
              number           TYPE string,
@@ -5942,9 +6005,9 @@ METHOD message_save_from_json.
               |"results":{ lv_results_json },| &&
               |"bdc_messages":{ lv_bdc_json }\}|.
   ENDMETHOD.
-
-
-METHOD object_lifecycle_from_json.
+* <<< END METHOD INCLUDE ZCL_AI_MCP_REST_FUN===========CM024
+* >>> BEGIN METHOD INCLUDE ZCL_AI_MCP_REST_FUN===========CM025
+  METHOD object_lifecycle_from_json.
     DATA ls_request TYPE ty_lifecycle_request.
     DATA lv_object_type TYPE string.
     DATA lv_mode TYPE string.
@@ -6160,9 +6223,9 @@ METHOD object_lifecycle_from_json.
               |"max_repair_rounds":{ lv_max_rounds },"steps":{ lv_steps },| &&
               |"final":\{"active":{ lv_active_json },"error_count":{ lv_error_count_json }\}\}|.
   ENDMETHOD.
-
-
-METHOD object_repair_from_json.
+* <<< END METHOD INCLUDE ZCL_AI_MCP_REST_FUN===========CM025
+* >>> BEGIN METHOD INCLUDE ZCL_AI_MCP_REST_FUN===========CM026
+  METHOD object_repair_from_json.
     DATA ls_request TYPE ty_object_repair_request.
     DATA lv_object_type TYPE string.
     DATA lv_target_kind TYPE string.
@@ -6321,9 +6384,9 @@ METHOD object_repair_from_json.
               |"read_back":{ lv_read_back },"check":{ lv_check_result },| &&
               |"activate":{ lv_activate_result }\}|.
   ENDMETHOD.
-
-
-METHOD probe_class_activation_check.
+* <<< END METHOD INCLUDE ZCL_AI_MCP_REST_FUN===========CM026
+* >>> BEGIN METHOD INCLUDE ZCL_AI_MCP_REST_FUN===========CM027
+  METHOD probe_class_activation_check.
     DATA lv_class TYPE seoclsname.
     DATA lt_objects TYPE STANDARD TABLE OF dwinactiv WITH EMPTY KEY.
     DATA ls_object TYPE dwinactiv.
@@ -6629,7 +6692,7 @@ METHOD probe_class_activation_check.
         object_type = 'CLAS'
         object_name = lv_class
         stage       = 'CL_WB_CHECKLIST'
-        value       = ls_error-code
+*        value       = ls_error-code
         message     = lv_error_text ) TO lt_results.
     ENDLOOP.
 
@@ -6662,9 +6725,9 @@ METHOD probe_class_activation_check.
               |"check_only":true,"error_count":{ lv_error_count },| &&
               |"results":{ lv_results_json }\}|.
   ENDMETHOD.
-
-
-METHOD probe_run_from_json.
+* <<< END METHOD INCLUDE ZCL_AI_MCP_REST_FUN===========CM027
+* >>> BEGIN METHOD INCLUDE ZCL_AI_MCP_REST_FUN===========CM028
+  METHOD probe_run_from_json.
     DATA ls_request TYPE ty_probe_run_request.
     DATA lv_runner TYPE syrepid.
     DATA lv_memid TYPE c LENGTH 80.
@@ -6748,9 +6811,9 @@ METHOD probe_run_from_json.
     rv_json = |\{"status":"OK","runner":"{ lv_runner }","memory_id":"{ lv_memid }",| &&
               |"results":{ lv_results_json }\}|.
   ENDMETHOD.
-
-
-METHOD read_function_from_json.
+* <<< END METHOD INCLUDE ZCL_AI_MCP_REST_FUN===========CM028
+* >>> BEGIN METHOD INCLUDE ZCL_AI_MCP_REST_FUN===========CM029
+  METHOD read_function_from_json.
     DATA ls_request TYPE ty_function_check_request.
     DATA lv_function_name TYPE rs38l-name.
     DATA lv_function_group TYPE rs38l-area.
@@ -6906,9 +6969,9 @@ METHOD read_function_from_json.
       rv_json = rv_json && |\}|.
     ENDIF.
   ENDMETHOD.
-
-
-METHOD read_function_group_from_json.
+* <<< END METHOD INCLUDE ZCL_AI_MCP_REST_FUN===========CM029
+* >>> BEGIN METHOD INCLUDE ZCL_AI_MCP_REST_FUN===========CM02A
+  METHOD read_function_group_from_json.
     DATA ls_request TYPE ty_function_group_read_request.
     DATA lv_function_group TYPE rs38l-area.
     DATA lv_program TYPE syrepid.
@@ -7128,9 +7191,9 @@ METHOD read_function_group_from_json.
       rv_json = rv_json && |\}|.
     ENDIF.
   ENDMETHOD.
-
-
-METHOD read_object_from_json.
+* <<< END METHOD INCLUDE ZCL_AI_MCP_REST_FUN===========CM02A
+* >>> BEGIN METHOD INCLUDE ZCL_AI_MCP_REST_FUN===========CM02B
+  METHOD read_object_from_json.
     DATA ls_request TYPE ty_read_request.
     DATA lv_object_type TYPE string.
     DATA lv_program TYPE syrepid.
@@ -7359,9 +7422,9 @@ METHOD read_object_from_json.
       rv_json = rv_json && |\}|.
     ENDIF.
   ENDMETHOD.
-
-
-METHOD register_class_tadir_entries.
+* <<< END METHOD INCLUDE ZCL_AI_MCP_REST_FUN===========CM02B
+* >>> BEGIN METHOD INCLUDE ZCL_AI_MCP_REST_FUN===========CM02C
+  METHOD register_class_tadir_entries.
     DATA lv_package TYPE devclass.
     DATA lv_class TYPE tadir-obj_name.
     DATA lv_result TYPE string.
@@ -7381,9 +7444,9 @@ METHOD register_class_tadir_entries.
 
     rv_json = |\{"status":"OK","object_type":"CLAS","object_name":"{ lv_class }","message":"Class TADIR entries registered"\}|.
   ENDMETHOD.
-
-
-METHOD register_cts_object.
+* <<< END METHOD INCLUDE ZCL_AI_MCP_REST_FUN===========CM02C
+* >>> BEGIN METHOD INCLUDE ZCL_AI_MCP_REST_FUN===========CM02D
+  METHOD register_cts_object.
     DATA lv_package TYPE devclass.
     DATA lv_transport TYPE trkorr.
     DATA lv_object TYPE tadir-obj_name.
@@ -7434,9 +7497,9 @@ METHOD register_cts_object.
     rv_json = |\{"status":"OK","object_type":"{ lv_object_type }","object_name":"{ lv_object }",| &&
               |"package":"{ lv_package }","transport":"{ lv_transport }","message":"Object registered in CTS"\}|.
   ENDMETHOD.
-
-
-METHOD register_tadir_entry.
+* <<< END METHOD INCLUDE ZCL_AI_MCP_REST_FUN===========CM02D
+* >>> BEGIN METHOD INCLUDE ZCL_AI_MCP_REST_FUN===========CM02E
+  METHOD register_tadir_entry.
     DATA lv_pgmid TYPE tadir-pgmid.
     DATA lv_object_type TYPE tadir-object.
     DATA lv_object TYPE tadir-obj_name.
@@ -7494,9 +7557,9 @@ METHOD register_tadir_entry.
 
     rv_json = |\{"status":"OK","object_type":"{ lv_object_type }","object_name":"{ lv_object }","message":"TADIR entry registered"\}|.
   ENDMETHOD.
-
-
-METHOD run.
+* <<< END METHOD INCLUDE ZCL_AI_MCP_REST_FUN===========CM02E
+* >>> BEGIN METHOD INCLUDE ZCL_AI_MCP_REST_FUN===========CM02F
+  METHOD run.
     DATA(lv_ddic_result) = create_ddic_from_json( iv_json ).
     IF lv_ddic_result CS '"status":"ERROR"'.
       rv_json = |\{"status":"ERROR","stage":"DDIC_CREATE","ddic":{ lv_ddic_result },"message":"DDIC creation failed; source save and program check were skipped"\}|.
@@ -7522,9 +7585,9 @@ METHOD run.
     DATA(lv_activate_result) = activate_from_json( iv_json ).
     rv_json = |\{"status":"OK","ddic":{ lv_ddic_result },"check":{ lv_check_result },"save":{ lv_save_result },"activate":{ lv_activate_result }\}|.
   ENDMETHOD.
-
-
-METHOD save_class.
+* <<< END METHOD INCLUDE ZCL_AI_MCP_REST_FUN===========CM02F
+* >>> BEGIN METHOD INCLUDE ZCL_AI_MCP_REST_FUN===========CM02G
+  METHOD save_class.
     DATA lt_source TYPE STANDARD TABLE OF string WITH EMPTY KEY.
     DATA lv_class TYPE seoclsname.
     DATA lv_package TYPE devclass.
@@ -7845,9 +7908,9 @@ METHOD save_class.
 
     rv_json = |\{"status":"OK","object_type":"CLAS","object_name":"{ lv_class }","message":"Class saved"\}|.
   ENDMETHOD.
-
-
-METHOD save_fugr_main_source_json.
+* <<< END METHOD INCLUDE ZCL_AI_MCP_REST_FUN===========CM02G
+* >>> BEGIN METHOD INCLUDE ZCL_AI_MCP_REST_FUN===========CM02H
+  METHOD save_fugr_main_source_json.
     DATA ls_request TYPE ty_fugr_main_source_request.
     DATA lv_program TYPE syrepid.
     DATA lv_group TYPE string.
@@ -7939,9 +8002,9 @@ METHOD save_fugr_main_source_json.
                 |"message":"{ escape( val = lv_message format = cl_abap_format=>e_json_string ) }"\}|.
     ENDIF.
   ENDMETHOD.
-
-
-METHOD save_function_source_from_json.
+* <<< END METHOD INCLUDE ZCL_AI_MCP_REST_FUN===========CM02H
+* >>> BEGIN METHOD INCLUDE ZCL_AI_MCP_REST_FUN===========CM02I
+  METHOD save_function_source_from_json.
     DATA ls_request TYPE ty_function_source_request.
     DATA lv_function_name TYPE rs38l-name.
     DATA lv_function_group TYPE rs38l-area.
@@ -8022,9 +8085,9 @@ METHOD save_function_source_from_json.
               |"include":"{ lv_include }",| &&
               |"message":"Function include source saved"\}|.
   ENDMETHOD.
-
-
-METHOD save_include_source_from_json.
+* <<< END METHOD INCLUDE ZCL_AI_MCP_REST_FUN===========CM02I
+* >>> BEGIN METHOD INCLUDE ZCL_AI_MCP_REST_FUN===========CM02J
+  METHOD save_include_source_from_json.
     DATA ls_request TYPE ty_include_source_request.
     DATA lv_function_group TYPE rs38l-area.
     DATA lv_include TYPE syrepid.
@@ -8094,9 +8157,9 @@ METHOD save_include_source_from_json.
               |"function_group":"{ lv_function_group }",| &&
               |"message":"Include source saved"\}|.
   ENDMETHOD.
-
-
-METHOD save_report.
+* <<< END METHOD INCLUDE ZCL_AI_MCP_REST_FUN===========CM02J
+* >>> BEGIN METHOD INCLUDE ZCL_AI_MCP_REST_FUN===========CM02K
+  METHOD save_report.
     DATA lt_source TYPE STANDARD TABLE OF string WITH EMPTY KEY.
     DATA lv_program TYPE progname.
     DATA lv_package TYPE devclass.
@@ -8182,9 +8245,9 @@ METHOD save_report.
               |"program_type":"{ COND string( WHEN lv_program_type = 'I' OR lv_subc = 'I' THEN 'I' ELSE '1' ) }",| &&
               |"message":"Source saved"\}|.
   ENDMETHOD.
-
-
-METHOD save_source_from_json.
+* <<< END METHOD INCLUDE ZCL_AI_MCP_REST_FUN===========CM02K
+* >>> BEGIN METHOD INCLUDE ZCL_AI_MCP_REST_FUN===========CM02L
+  METHOD save_source_from_json.
     DATA ls_request TYPE ty_source_request.
 
     /ui2/cl_json=>deserialize(
@@ -8205,9 +8268,9 @@ METHOD save_source_from_json.
         rv_json = '{"status":"ERROR","message":"Only PROG/REPORT and CLAS/CLASS are implemented"}'.
     ENDCASE.
   ENDMETHOD.
-
-
-METHOD status_from_json.
+* <<< END METHOD INCLUDE ZCL_AI_MCP_REST_FUN===========CM02L
+* >>> BEGIN METHOD INCLUDE ZCL_AI_MCP_REST_FUN===========CM02M
+  METHOD status_from_json.
     DATA ls_request TYPE ty_ddic_request.
     DATA lv_results TYPE string VALUE '['.
 
@@ -8242,9 +8305,9 @@ METHOD status_from_json.
     lv_results = lv_results && ']'.
     rv_json = |\{"status":"OK","results":{ lv_results }\}|.
   ENDMETHOD.
-
-
-METHOD syntax_check_source.
+* <<< END METHOD INCLUDE ZCL_AI_MCP_REST_FUN===========CM02M
+* >>> BEGIN METHOD INCLUDE ZCL_AI_MCP_REST_FUN===========CM02N
+  METHOD syntax_check_source.
     DATA lt_source TYPE STANDARD TABLE OF string WITH EMPTY KEY.
     DATA lv_message TYPE string.
     DATA lv_line TYPE i.
@@ -8280,9 +8343,9 @@ METHOD syntax_check_source.
                 |"suggestion":"Fix the syntax error at the returned line and word, then retry"\}]\}|.
     ENDIF.
   ENDMETHOD.
-
-
-METHOD table_exists.
+* <<< END METHOD INCLUDE ZCL_AI_MCP_REST_FUN===========CM02N
+* >>> BEGIN METHOD INCLUDE ZCL_AI_MCP_REST_FUN===========CM02O
+  METHOD table_exists.
     DATA lv_tabname TYPE dd02l-tabname.
 
     SELECT SINGLE tabname
@@ -8293,9 +8356,9 @@ METHOD table_exists.
 
     rv_exists = xsdbool( sy-subrc = 0 ).
   ENDMETHOD.
-
-
-METHOD textpool_save_from_json.
+* <<< END METHOD INCLUDE ZCL_AI_MCP_REST_FUN===========CM02O
+* >>> BEGIN METHOD INCLUDE ZCL_AI_MCP_REST_FUN===========CM02P
+  METHOD textpool_save_from_json.
     TYPES: BEGIN OF ty_textpool_work,
              requested_key TYPE string,
              id            TYPE string,
@@ -8621,9 +8684,9 @@ METHOD textpool_save_from_json.
               |"cts":{ lv_cts_json },| &&
               |"results":{ lv_results_json }\}|.
   ENDMETHOD.
-
-
-METHOD validate_fugr_include_write.
+* <<< END METHOD INCLUDE ZCL_AI_MCP_REST_FUN===========CM02P
+* >>> BEGIN METHOD INCLUDE ZCL_AI_MCP_REST_FUN===========CM02Q
+  METHOD validate_fugr_include_write.
     DATA lv_function_group TYPE string.
     DATA lv_include TYPE string.
     DATA lv_prefix TYPE string.
@@ -8682,9 +8745,9 @@ METHOD validate_fugr_include_write.
               |"function_group":"{ lv_function_group }",| &&
               |"message":"Only TOP, Fxx, Oxx, Ixx generated includes are allowed for this route"\}|.
   ENDMETHOD.
-
-
-METHOD validate_names.
+* <<< END METHOD INCLUDE ZCL_AI_MCP_REST_FUN===========CM02Q
+* >>> BEGIN METHOD INCLUDE ZCL_AI_MCP_REST_FUN===========CM02R
+  METHOD validate_names.
     DATA lv_messages TYPE string VALUE '['.
     DATA lt_domain_names TYPE STANDARD TABLE OF string WITH EMPTY KEY.
     DATA lt_dtel_names TYPE STANDARD TABLE OF string WITH EMPTY KEY.
@@ -8815,9 +8878,9 @@ METHOD validate_names.
       rv_json = |\{"status":"ERROR","messages":{ lv_messages }\}|.
     ENDIF.
   ENDMETHOD.
-
-
-METHOD validate_names_from_json.
+* <<< END METHOD INCLUDE ZCL_AI_MCP_REST_FUN===========CM02R
+* >>> BEGIN METHOD INCLUDE ZCL_AI_MCP_REST_FUN===========CM02S
+  METHOD validate_names_from_json.
     DATA ls_request TYPE ty_ddic_request.
 
     TRY.
@@ -8831,63 +8894,160 @@ METHOD validate_names_from_json.
                   |"message":"{ escape( val = lx_validate->get_text( ) format = cl_abap_format=>e_json_string ) }"\}|.
     ENDTRY.
   ENDMETHOD.
+* <<< END METHOD INCLUDE ZCL_AI_MCP_REST_FUN===========CM02S
 
-
-METHOD write_json.
-    io_server->response->set_status( code = iv_status reason = 'OK' ).
-    io_server->response->set_header_field( name = 'Content-Type' value = 'application/json; charset=utf-8' ).
-    io_server->response->set_cdata( iv_json ).
-  ENDMETHOD.
-
-  METHOD handle_transport_create.
-    DATA(lv_result) = transport_create_from_json( io_server->request->get_cdata( ) ).
-    write_json( io_server = io_server iv_status = 200 iv_json = lv_result ).
-  ENDMETHOD.
-
-  METHOD transport_create_from_json.
-    DATA ls_req TYPE ty_transport_create_request.
-    DATA lv_trkorr TYPE trkorr.
-    DATA lv_type TYPE trfunction VALUE 'K'.
-    DATA lv_text TYPE as4text.
-    DATA lv_target TYPE trtarget.
+  METHOD function_execute_from_json.
+    DATA ls_req  TYPE ty_function_execute_req.
+    DATA ls_res  TYPE ty_function_execute_res.
+    DATA lv_func TYPE rs38l_fnam.
+    
+    ls_res-status = 'OK'.
 
     TRY.
         /ui2/cl_json=>deserialize(
           EXPORTING json = iv_json
           CHANGING  data = ls_req ).
-      CATCH cx_root INTO DATA(lx_err).
-        rv_json = |\{"status":"ERROR","message":"JSON parse error: { escape( val = lx_err->get_text( ) format = cl_abap_format=>e_json_string ) }"\}|.
+      CATCH cx_root INTO DATA(lx_json).
+        ls_res-status = 'ERROR'.
+        ls_res-message = |JSON Parse Error: { escape( val = lx_json->get_text( ) format = cl_abap_format=>e_json_string ) }|.
+        rv_json = /ui2/cl_json=>serialize( data = ls_res ).
         RETURN.
     ENDTRY.
 
-    IF ls_req-description IS INITIAL.
-      rv_json = '{"status":"ERROR","message":"description is required"}'.
+    IF ls_req-function_name IS INITIAL.
+      ls_res-status = 'ERROR'.
+      ls_res-message = 'function_name is required'.
+      rv_json = /ui2/cl_json=>serialize( data = ls_res ).
       RETURN.
     ENDIF.
 
-    lv_text = ls_req-description.
-    IF ls_req-type IS NOT INITIAL.
-      lv_type = to_upper( ls_req-type ).
-    ENDIF.
-    IF ls_req-target_system IS NOT INITIAL.
-      lv_target = to_upper( ls_req-target_system ).
+    lv_func = to_upper( ls_req-function_name ).
+
+    SELECT funcname, parameter, paramtype, structure, pposition
+      FROM fuparef
+      INTO TABLE @DATA(lt_params)
+      WHERE funcname = @lv_func.
+
+    IF sy-subrc <> 0.
+      ls_res-status = 'ERROR'.
+      ls_res-message = |Function module { lv_func } not found in FUPARAREF|.
+      rv_json = /ui2/cl_json=>serialize( data = ls_res ).
+      RETURN.
     ENDIF.
 
-    CALL FUNCTION 'TR_INSERT_REQUEST_WITH_TASKS'
-      EXPORTING
-        iv_type           = lv_type
-        iv_text           = lv_text
-        iv_owner          = sy-uname
-        iv_target         = lv_target
-      IMPORTING
-        ev_trkorr         = lv_trkorr
-      EXCEPTIONS
-        OTHERS            = 1.
+    DATA lt_ptab TYPE abap_func_parmbind_tab.
+    DATA ls_ptab TYPE abap_func_parmbind.
 
-    IF sy-subrc = 0 AND lv_trkorr IS NOT INITIAL.
-      rv_json = |\{"status":"OK","trkorr":"{ lv_trkorr }","type":"{ lv_type }","description":"{ escape( val = lv_text format = cl_abap_format=>e_json_string ) }","owner":"{ sy-uname }"\}|.
-    ELSE.
-      rv_json = |\{"status":"ERROR","message":"Failed to create transport request in SAP, subrc={ sy-subrc }"\}|.
-    ENDIF.
+    FIELD-SYMBOLS <fs_group> TYPE any.
+    FIELD-SYMBOLS <fs_val>   TYPE any.
+
+    LOOP AT lt_params INTO DATA(ls_param).
+      CLEAR ls_ptab.
+      ls_ptab-name = ls_param-parameter.
+
+      DATA dref TYPE REF TO data.
+      TRY.
+          IF ls_param-structure IS NOT INITIAL.
+            CREATE DATA dref TYPE (ls_param-structure).
+          ELSE.
+            CREATE DATA dref TYPE string.
+          ENDIF.
+        CATCH cx_root.
+          CREATE DATA dref TYPE string.
+      ENDTRY.
+
+      DATA lv_param_json TYPE string.
+      CLEAR lv_param_json.
+      DATA lv_lower_name TYPE string.
+
+      CASE ls_param-paramtype.
+        WHEN 'I'. 
+          ls_ptab-kind = abap_func_exporting.
+          IF ls_req-importing IS BOUND.
+            ASSIGN ls_req-importing->* TO <fs_group>.
+            IF <fs_group> IS ASSIGNED.
+              ASSIGN COMPONENT ls_param-parameter OF STRUCTURE <fs_group> TO <fs_val>.
+              IF sy-subrc <> 0.
+                lv_lower_name = to_lower( ls_param-parameter ).
+                ASSIGN COMPONENT lv_lower_name OF STRUCTURE <fs_group> TO <fs_val>.
+              ENDIF.
+              IF sy-subrc = 0.
+                lv_param_json = /ui2/cl_json=>serialize( data = <fs_val> ).
+              ENDIF.
+            ENDIF.
+          ENDIF.
+
+        WHEN 'E'. 
+          ls_ptab-kind = abap_func_importing.
+
+        WHEN 'C'. 
+          ls_ptab-kind = abap_func_changing.
+          IF ls_req-changing IS BOUND.
+            ASSIGN ls_req-changing->* TO <fs_group>.
+            IF <fs_group> IS ASSIGNED.
+              ASSIGN COMPONENT ls_param-parameter OF STRUCTURE <fs_group> TO <fs_val>.
+              IF sy-subrc <> 0.
+                lv_lower_name = to_lower( ls_param-parameter ).
+                ASSIGN COMPONENT lv_lower_name OF STRUCTURE <fs_group> TO <fs_val>.
+              ENDIF.
+              IF sy-subrc = 0.
+                lv_param_json = /ui2/cl_json=>serialize( data = <fs_val> ).
+              ENDIF.
+            ENDIF.
+          ENDIF.
+
+        WHEN 'T'. 
+          ls_ptab-kind = abap_func_tables.
+          IF ls_req-tables IS BOUND.
+            ASSIGN ls_req-tables->* TO <fs_group>.
+            IF <fs_group> IS ASSIGNED.
+              ASSIGN COMPONENT ls_param-parameter OF STRUCTURE <fs_group> TO <fs_val>.
+              IF sy-subrc <> 0.
+                lv_lower_name = to_lower( ls_param-parameter ).
+                ASSIGN COMPONENT lv_lower_name OF STRUCTURE <fs_group> TO <fs_val>.
+              ENDIF.
+              IF sy-subrc = 0.
+                lv_param_json = /ui2/cl_json=>serialize( data = <fs_val> ).
+              ENDIF.
+            ENDIF.
+          ENDIF.
+      ENDCASE.
+
+      IF lv_param_json IS NOT INITIAL AND lv_param_json <> 'null'.
+        TRY.
+            ASSIGN dref->* TO FIELD-SYMBOL(<fs_target>).
+            /ui2/cl_json=>deserialize(
+              EXPORTING json = lv_param_json
+              CHANGING  data = <fs_target> ).
+          CATCH cx_root.
+          ENDTRY.
+      ENDIF.
+
+      ls_ptab-value = dref.
+      INSERT ls_ptab INTO TABLE lt_ptab.
+    ENDLOOP.
+
+    TRY.
+        CALL FUNCTION lv_func
+          PARAMETER-TABLE lt_ptab.
+      CATCH cx_root INTO DATA(lx_err).
+        ls_res-status = 'ERROR'.
+        ls_res-subrc = sy-subrc.
+        ls_res-message = |Execution exception: { escape( val = lx_err->get_text( ) format = cl_abap_format=>e_json_string ) }|.
+        rv_json = /ui2/cl_json=>serialize( data = ls_res ).
+        RETURN.
+    ENDTRY.
+
+    ls_res-subrc = sy-subrc.
+    ls_res-parameters = lt_ptab.
+    rv_json = /ui2/cl_json=>serialize( data = ls_res ).
   ENDMETHOD.
-ENDCLASS.
+* >>> BEGIN METHOD INCLUDE ZCL_AI_MCP_REST_FUN===========CM02T
+  METHOD write_json.
+    io_server->response->set_status( code = iv_status reason = 'OK' ).
+    io_server->response->set_header_field( name = 'Content-Type' value = 'application/json; charset=utf-8' ).
+    io_server->response->set_cdata( iv_json ).
+  ENDMETHOD.
+* <<< END METHOD INCLUDE ZCL_AI_MCP_REST_FUN===========CM02T
+endclass. "ZCL_AI_MCP_REST_FUN implementation
+

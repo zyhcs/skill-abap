@@ -20,8 +20,13 @@
     "DTEL": "ZDE_{NAME}",
     "DOMA": "ZDO_{NAME}"
   },
+  "transport_request_patterns": {
+    "WORKBENCH": "{MODULE}_{DESCRIPTION}_BY_{USER}_{YYYYMMDD}",
+    "TOC": "TOC_{MODULE}_{DESCRIPTION}_BY_{USER}_{YYYYMMDD}"
+  },
   "rules_notes": [
     "1. 所有自定义对象名必须以 Z 开头 (系统硬性防护)。",
-    "2. 建议根据业务模块填充 {MODULE} 前缀，具体细则待用户补充规则后启用。"
+    "2. 建议根据业务模块填充 {MODULE} 前缀，具体细则待用户补充规则后启用。",
+    "3. 传输请求（Formal & TOC）遵循 模块_功能描述_BY_用户名_日期 规则。"
   ]
 }

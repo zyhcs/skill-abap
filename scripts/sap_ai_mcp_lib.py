@@ -47,12 +47,17 @@ ENDPOINTS = {
     "function_create": {"path": "/function/create", "mode": "write", "defaults": {}},
     "function_check": {"path": "/function/check", "mode": "check", "defaults": {}},
     "function_source_save": {"path": "/function/source_save", "mode": "write", "defaults": {}},
+    "function_execute": {"path": "/function/execute", "mode": "write", "defaults": {}},
     "include_source_save": {"path": "/include/source_save", "mode": "write", "defaults": {}},
     "dynpro_import_screen": {"path": "/dynpro/import_screen", "mode": "write", "defaults": {}},
     "dynpro_import_from_json": {"path": "/dynpro/import_from_json", "mode": "write", "defaults": {}},
     "dynpro_import_custom_control": {"path": "/dynpro/import_custom_control", "mode": "write", "defaults": {}},
     "dynpro_import_layout": {"path": "/dynpro/import_layout", "mode": "write", "defaults": {}},
     "transport_create": {"path": "/transport/create", "mode": "write", "defaults": {"type": "K"}},
+    "transport_copy": {"path": "/transport/copy", "mode": "write", "defaults": {}},
+    "transport_release": {"path": "/transport/release", "mode": "write", "defaults": {}},
+    "transport_import": {"path": "/transport/import", "mode": "write", "defaults": {}},
+    "transport_search": {"path": "/transport/search", "mode": "read", "defaults": {}},
     "table_read": {"path": "/table/read", "mode": "read", "defaults": {}},
 }
 

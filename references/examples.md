@@ -279,4 +279,130 @@ ZSDG_AI_MCP_RMB_UPPER02
 ZSDF_AI_MCP_RMB_TO_UPPER02
 ZSDF_AI_MCP_IEC001
 ZSDF_AI_MCP_GOODTYP
+ZRFM_TEST_DEMO
+```
+
+## Function Module Execution Payload
+
+Use `/function/execute` to dynamically call a Function Module with parameter deserialization and structured JSON return.
+
+Request:
+```json
+{
+  "function_name": "ZRFM_TEST_DEMO",
+  "importing": {
+    "IS_REQUEST": {
+      "REQUEST": {
+        "INPUT": "hello abap"
+      }
+    }
+  }
+}
+```
+
+Response:
+```json
+{
+  "STATUS": "OK",
+  "SUBRC": 0,
+  "MESSAGE": "",
+  "PARAMETERS": [
+    {
+      "NAME": "IS_REQUEST",
+      "KIND": 10,
+      "VALUE": {
+        "UUID": "",
+        "INTERFACE_ID": "",
+        "SR_SYSID": "",
+        "REQUEST": {
+          "INPUT": "hello abap"
+        }
+      }
+    },
+    {
+      "NAME": "ES_RESPONSE",
+      "KIND": 20,
+      "VALUE": {
+        "UUID": "",
+        "SR_SYSID": "",
+        "INTERFACE_ID": "",
+        "TYPE": "S",
+        "MESSAGE": "Success",
+        "RESPONSE": {
+          "OUTPUT": "在20260727092455时刻收到请求!"
+        }
+      }
+    }
+  ]
+}
+```
+
+## Transport Request Search Payload
+
+Use `/transport/search` to discover unreleased requests for a specified user or type.
+
+Request:
+```json
+{
+  "username": "021569",
+  "request_type": "K",
+  "status": "D"
+}
+```
+
+## Transport Request Create (TOC / Workbench) Payload
+
+Use `/transport/create` to create a new Workbench request or Transport of Copies (TOC).
+
+Request (TOC):
+```json
+{
+  "type": "T",
+  "text": "TOC_FI_ZFI064_SH_BY_021569_20260727",
+  "target": "S4Q"
+}
+```
+
+Request (Workbench):
+```json
+{
+  "type": "K",
+  "text": "FI_ZFI064_SH_BY_021569_20260727"
+}
+```
+
+## Transport Object Copy Payload
+
+Use `/transport/copy` to pull objects from a source request into a target TOC request.
+
+Request:
+```json
+{
+  "source_tr": "S4DK997855",
+  "target_tr": "S4DK998251"
+}
+```
+
+## Transport Release Payload
+
+Use `/transport/release` to release a request and auto-bypass locking checks for TOCs.
+
+Request:
+```json
+{
+  "trkorr": "S4DK998251"
+}
+```
+
+## Transport Import Payload
+
+Use `/transport/import` on the target profile (e.g. `--profile qas600`) to trigger TMS import.
+
+Request:
+```json
+{
+  "trkorr": "S4DK998251",
+  "system": "S4Q",
+  "client": "600"
+}
 ```

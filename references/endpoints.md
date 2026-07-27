@@ -39,6 +39,7 @@ http://<your-sap-host>:<port>/sap/bc/zai_mcp_rest/object/check?sap-client=100
 | `/object/lifecycle` | Orchestrate save/check/repair/check/activate/verify for supported objects. Default repair rounds: 3; hard limit: 5. First supported objects: `PROG` and `CLAS`. |
 | `/function/create` | Create a function group and function module |
 | `/function/check` | Check a function module by compiling its function group program |
+| `/function/execute` | Dynamic Function Module execution. Accepts `function_name`, `importing`, `changing`, `tables` and returns `exporting`, `changing`, `tables`, `subrc`, and `exception`. |
 | `/function/source_save` | Update source of an existing Z function module include. The handler resolves the function module to its generated `LZ*Uxx` include and validates that it belongs to the Z function group before saving. |
 | `/include/source_save` | Update a generated `LZ*` function group include for a Z function group. Allows `TOP`, `Fxx`, `Oxx`, and `Ixx`; rejects `Uxx` so function module source must go through `/function/source_save`. Payload requires `function_group`, `include_name`, and full `source_code`; optional `check_function` runs `/function/check` after save. |
 | `/function/main_source_save` | Update a `SAPLZ*` function group main include list |
@@ -48,7 +49,11 @@ http://<your-sap-host>:<port>/sap/bc/zai_mcp_rest/object/check?sap-client=100
 | `/dynpro/import_screen` | Create or update a generated normal Dynpro screen from JSON using only `screen_elements` and optional `flow_logic`; does not require or create table controls or custom controls. |
 | `/dynpro/import_custom_control` | Create or update a generated Dynpro screen from JSON with one or more Dynpro `CUST_CTRL` containers for OO ALV/custom controls. This is separate from `/dynpro/import_from_json` and does not create table controls. |
 | `/dynpro/import_layout` | Create or update a generated Dynpro screen from JSON with explicit `containers[]` plus `screen_elements[]`. Use this for layout containers such as `SUBSCREEN` and `STRIP_CTRL`/tabstrip structures without changing the normal, table-control, or custom-control import behavior. |
-| `/transport/create` | Create a new SAP Transport Request (TRKORR, Workbench/Customizing) |
+| `/transport/create` | Create a new SAP Transport Request (TRKORR, Workbench/Customizing/Transport of Copies) |
+| `/transport/copy` | Copy objects from a source request (and its tasks) to a target request using safe TR_REQUEST_CHOICE |
+| `/transport/release` | Release a transport request and its tasks. Automatically skips lock checking for TOCs |
+| `/transport/import` | Trigger TMS import for a request in a target system/client |
+| `/transport/search` | Search for unreleased requests belonging to a user by type and status |
 | `/run` | Combined DDIC create plus ABAP check/save/activate flow |
 | `/capabilities` | Return handler feature flags for capability-aware clients |
 | `/probe/run` | Run controlled probe checks. Supports whitelisted `ZSDRP_AI_MCP_*` runner reports and built-in `CLASS_ACTIVATION_CHECK` for class check-only activation diagnostics. |

@@ -34,11 +34,12 @@ Load only the playbook needed for the task:
 - DDIC validate/create/status: `references/playbook-ddic.md`
 - Report check/save/activate: `references/playbook-report.md`
 - Global class save/activate/verify: `references/playbook-class.md`
-- Function group/module create/check/repair: `references/playbook-function-module.md`
+- Function group/module create/check/repair/execute: `references/playbook-function-module.md` & `references/playbook-function-execute.md`
 - Message class message maintenance: `references/playbook-message.md`
 - Report/function group textpool maintenance: `references/playbook-textpool.md`
 - Existing source read workflows: `references/playbook-read-existing.md`
 - Generated Dynpro import/debug/check: `references/playbook-dynpro.md`
+- Transport orchestration and TOC pipelines: `references/playbook-transport.md`
 - Known SAP or client-side errors: `references/troubleshooting.md`
 - Payload examples and tested historical objects: `references/examples.md`
 
@@ -54,7 +55,7 @@ Load only the playbook needed for the task:
 - Prefer `scripts/sap_ai_mcp_client.py` for repeated read, deploy, check, and repair workflows. Use `scripts/sap_ai_mcp_call.py` only for raw HTTP debugging or endpoint experiments not yet covered by the client. Use `curl.exe` only when the wrapper is unavailable or the user asks for raw HTTP behavior.
 - Never save, activate, repair, lifecycle-run, or otherwise write `ZCL_AI_MCP_REST_HANDLER*` through the same `zai_mcp_rest` REST service. Treat this as a pre-call hard stop, not a retryable failure. Patch/deploy the handler only through SE24/ADT or another explicitly approved independent channel.
 - Treat fixed point arithmetic as a server-side fixed default for report syntax contexts. `/object/check`, `/object/read` syntax status, and `/object/save` for `PROG`/`REPORT` should use report directory attributes equivalent to `SUBC = '1'`, `APPL = space`, `FIXPT = 'X'`, and `UCCHECK = 'X'`; do not work around missing fixed point context by downgrading valid new Open SQL syntax.
-- Write request bodies as payload files. Do not inline complex JSON, ABAP source, Chinese text, or generated Dynpro JSON into a long PowerShell command.
+- Write request bodies as payload files. Do not inline complex JSON, ABAP source, Chinese text, or generated Dynpro JSON into a long PowerShell command. Store temporary payload and response JSON files in a temporary folder or remove them immediately after successful execution to avoid cluttering the workspace.
 - Use ASCII for simple JSON and UTF-8 without BOM for non-ASCII payloads.
 - Default to `source_code` as a single string for ABAP source in requests and read results. Use `source_lines` only as an auxiliary line-number view when the handler returns it; do not send line arrays unless an endpoint explicitly documents them.
 - Treat `source_code` returned by read endpoints as the source of truth when repository read status is OK.
@@ -128,6 +129,15 @@ Dynpro:
 3. Generated normal screens should default `next_screen` to the screen itself; pass `next_screen` only for an intentional different target.
 4. For table controls, use full `flow_logic` when SE51/Wizard-compatible PBO/PAI is needed.
 5. Verify with `/debug/dynpro_read`, then `/object/activate` and `/object/check` for report screens or `/function/check` for function groups.
+
+Transport Automation (TOC Pipeline):
+
+1. Call `/transport/search` to find unreleased developer requests.
+2. Call `/transport/create` with `target` to generate a TOC shell. Naming rule: `TOC_<MODULE>_<DESCRIPTION>_BY_<USER>_<YYYYMMDD>` (or `<MODULE>_<DESCRIPTION>_BY_<USER>_<YYYYMMDD>` for Workbench requests).
+3. Call `/transport/copy` to merge physical objects (skipping locks/MERG).
+4. Call `/transport/release` to generate transport data files.
+5. Call `/transport/import` using the target profile (e.g. `--profile qas600`) to trigger TMS push.
+
 Read existing source:
 
 1. Prefer the dedicated read endpoint when available.

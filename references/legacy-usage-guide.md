@@ -1,4 +1,4 @@
-﻿# SAP AI MCP REST Interface Usage Guide
+# SAP AI MCP REST Interface Usage Guide
 
 ## 1. Overview
 
@@ -96,6 +96,12 @@ Do not hardcode production passwords in source code. Prefer environment variable
 | `/debug/domain_values` | Debug: inspect fixed values of a DDIC domain |
 | `/debug/class_methods` | Debug: inspect class methods and parameters |
 | `/debug/locks` | Debug: inspect enqueue locks |
+| `/function/execute` | Dynamically execute Function Module with parameter deserialization and structured output |
+| `/transport/search` | Search unreleased transport requests belonging to a user by type and status |
+| `/transport/create` | Create a new SAP Transport Request (Workbench / Transport of Copies) |
+| `/transport/copy` | Copy physical objects from a source request into a target TOC request |
+| `/transport/release` | Release a transport request (auto-bypasses locking check for TOCs) |
+| `/transport/import` | Trigger TMS import for a request in a target system/client |
 
 Recommended future read endpoints:
 
@@ -389,6 +395,7 @@ Function module endpoints:
 | `/function/create` | Create a function group if needed, create the function module, save source, and append `R3TR FUGR` to CTS |
 | `/function/check` | Validate an existing function module by generating `SAPL<function_group>` |
 | `/function/source_save` | Replace source of an existing Z function module include |
+| `/function/execute` | Dynamically execute a Function Module with parameter deserialization and structured JSON return |
 
 Creation payload fields:
 
@@ -952,3 +959,15 @@ Successful report activation response:
   "message": "Report generated successfully"
 }
 ```
+
+## 16. Transport Automation Endpoints
+
+Transport automation endpoints for CTS/TMS management:
+
+| PATH_INFO | Purpose | Key Payload Fields |
+|---|---|---|
+| `/transport/search` | Query unreleased TRs for user | `username`, `request_type`, `status` |
+| `/transport/create` | Create TR / TOC request | `type` (`T`/`K`), `text`, `target` |
+| `/transport/copy` | Copy objects from source TR to target TOC | `source_tr`, `target_tr` |
+| `/transport/release` | Release TR (bypass lock check for TOC) | `trkorr` |
+| `/transport/import` | Trigger TMS import into target system/client | `trkorr`, `system`, `client` |
