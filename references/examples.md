@@ -1,4 +1,4 @@
-﻿# Examples
+# Examples
 
 ## DDIC Payload
 
@@ -88,6 +88,16 @@
     { "id": "I", "key": "900", "entry": "Explicit text symbol" },
     { "id": "S", "key": "P_BUKRS", "entry": "Company Code" }
   ]
+}
+```
+
+## Table Read Payload
+
+```json
+{
+  "table": "ZTDOC_RESTAPI",
+  "where": "HANDLE_METHOD = 'ZREST_MM002'",
+  "max_rows": 5
 }
 ```
 
