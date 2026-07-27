@@ -60,6 +60,7 @@ http://<your-sap-host>:<port>/sap/bc/zai_mcp_rest/object/check?sap-client=100
 | `/debug/class_methods` | Inspect class methods and parameters |
 | `/class/method/read` | Read a single global class method source when supported. Supports `version = ACTIVE` default, `INACTIVE`, or `BOTH` when deployed. |
 | `/debug/locks` | Inspect enqueue locks |
+| `/table/read` | Read dynamic table contents by specifying table name, where clause, and max_rows limit. |
 
 ## Recommended Future Read Endpoints
 
