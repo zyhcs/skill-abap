@@ -56,6 +56,12 @@
 5. **标准模板库 (`templates/`)**：
    * 预置标准 ABAP Header 注释模板 (`abap_header.txt`) 与透明表必备审计字段模板 (`table_audit_fields.json`)。
 
+6. **动态 Function Module 执行引擎 (`/function/execute`)**：
+   * 原生支持带复杂/多层嵌套 JSON 报文的函数模块动态参数解序列化与反射装配，自动提取 `FUPARAREF` 定义并以结构化 `PARAMETERS`（含 `KIND` 标识输入输出）返回运行结果。
+
+7. **CTS 传输请求自动化与无侵入 TOC CI/CD 流水线 (`/transport/*`)**：
+   * 提供未释放请求搜索 (`/transport/search`)、请求/TOC 创建 (`/transport/create`)、纯净物理对象提取挂载 (`/transport/copy`)、自动绕过锁校验的请求释放 (`/transport/release`) 以及目标系统自动 TMS 导入 (`/transport/import`)。
+
 ---
 
 ## 目录结构 (Directory Structure)
@@ -97,7 +103,9 @@ abap-mcp-api/
 │   ├── playbook-ddic.md           # DDIC 操作 SOP
 │   ├── playbook-report.md         # Report 操作 SOP
 │   ├── playbook-class.md          # Class 操作 SOP
-│   └── playbook-function-module.md # Function Module 操作 SOP
+│   ├── playbook-function-module.md # Function Module 操作 SOP
+│   ├── playbook-function-execute.md # Function Module 动态执行 SOP
+│   └── playbook-transport.md      # CTS 传输自动化与 TOC CI/CD 流水线 SOP
 └── tests/                         # 单元测试与契约测试
 ```
 
@@ -141,6 +149,17 @@ res = client.call('ddic_create', {
 client.call('object_check', {"object_type": "PROG", "object_name": "ZRP_DEMO", "source_code": abap_source})
 client.call('object_save', {"object_type": "PROG", "object_name": "ZRP_DEMO", "source_code": abap_source})
 client.call('object_activate', {"object_type": "PROG", "object_name": "ZRP_DEMO"})
+
+# 3. 动态执行 Function Module
+client.call('function_execute', {
+    "function_name": "ZRFM_TEST_DEMO",
+    "importing": {"IS_REQUEST": {"REQUEST": {"INPUT": "hello abap"}}}
+})
+
+# 4. TOC CI/CD 自动化部署流水线
+toc = client.call('transport_create', {"type": "T", "text": "TOC_FI_ZFI064_SH_BY_021569_20260727", "target": "S4Q"})
+client.call('transport_copy', {"source_tr": "S4DK997855", "target_tr": toc["body"]["trkorr"]})
+client.call('transport_release', {"trkorr": toc["body"]["trkorr"]})
 ```
 
 ---
