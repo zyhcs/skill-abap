@@ -10465,6 +10465,35 @@ escape( val = lv_message format = cl_abap_format=>e_json_string ) }"\}|.
       RETURN.
     ENDIF.
 
+    " 显式调用 CUA 生成与激活
+    CALL FUNCTION 'RS_CUA_GENERATE'
+      EXPORTING
+        objectname       = lv_target_program
+        without_messages = 'X'
+      EXCEPTIONS
+        OTHERS           = 0.
+
+    DATA lt_cua_objects TYPE STANDARD TABLE OF dwinactiv.
+    DATA ls_cua_object  TYPE dwinactiv.
+    ls_cua_object-object   = 'CUAD'.
+    ls_cua_object-obj_name = lv_target_program.
+    ls_cua_object-uname    = sy-uname.
+    APPEND ls_cua_object TO lt_cua_objects.
+
+    CALL FUNCTION 'RS_WORKING_OBJECTS_ACTIVATE'
+      EXPORTING
+        suppress_syntax_check  = 'X'
+        suppress_generation    = space
+        suppress_insert        = 'X'
+        suppress_corr_insert   = 'X'
+        with_popup             = space
+        suppress_enqueue       = abap_true
+        ui_decoupled           = abap_true
+      TABLES
+        objects                = lt_cua_objects
+      EXCEPTIONS
+        OTHERS                 = 0.
+
     IF lv_transport IS NOT INITIAL.
       lv_cts_json = append_cts_object(
         iv_pgmid       = 'LIMU'

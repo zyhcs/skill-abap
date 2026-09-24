@@ -532,6 +532,25 @@ def strip_function_wrapper(source_code: str) -> str:
     return source_code
 
 
+def strip_method_wrapper(source_code: str) -> str:
+    lines = source_code.splitlines()
+    if not lines:
+        return source_code
+    first_idx = 0
+    while first_idx < len(lines) and not lines[first_idx].strip():
+        first_idx += 1
+    if first_idx >= len(lines):
+        return source_code
+    first = lines[first_idx].strip().upper()
+    last_idx = len(lines) - 1
+    while last_idx >= 0 and not lines[last_idx].strip():
+        last_idx -= 1
+    last = lines[last_idx].strip().upper() if last_idx >= 0 else ""
+    if first.startswith("METHOD ") and last == "ENDMETHOD.":
+        return "\n".join(lines[first_idx + 1:last_idx]).strip("\n")
+    return source_code
+
+
 def ensure_function_wrapper(function_name: str, source_code: str) -> str:
     stripped = source_code.strip()
     if stripped.upper().startswith("FUNCTION "):
@@ -689,6 +708,7 @@ def class_method_repair(client: SapAiMcpClient, payload: dict[str, object], *, d
         raise SapAI_MCPError("SOURCE_CODE_REQUIRED", "class method repair requires caller-provided method body source_code.")
 
     repair_payload = copy.deepcopy(payload)
+    repair_payload["source_code"] = strip_method_wrapper(source_code)
     repair_payload["object_type"] = "CLAS"
     repair_payload["object_name"] = object_name
     if not isinstance(repair_payload.get("target"), dict):
