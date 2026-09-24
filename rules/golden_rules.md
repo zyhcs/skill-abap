@@ -44,6 +44,14 @@
 3. **批量查询优先**：严禁在 `LOOP AT` 中执行 `SELECT`，必须先收集主键使用 `FOR ALL ENTRIES IN` 或 Range 内表在循环外批量拉取。
 4. **检查 `sy-subrc`**：任何 `SELECT`、`READ TABLE`、`CALL FUNCTION` 后必须立即判断 `sy-subrc`。
 
+### 3.3 FM ALV 报表工具栏与按钮事件核心准则 (CRITICAL)
+1. **FM ALV 按钮必须通过 GUI 状态 (SE41) 定义**：
+   - `REUSE_ALV_GRID_DISPLAY_LVC` 是基于函数模块封装的标准全屏 ALV，其应用工具栏按钮**必须通过 GUI 状态（如拷贝 `SAPLKKBL/STANDARD_FULLSCREEN` 并在 SE41 维护）**实现。
+   - **严禁混淆使用 OO ALV 的 `lcl_event_receiver` (`handle_toolbar`)** 在 FM ALV 中注入按钮（FM ALV 顶部工具栏属于 SAP GUI Application Toolbar，`handle_toolbar` 无法在全屏模式下生效）。
+2. **事件处理统一走 `USER_COMMAND` 回调**：
+   - 所有 GUI 按钮功能码（如 `&DATA_SAVE`, `ADD`, `DEL` 等）统一在 `i_callback_user_command` 指定的子例程（`FORM user_command USING uv_ucomm ...`）中集中捕获并分发。
+   - 在执行增删改逻辑前后，调用 `lo_grid->check_changed_data( )` 确保网格数据同步，并通过 `us_selfield-refresh = 'X'` 刷新视图。
+
 ---
 
 ## 4. AI 执行 DDIC 数据字典标准作业程序 (AI Agent SOP)
