@@ -58,7 +58,11 @@ ENDPOINTS = {
     "transport_release": {"path": "/transport/release", "mode": "write", "defaults": {}},
     "transport_import": {"path": "/transport/import", "mode": "write", "defaults": {}},
     "transport_search": {"path": "/transport/search", "mode": "read", "defaults": {}},
+    "textpool_save": {"path": "/textpool/save", "mode": "write", "defaults": {}},
+    "message_save": {"path": "/message/save", "mode": "write", "defaults": {}},
     "table_read": {"path": "/table/read", "mode": "read", "defaults": {}},
+    "run": {"path": "/run", "mode": "write", "defaults": {}},
+    "probe_run": {"path": "/probe/run", "mode": "write", "defaults": {}},
 }
 
 PATH_TO_NAME = {spec["path"]: name for name, spec in ENDPOINTS.items()}
@@ -227,7 +231,7 @@ def resolve_profile_config(profile_name: str | None = None, config_path: Path | 
 
     password_env_key = profile_info.get("password_env")
     password = os.environ.get(str(password_env_key)) if password_env_key else None
-    password = password or os.environ.get("SAP_AI_MCP_PASSWORD") or os.environ.get("SAP_PASSWORD") or DEFAULT_PASSWORD
+    password = password or os.environ.get("SAP_AI_MCP_PASSWORD") or os.environ.get("SAP_PASSWORD") or profile_info.get("password") or DEFAULT_PASSWORD
 
     allow_write = profile_info.get("allow_write")
     if allow_write is None:
@@ -427,6 +431,33 @@ class SapAiMcpClient:
                 summary["includes"] = include_summaries
                 summary["include_count"] = len(include_summaries)
         return {k: v for k, v in summary.items() if v is not None}
+
+    def table_read(self, table: str, where: str = "", max_rows: int = 100, *, dry_run: bool = False) -> dict[str, object]:
+        payload = {"table": table.upper(), "where": where, "max_rows": max_rows}
+        return self.call("table_read", payload, dry_run=dry_run)
+
+    def transport_search(self, user: str = "", *, dry_run: bool = False) -> dict[str, object]:
+        payload = {"user": user.upper()} if user else {}
+        return self.call("transport_search", payload, dry_run=dry_run)
+
+    def transport_create(self, tr_type: str = "K", text: str = "", target: str = "", *, dry_run: bool = False) -> dict[str, object]:
+        payload = {"type": tr_type.upper(), "text": text, "target": target.upper()}
+        return self.call("transport_create", payload, dry_run=dry_run)
+
+    def transport_copy(self, source_tr: str, target_tr: str, *, dry_run: bool = False) -> dict[str, object]:
+        payload = {"source_tr": source_tr.upper(), "target_tr": target_tr.upper()}
+        return self.call("transport_copy", payload, dry_run=dry_run)
+
+    def transport_release(self, trkorr: str, *, dry_run: bool = False) -> dict[str, object]:
+        payload = {"trkorr": trkorr.upper()}
+        return self.call("transport_release", payload, dry_run=dry_run)
+
+    def transport_import(self, trkorr: str, system: str, client: str = "", *, dry_run: bool = False) -> dict[str, object]:
+        payload = {"trkorr": trkorr.upper(), "system": system.upper(), "client": client}
+        return self.call("transport_import", payload, dry_run=dry_run)
+
+    def function_execute(self, payload: dict[str, object], *, dry_run: bool = False) -> dict[str, object]:
+        return self.call("function_execute", payload, dry_run=dry_run)
 
 
 def sap_status(result: dict[str, object]) -> str:

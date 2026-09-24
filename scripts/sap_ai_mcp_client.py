@@ -115,6 +115,33 @@ def build_parser() -> argparse.ArgumentParser:
     function_check_parser.add_argument("function_name")
     function_repair_parser = func_sub.add_parser("repair")
     function_repair_parser.add_argument("payload", type=Path)
+    function_exec_parser = func_sub.add_parser("execute")
+    function_exec_parser.add_argument("payload", type=Path)
+
+    tab = sub.add_parser("table")
+    tab_sub = tab.add_subparsers(dest="action", required=True)
+    tab_read_parser = tab_sub.add_parser("read")
+    tab_read_parser.add_argument("table_name")
+    tab_read_parser.add_argument("--where", default="", help="Open SQL WHERE clause condition")
+    tab_read_parser.add_argument("--max-rows", type=int, default=100, help="Max rows to return (default 100)")
+
+    tr = sub.add_parser("transport")
+    tr_sub = tr.add_subparsers(dest="action", required=True)
+    tr_search_parser = tr_sub.add_parser("search")
+    tr_search_parser.add_argument("--user", default="", help="Username to search unreleased requests for")
+    tr_create_parser = tr_sub.add_parser("create")
+    tr_create_parser.add_argument("--type", default="K", choices=["K", "W", "T"], help="TR Type: K (Customizing), W (Workbench), T (TOC)")
+    tr_create_parser.add_argument("--text", default="", help="Short description for TR")
+    tr_create_parser.add_argument("--target", default="", help="Target system (e.g. QAS600) required for TOC")
+    tr_copy_parser = tr_sub.add_parser("copy")
+    tr_copy_parser.add_argument("--source-tr", required=True, help="Source TR to copy objects from")
+    tr_copy_parser.add_argument("--target-tr", required=True, help="Target TR (usually TOC) to append objects to")
+    tr_release_parser = tr_sub.add_parser("release")
+    tr_release_parser.add_argument("--trkorr", required=True, help="TR number to release")
+    tr_import_parser = tr_sub.add_parser("import")
+    tr_import_parser.add_argument("--trkorr", required=True, help="TR number to import")
+    tr_import_parser.add_argument("--system", required=True, help="Target system ID (e.g. S4Q)")
+    tr_import_parser.add_argument("--client", default="", help="Target client (e.g. 600)")
 
     return parser
 
@@ -174,6 +201,20 @@ def main(argv: list[str] | None = None) -> int:
             result = function_check(client, args.function_name, dry_run=args.dry_run)
         elif args.command == "function" and args.action == "repair":
             result = function_repair(client, load_json_file(args.payload), dry_run=args.dry_run)
+        elif args.command == "function" and args.action == "execute":
+            result = client.function_execute(load_json_file(args.payload), dry_run=args.dry_run)
+        elif args.command == "table" and args.action == "read":
+            result = client.table_read(args.table_name, where=args.where, max_rows=args.max_rows, dry_run=args.dry_run)
+        elif args.command == "transport" and args.action == "search":
+            result = client.transport_search(user=args.user, dry_run=args.dry_run)
+        elif args.command == "transport" and args.action == "create":
+            result = client.transport_create(tr_type=args.type, text=args.text, target=args.target, dry_run=args.dry_run)
+        elif args.command == "transport" and args.action == "copy":
+            result = client.transport_copy(source_tr=args.source_tr, target_tr=args.target_tr, dry_run=args.dry_run)
+        elif args.command == "transport" and args.action == "release":
+            result = client.transport_release(trkorr=args.trkorr, dry_run=args.dry_run)
+        elif args.command == "transport" and args.action == "import":
+            result = client.transport_import(trkorr=args.trkorr, system=args.system, client=args.client, dry_run=args.dry_run)
         else:
             parser.error("Unsupported command.")
             return 2
