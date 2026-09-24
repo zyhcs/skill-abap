@@ -1184,41 +1184,97 @@ CLASS ZCL_AI_MCP_REST_FUN IMPLEMENTATION.
     DATA lv_object_type TYPE e071-object.
     DATA lv_transport TYPE e070-trkorr.
     DATA lv_pgmid TYPE tadir-pgmid.
-    DATA lv_dialog TYPE trboolean.
     DATA lt_e071 TYPE STANDARD TABLE OF e071.
     DATA lt_e071k TYPE STANDARD TABLE OF e071k.
     DATA ls_e071 TYPE e071.
+    DATA lv_req_type TYPE e070-trfunction.
+    DATA lv_category TYPE e070-korrdev.
+    DATA lv_task TYPE e070-trkorr.
+    DATA lv_new_task TYPE e070-trkorr.
 
     lv_object = to_upper( iv_object_name ).
     lv_object_type = iv_object_type.
-    lv_transport = iv_transport.
-    lv_pgmid = lv_pgmid.
-    lv_dialog = space.
+    lv_transport = to_upper( iv_transport ).
 
-    IF iv_transport IS INITIAL.
+    IF iv_pgmid IS NOT INITIAL.
+      lv_pgmid = iv_pgmid.
+    ELSE.
+      lv_pgmid = 'R3TR'.
+    ENDIF.
+
+    IF lv_transport IS INITIAL.
       rv_json = |\{"status":"ERROR","stage":"CTS_APPEND","object_type":"{ iv_object_type }",| &&
                 |"object_name":"{ lv_object }","message":"transport is required"\}|.
       RETURN.
     ENDIF.
 
+    " 1. 检查传入的是否为父请求 (Header Request: W / K)
+    SELECT SINGLE trfunction, korrdev
+      FROM e070
+      WHERE trkorr = @lv_transport
+      INTO (@lv_req_type, @lv_category).
+
+    IF lv_req_type = 'K' OR lv_req_type = 'W'.
+      " 1. 优先查找当前用户在该请求下的可修改【开发任务】('S')
+      SELECT SINGLE trkorr
+        FROM e070
+        WHERE strkorr = @lv_transport
+          AND trfunction = 'S'
+          AND trstatus = 'D'
+          AND as4user = @sy-uname
+        INTO @lv_task.
+
+      IF sy-subrc <> 0 OR lv_task IS INITIAL.
+        " 2. 其次查找该请求下任意用户的可修改【开发任务】('S')
+        SELECT SINGLE trkorr
+          FROM e070
+          WHERE strkorr = @lv_transport
+            AND trfunction = 'S'
+            AND trstatus = 'D'
+          INTO @lv_task.
+      ENDIF.
+
+      IF lv_task IS NOT INITIAL.
+        lv_transport = lv_task.
+      ELSE.
+        " 3. 若无任何可用开发任务，则自动新建一个开发任务 ('S')
+        CALL FUNCTION 'TR_INSERT_NEW_COMM'
+          EXPORTING
+            wi_kurztext   = 'AI MCP Development Task'
+            wi_trfunction = 'S'
+            wi_strkorr    = lv_transport
+            wi_category   = lv_category
+          IMPORTING
+            we_trkorr     = lv_new_task
+          EXCEPTIONS
+            OTHERS        = 1.
+        IF sy-subrc = 0 AND lv_new_task IS NOT INITIAL.
+          lv_transport = lv_new_task.
+        ENDIF.
+      ENDIF.
+
+    ENDIF.
+
+    " 2. 组装 E071 条目
     CLEAR ls_e071.
-    ls_e071-trkorr = lv_transport.
-    ls_e071-pgmid = lv_pgmid.
-    ls_e071-object = lv_object_type.
+    ls_e071-trkorr   = lv_transport.
+    ls_e071-pgmid    = lv_pgmid.
+    ls_e071-object   = lv_object_type.
     ls_e071-obj_name = lv_object.
-    ls_e071-objfunc = space.
+    ls_e071-objfunc  = space.
     APPEND ls_e071 TO lt_e071.
 
+    " 3. 调用标准函数挂载对象并加锁
     TRY.
         CALL FUNCTION 'TR_APPEND_TO_COMM_OBJS_KEYS'
           EXPORTING
-            wi_trkorr = lv_transport
-            iv_dialog = lv_dialog
+            wi_trkorr             = lv_transport
+            wi_suppress_key_check = 'X'
           TABLES
-            wt_e071   = lt_e071
-            wt_e071k  = lt_e071k
+            wt_e071               = lt_e071
+            wt_e071k              = lt_e071k
           EXCEPTIONS
-            OTHERS    = 1.
+            OTHERS                = 1.
       CATCH cx_root INTO DATA(lx_cts_append).
         rv_json = |\{"status":"ERROR","stage":"CTS_APPEND_EXCEPTION","object_type":"{ lv_object_type }",| &&
                   |"object_name":"{ lv_object }","transport":"{ lv_transport }",| &&
@@ -1237,7 +1293,7 @@ CLASS ZCL_AI_MCP_REST_FUN IMPLEMENTATION.
       RETURN.
     ENDIF.
 
-    rv_json = |\{"status":"OK","object_type":"{ iv_object_type }","object_name":"{ lv_object }","transport":"{ iv_transport }","message":"Object appended to CTS"\}|.
+    rv_json = |\{"status":"OK","object_type":"{ iv_object_type }","object_name":"{ lv_object }","transport":"{ lv_transport }","message":"Object appended to CTS"\}|.
   ENDMETHOD.
 
 
@@ -2576,8 +2632,19 @@ CLASS ZCL_AI_MCP_REST_FUN IMPLEMENTATION.
     ENDIF.
 
     ls_dd02v-tabname = to_upper( is_table-name ).
-    ls_dd02v-ddlanguage = sy-langu.
+    ls_dd02v-ddlanguage = '1'.
+    ls_dd02v-masterlang = '1'.
     ls_dd02v-tabclass = 'TRANSP'.
+
+    " 1. 自动设置客户端依赖属性
+    ls_dd02v-clidep = space.
+    LOOP AT is_table-fields INTO DATA(ls_field_chk).
+      IF to_upper( ls_field_chk-name ) = 'MANDT' OR to_upper( ls_field_chk-data_element ) = 'MANDT'.
+        ls_dd02v-clidep = 'X'.
+        EXIT.
+      ENDIF.
+    ENDLOOP.
+
     IF is_table-delivery_class IS INITIAL.
       ls_dd02v-contflag = 'A'.
     ELSE.
@@ -2597,6 +2664,7 @@ CLASS ZCL_AI_MCP_REST_FUN IMPLEMENTATION.
     ENDIF.
     ls_dd02v-ddtext = is_table-description.
 
+    " 2. 技术设置
     ls_dd09l-tabname = ls_dd02v-tabname.
     IF is_table-data_class IS INITIAL.
       ls_dd09l-tabart = 'APPL0'.
@@ -2610,6 +2678,9 @@ CLASS ZCL_AI_MCP_REST_FUN IMPLEMENTATION.
       ls_dd09l-tabkat = is_table-size_category.
     ENDIF.
 
+    ls_dd09l-bufallow  = 'N'.
+    ls_dd09l-pufferung = space.
+
     ASSIGN COMPONENT 'ROWORCOLST' OF STRUCTURE ls_dd09l TO <lv_storage_type>.
     IF sy-subrc = 0.
       IF is_table-storage_type IS INITIAL.
@@ -2619,6 +2690,18 @@ CLASS ZCL_AI_MCP_REST_FUN IMPLEMENTATION.
       ENDIF.
     ENDIF.
 
+    " 3. 【关键调整】在 PUT 和 ACTIVATE 之前，先注册 TADIR 和 CTS 请求
+    lv_cts_result = register_cts_object(
+      iv_object_type = 'TABL'
+      iv_object_name = ls_dd02v-tabname
+      iv_package     = iv_package
+      iv_transport   = iv_transport ).
+    IF lv_cts_result CS '"status":"ERROR"'.
+      rv_json = lv_cts_result.
+      RETURN.
+    ENDIF.
+
+    " 4. 组装字段表
     LOOP AT is_table-fields INTO DATA(ls_field).
       DATA(lv_reftable) = ls_field-reference_table.
       DATA(lv_reffield) = ls_field-reference_field.
@@ -2638,12 +2721,14 @@ CLASS ZCL_AI_MCP_REST_FUN IMPLEMENTATION.
         keyflag    = COND #( WHEN ls_field-key_flag = abap_true THEN 'X' ELSE space )
         notnull    = COND #( WHEN ls_field-not_null = abap_true THEN 'X' ELSE space )
         rollname   = to_upper( ls_field-data_element )
+        comptype   = 'E'
         reftable   = to_upper( lv_reftable )
         reffield   = to_upper( lv_reffield )
         precfield  = to_upper( lv_precfield )
         ddlanguage = sy-langu ) TO lt_dd03p.
     ENDLOOP.
 
+    " 5. 保存表结构草稿
     CALL FUNCTION 'DDIF_TABL_PUT'
       EXPORTING
         name              = ls_dd02v-tabname
@@ -2674,11 +2759,13 @@ CLASS ZCL_AI_MCP_REST_FUN IMPLEMENTATION.
       RETURN.
     ENDIF.
 
+       " 6. 执行激活
     CALL FUNCTION 'DDIF_TABL_ACTIVATE'
       EXPORTING
-        name   = ls_dd02v-tabname
+        name     = ls_dd02v-tabname
+        auth_chk = space
       EXCEPTIONS
-        OTHERS = 1.
+        OTHERS   = 1.
 
     IF sy-subrc <> 0.
       rv_json = build_fm_error_json(
@@ -2691,23 +2778,20 @@ CLASS ZCL_AI_MCP_REST_FUN IMPLEMENTATION.
       RETURN.
     ENDIF.
 
+    " 【关键行】等待 HANA 物理表创建与激活完成
+    COMMIT WORK AND WAIT.
+
+    " 7. 检查激活状态
     SELECT SINGLE as4local
       FROM dd02l
       INTO lv_as4local
       WHERE tabname = ls_dd02v-tabname
         AND as4local <> 'D'.
 
+
     IF sy-subrc = 0 AND lv_as4local = 'A'.
-      lv_cts_result = register_cts_object(
-        iv_object_type = 'TABL'
-        iv_object_name = ls_dd02v-tabname
-        iv_package     = iv_package
-        iv_transport   = iv_transport ).
-      IF lv_cts_result CS '"status":"ERROR"'.
-        rv_json = lv_cts_result.
-        RETURN.
-      ENDIF.
-      rv_json = |\{"status":"OK","object_type":"TABL","object_name":"{ ls_dd02v-tabname }","message":"Table created and activated"\}|.
+      rv_json = |\{"status":"OK","object_type":"TABL","object_name":"{ ls_dd02v-tabname }",| &&
+                |"package":"{ iv_package }","transport":"{ iv_transport }","message":"Table created and activated"\}|.
     ELSE.
       rv_json = |\{"status":"ERROR","stage":"TABL_ACTIVE_VERIFY",| &&
                 |"object_type":"TABL","object_name":"{ ls_dd02v-tabname }",| &&
@@ -10067,6 +10151,13 @@ escape( val = lv_message format = cl_abap_format=>e_json_string ) }"\}|.
     DATA lt_dtel_names TYPE STANDARD TABLE OF string WITH EMPTY KEY.
     DATA lt_table_names TYPE STANDARD TABLE OF string WITH EMPTY KEY.
 
+    DATA lv_req_package TYPE devclass.
+    DATA lv_exist_pkg TYPE devclass.
+    lv_req_package = to_upper( is_request-package ).
+    IF lv_req_package IS INITIAL.
+      lv_req_package = '$TMP'.
+    ENDIF.
+
     LOOP AT is_request-domains INTO DATA(ls_domain).
       DATA(lv_domain_name) = to_upper( ls_domain-name ).
 
@@ -10097,12 +10188,29 @@ escape( val = lv_message format = cl_abap_format=>e_json_string ) }"\}|.
         APPEND lv_domain_name TO lt_domain_names.
       ENDIF.
 
-      IF domain_exists( lv_domain_name ) = abap_true.
-        append_result(
-          EXPORTING iv_result = |\{"severity":"E","object_type":"DOMA",| &&
-                                |"object_name":"{ lv_domain_name }",| &&
-                                |"message":"Domain already exists in SAP. Name will not be changed automatically."\}|
-          CHANGING cv_json = lv_messages ).
+*      IF domain_exists( lv_domain_name ) = abap_true.
+*        append_result(
+*          EXPORTING iv_result = |\{"severity":"E","object_type":"DOMA",| &&
+*                                |"object_name":"{ lv_domain_name }",| &&
+*                                |"message":"Domain already exists in SAP. Name will not be changed automatically."\}|
+*          CHANGING cv_json = lv_messages ).
+*      ENDIF.
+
+      SELECT SINGLE devclass FROM tadir
+        WHERE pgmid = 'R3TR' AND object = 'DOMA' AND obj_name = @lv_domain_name
+        INTO @lv_exist_pkg.
+      IF sy-subrc = 0.
+        IF lv_exist_pkg <> lv_req_package.
+          append_result(
+            EXPORTING iv_result = |\{"severity":"E","object_type":"DOMA","object_name":"{ lv_domain_name }",| &&
+                                  |"message":"Domain already exists in package '{ lv_exist_pkg }'. Target package is '{ lv_req_package }'."\}|
+            CHANGING cv_json = lv_messages ).
+        ELSE.
+          append_result(
+            EXPORTING iv_result = |\{"severity":"W","object_type":"DOMA","object_name":"{ lv_domain_name }",| &&
+                                  |"message":"Domain already exists in package '{ lv_exist_pkg }'. Will update and register CTS."\}|
+            CHANGING cv_json = lv_messages ).
+        ENDIF.
       ENDIF.
     ENDLOOP.
 
@@ -10136,12 +10244,29 @@ escape( val = lv_message format = cl_abap_format=>e_json_string ) }"\}|.
         APPEND lv_dtel_name TO lt_dtel_names.
       ENDIF.
 
-      IF data_element_exists( lv_dtel_name ) = abap_true.
-        append_result(
-          EXPORTING iv_result = |\{"severity":"E","object_type":"DTEL",| &&
-                                |"object_name":"{ lv_dtel_name }",| &&
-                                |"message":"Data element already exists in SAP. Name will not be changed automatically."\}|
-          CHANGING cv_json = lv_messages ).
+*      IF data_element_exists( lv_dtel_name ) = abap_true.
+*        append_result(
+*          EXPORTING iv_result = |\{"severity":"E","object_type":"DTEL",| &&
+*                                |"object_name":"{ lv_dtel_name }",| &&
+*                                |"message":"Data element already exists in SAP. Name will not be changed automatically."\}|
+*          CHANGING cv_json = lv_messages ).
+*      ENDIF.
+
+      SELECT SINGLE devclass FROM tadir
+        WHERE pgmid = 'R3TR' AND object = 'DTEL' AND obj_name = @lv_dtel_name
+        INTO @lv_exist_pkg.
+      IF sy-subrc = 0.
+        IF lv_exist_pkg <> lv_req_package.
+          append_result(
+            EXPORTING iv_result = |\{"severity":"E","object_type":"DTEL","object_name":"{ lv_dtel_name }",| &&
+                                  |"message":"Data element already exists in package '{ lv_exist_pkg }'. Target package is '{ lv_req_package }'."\}|
+            CHANGING cv_json = lv_messages ).
+        ELSE.
+          append_result(
+            EXPORTING iv_result = |\{"severity":"W","object_type":"DTEL","object_name":"{ lv_dtel_name }",| &&
+                                  |"message":"Data element already exists in package '{ lv_exist_pkg }'. Will update and register CTS."\}|
+            CHANGING cv_json = lv_messages ).
+        ENDIF.
       ENDIF.
     ENDLOOP.
 
@@ -10175,21 +10300,39 @@ escape( val = lv_message format = cl_abap_format=>e_json_string ) }"\}|.
         APPEND lv_table_name TO lt_table_names.
       ENDIF.
 
-      IF table_exists( lv_table_name ) = abap_true.
-        append_result(
-          EXPORTING iv_result = |\{"severity":"E","object_type":"TABL",| &&
-                                |"object_name":"{ lv_table_name }",| &&
-                                |"message":"Table already exists in SAP. Name will not be changed automatically."\}|
-          CHANGING cv_json = lv_messages ).
+*      IF table_exists( lv_table_name ) = abap_true.
+*        append_result(
+*          EXPORTING iv_result = |\{"severity":"E","object_type":"TABL",| &&
+*                                |"object_name":"{ lv_table_name }",| &&
+*                                |"message":"Table already exists in SAP. Name will not be changed automatically."\}|
+*          CHANGING cv_json = lv_messages ).
+*      ENDIF.
+
+      SELECT SINGLE devclass FROM tadir
+        WHERE pgmid = 'R3TR' AND object = 'TABL' AND obj_name = @lv_table_name
+        INTO @lv_exist_pkg.
+      IF sy-subrc = 0.
+        IF lv_exist_pkg <> lv_req_package.
+          append_result(
+            EXPORTING iv_result = |\{"severity":"E","object_type":"TABL","object_name":"{ lv_table_name }",| &&
+                                  |"message":"Table already exists in package '{ lv_exist_pkg }'. Target package is '{ lv_req_package }'."\}|
+            CHANGING cv_json = lv_messages ).
+        ELSE.
+          append_result(
+            EXPORTING iv_result = |\{"severity":"W","object_type":"TABL","object_name":"{ lv_table_name }",| &&
+                                  |"message":"Table already exists in package '{ lv_exist_pkg }'. Will update and register CTS."\}|
+            CHANGING cv_json = lv_messages ).
+        ENDIF.
       ENDIF.
     ENDLOOP.
 
     lv_messages = lv_messages && ']'.
 
-    IF lv_messages = '[]'.
-      rv_json = '{"status":"OK","messages":[]}'.
-    ELSE.
+    " --- 判定返回状态：仅当存在 E 级别错误时才标记为 ERROR，纯 W 警告返回 OK ---
+    IF lv_messages CS '"severity":"E"'.
       rv_json = |\{"status":"ERROR","messages":{ lv_messages }\}|.
+    ELSE.
+      rv_json = |\{"status":"OK","messages":{ lv_messages }\}|.
     ENDIF.
   ENDMETHOD.
 
