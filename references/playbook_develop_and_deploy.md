@@ -109,9 +109,75 @@ python3 scripts/sap_ai_mcp_client.py --profile dev200 call message_save message_
 
 ---
 
-## 5. DDIC 数据字典对象 (`ddic deploy`)
+## 5. DDIC 数据字典对象开发与增量维护 (`ddic deploy`)
 
-流水线自动执行：**命名验证 -> 创建对象 -> 状态检查**。
-```bash
-python3 scripts/sap_ai_mcp_client.py --profile dev200 ddic deploy ddic_payload.json
+流水线自动执行：**命名验证 (`ddic_validate`) -> 创建/更新对象 (`ddic_create`) -> 状态检查 (`ddic_status`)**。
+
+### 5.1 完整部署 Payload (`ddic_payload.json`) 示例
+支持一次性定义域 (Domains)、数据元素 (Data Elements) 与透明表 (Tables)：
+
+```json
+{
+  "package": "ZPMCP",
+  "transport": "S4HK912265",
+  "domains": [],
+  "data_elements": [
+    {
+      "name": "ZE_PROG_NAME",
+      "domain": "CHAR30",
+      "description": "程序名",
+      "short_text": "程序名",
+      "medium_text": "程序名",
+      "long_text": "程序名称",
+      "heading": "程序名"
+    },
+    {
+      "name": "ZE_PROG_DESC",
+      "domain": "CHAR50",
+      "description": "程序描述",
+      "short_text": "程序描述",
+      "medium_text": "程序描述",
+      "long_text": "程序描述说明",
+      "heading": "程序描述"
+    },
+    {
+      "name": "ZE_SOURCE_CODE",
+      "domain": "STRING",
+      "description": "源码",
+      "short_text": "源码",
+      "medium_text": "源码内容",
+      "long_text": "程序源代码",
+      "heading": "源码"
+    }
+  ],
+  "tables": [
+    {
+      "name": "ZTAI_DEMO",
+      "description": "AI演示程序源码存储表",
+      "delivery_class": "A",
+      "data_maintenance": "X",
+      "data_class": "APPL0",
+      "size_category": "0",
+      "enhancement_category": "4",
+      "fields": [
+        { "name": "MANDT", "data_element": "MANDT", "key_flag": true, "not_null": true, "position": 1 },
+        { "name": "PROG_NAME", "data_element": "ZE_PROG_NAME", "key_flag": true, "not_null": true, "position": 2 },
+        { "name": "PROG_DESC", "data_element": "ZE_PROG_DESC", "key_flag": false, "not_null": false, "position": 3 },
+        { "name": "ERNAM", "data_element": "ERNAM", "key_flag": false, "not_null": false, "position": 4 },
+        { "name": "ERDAT", "data_element": "ERDAT", "key_flag": false, "not_null": false, "position": 5 },
+        { "name": "SOURCE_CODE", "data_element": "ZE_SOURCE_CODE", "key_flag": false, "not_null": false, "position": 6 }
+      ]
+    }
+  ]
+}
 ```
+
+### 5.2 执行部署与更新
+```bash
+python3 scripts/sap_ai_mcp_client.py --profile dev400 ddic deploy ddic_payload.json
+```
+
+### 5.3 增量表字段修改机制
+- 若透明表已存在，可直接在 `fields` 中增删或重排字段并重新执行 `ddic deploy`。
+- 服务端会自动更新表定义、重构数据库物理结构并重新激活。
+- **校验已有对象**：当对象在同包中已存在时，流水线会发出 `W` (Warning) 并执行安全更新；若对象在其他包（如 `$TMP`），会发出 `E` (Error) 阻断并提示跨包冲突。
