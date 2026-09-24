@@ -319,6 +319,15 @@ CLASS zcl_ai_mcp_rest_fun DEFINITION
     TYPES tt_dynpro_elements TYPE STANDARD TABLE OF ty_dynpro_element WITH EMPTY KEY.
     TYPES tt_dynpro_flow_lines TYPE STANDARD TABLE OF string WITH EMPTY KEY.
 
+    TYPES: BEGIN OF ty_gui_status_copy_request,
+             source_program TYPE string,
+             source_status  TYPE string,
+             target_program TYPE string,
+             target_status  TYPE string,
+             package        TYPE string,
+             transport      TYPE string,
+           END OF ty_gui_status_copy_request.
+
     TYPES: BEGIN OF ty_dynpro_container,
              name           TYPE string,
              type           TYPE string,
@@ -548,6 +557,9 @@ CLASS zcl_ai_mcp_rest_fun DEFINITION
     METHODS handle_textpool_save
       IMPORTING io_server TYPE REF TO if_http_server.
 
+    METHODS handle_gui_status_copy
+      IMPORTING io_server TYPE REF TO if_http_server.
+
     METHODS handle_ddic_create
       IMPORTING io_server TYPE REF TO if_http_server.
 
@@ -699,6 +711,10 @@ CLASS zcl_ai_mcp_rest_fun DEFINITION
       RETURNING VALUE(rv_json) TYPE string.
 
     METHODS textpool_save_from_json
+      IMPORTING iv_json        TYPE string
+      RETURNING VALUE(rv_json) TYPE string.
+
+    METHODS gui_status_copy_from_json
       IMPORTING iv_json        TYPE string
       RETURNING VALUE(rv_json) TYPE string.
 
@@ -1408,6 +1424,7 @@ CLASS ZCL_AI_MCP_REST_FUN IMPLEMENTATION.
               '"ddic_domain_update_values":true,' &&
               '"include_source_save":true,' &&
               '"textpool_save":true,' &&
+              '"gui_status_copy":true,' &&
               '"dynpro_import_screen":true,' &&
               '"dynpro_import_layout":true,' &&
               '"class_method_read":true,' &&
@@ -4583,6 +4600,8 @@ CLASS ZCL_AI_MCP_REST_FUN IMPLEMENTATION.
             handle_transport_import( server ).
           WHEN '/transport/search'.
             handle_transport_search( server ).
+          WHEN '/gui/status/copy' OR '/gui/copy'.
+            handle_gui_status_copy( server ).
 
 
           WHEN OTHERS.
@@ -10356,6 +10375,111 @@ escape( val = lv_message format = cl_abap_format=>e_json_string ) }"\}|.
         rv_json = |\{"status":"ERROR","stage":"DDIC_VALIDATE",| &&
                   |"message":"{ escape( val = lx_validate->get_text( ) format = cl_abap_format=>e_json_string ) }"\}|.
     ENDTRY.
+  ENDMETHOD.
+
+
+* <SIGNATURE>---------------------------------------------------------------------------------------+
+* | Instance Private Method ZCL_AI_MCP_REST_FUN->HANDLE_GUI_STATUS_COPY
+* +-------------------------------------------------------------------------------------------------+
+* | [--->] IO_SERVER                      TYPE REF TO IF_HTTP_SERVER
+* +--------------------------------------------------------------------------------------</SIGNATURE>
+  METHOD handle_gui_status_copy.
+    DATA(lv_result) = gui_status_copy_from_json( io_server->request->get_cdata( ) ).
+    write_json( io_server = io_server iv_status = 200 iv_json = lv_result ).
+  ENDMETHOD.
+
+
+* <SIGNATURE>---------------------------------------------------------------------------------------+
+* | Instance Private Method ZCL_AI_MCP_REST_FUN->GUI_STATUS_COPY_FROM_JSON
+* +-------------------------------------------------------------------------------------------------+
+* | [--->] IV_JSON                        TYPE        STRING
+* | [<-()] RV_JSON                        TYPE        STRING
+* +--------------------------------------------------------------------------------------</SIGNATURE>
+  METHOD gui_status_copy_from_json.
+    DATA ls_request TYPE ty_gui_status_copy_request.
+    DATA lv_source_program TYPE trdir-name.
+    DATA lv_source_status  TYPE rsmpe-status.
+    DATA lv_target_program TYPE trdir-name.
+    DATA lv_target_status  TYPE rsmpe-status.
+    DATA lv_transport      TYPE trkorr.
+    DATA lv_cts_json       TYPE string VALUE 'null'.
+
+    TRY.
+        /ui2/cl_json=>deserialize(
+          EXPORTING json = iv_json
+          CHANGING  data = ls_request ).
+      CATCH cx_root INTO DATA(lx_json).
+        rv_json = |\{"status":"ERROR","stage":"JSON_PARSE",| &&
+                  |"message":"{ escape( val = lx_json->get_text( ) format = cl_abap_format=>e_json_string ) }"\}|.
+        RETURN.
+    ENDTRY.
+
+    lv_source_program = to_upper( ls_request-source_program ).
+    IF lv_source_program IS INITIAL.
+      lv_source_program = 'SAPLKKBL'.
+    ENDIF.
+
+    lv_source_status = to_upper( ls_request-source_status ).
+    IF lv_source_status IS INITIAL.
+      lv_source_status = 'STANDARD_FULLSCREEN'.
+    ENDIF.
+
+    lv_target_program = to_upper( ls_request-target_program ).
+    IF lv_target_program IS INITIAL.
+      rv_json = '{"status":"ERROR","message":"target_program is required"}'.
+      RETURN.
+    ENDIF.
+
+    lv_target_status = to_upper( ls_request-target_status ).
+    IF lv_target_status IS INITIAL.
+      lv_target_status = lv_source_status.
+    ENDIF.
+
+    lv_transport = to_upper( ls_request-transport ).
+
+    CALL FUNCTION 'RS_CUA_COPY_STA'
+      EXPORTING
+        im_program             = lv_source_program
+        im_status              = lv_source_status
+        im_tprogram            = lv_target_program
+        im_tstatus             = lv_target_status
+        suppress_dialog        = 'X'
+        generate               = 'X'
+      EXCEPTIONS
+        not_executed           = 1
+        insufficient_parameters = 2
+        unknown_version        = 3
+        s_program_not_found    = 4
+        t_program_not_found    = 5
+        s_status_not_found     = 6
+        t_status_found         = 7
+        wrong_program_type     = 8
+        invalid_status_name    = 9
+        permission_failure     = 10
+        generation_failure     = 11
+        OTHERS                 = 12.
+
+    IF sy-subrc <> 0 AND sy-subrc <> 7.
+      rv_json = |\{"status":"ERROR","stage":"CUA_COPY","subrc":{ sy-subrc },| &&
+                |"message":"Failed to copy GUI status from { lv_source_program }/{ lv_source_status } to { lv_target_program }/{ lv_target_status }"\}|.
+      RETURN.
+    ENDIF.
+
+    IF lv_transport IS NOT INITIAL.
+      lv_cts_json = append_cts_object(
+        iv_pgmid       = 'LIMU'
+        iv_object_type = 'CUAD'
+        iv_object_name = lv_target_program
+        iv_transport   = lv_transport ).
+    ENDIF.
+
+    rv_json = |\{"status":"OK",| &&
+              |"source_program":"{ lv_source_program }",| &&
+              |"source_status":"{ lv_source_status }",| &&
+              |"target_program":"{ lv_target_program }",| &&
+              |"target_status":"{ lv_target_status }",| &&
+              |"cts":{ lv_cts_json },| &&
+              |"message":"GUI status copied and generated successfully"\}|.
   ENDMETHOD.
 
 

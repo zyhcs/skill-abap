@@ -61,6 +61,7 @@ ENDPOINTS = {
     "textpool_save": {"path": "/textpool/save", "mode": "write", "defaults": {}},
     "message_save": {"path": "/message/save", "mode": "write", "defaults": {}},
     "table_read": {"path": "/table/read", "mode": "read", "defaults": {}},
+    "gui_status_copy": {"path": "/gui/status/copy", "mode": "write", "defaults": {"source_program": "SAPLKKBL", "source_status": "STANDARD_FULLSCREEN"}},
     "run": {"path": "/run", "mode": "write", "defaults": {}},
     "probe_run": {"path": "/probe/run", "mode": "write", "defaults": {}},
 }
@@ -459,6 +460,27 @@ class SapAiMcpClient:
     def function_execute(self, payload: dict[str, object], *, dry_run: bool = False) -> dict[str, object]:
         return self.call("function_execute", payload, dry_run=dry_run)
 
+    def gui_status_copy(
+        self,
+        *,
+        target_program: str,
+        target_status: str = "STANDARD_FULLSCREEN",
+        source_program: str = "SAPLKKBL",
+        source_status: str = "STANDARD_FULLSCREEN",
+        package: str = "",
+        transport: str = "",
+        dry_run: bool = False,
+    ) -> dict[str, object]:
+        payload = {
+            "source_program": source_program.upper(),
+            "source_status": source_status.upper(),
+            "target_program": target_program.upper(),
+            "target_status": target_status.upper(),
+            "package": package.upper(),
+            "transport": transport.upper(),
+        }
+        return self.call("gui_status_copy", payload, step="gui_status_copy", dry_run=dry_run)
+
 
 def sap_status(result: dict[str, object]) -> str:
     body = result.get("body")
@@ -539,22 +561,44 @@ def ddic_deploy(client: SapAiMcpClient, payload: dict[str, object], *, dry_run: 
     return summary
 
 
-def report_deploy(client: SapAiMcpClient, payload: dict[str, object], *, dry_run: bool = False) -> dict[str, object]:
+def report_deploy(
+    client: SapAiMcpClient,
+    payload: dict[str, object],
+    *,
+    copy_gui: bool = True,
+    gui_source_prog: str = "SAPLKKBL",
+    gui_source_status: str = "STANDARD_FULLSCREEN",
+    dry_run: bool = False,
+) -> dict[str, object]:
     run_dir = new_run_dir(client.log_root, "report-deploy")
     payload = normalize_package_transport(payload)
     payload.setdefault("object_type", "PROG")
+    object_name = str(payload.get("object_name") or "").upper()
     steps: list[str] = []
     for idx, endpoint in enumerate(["object_check", "object_save"], start=1):
         result = client.call(endpoint, payload, run_dir=run_dir, step=f"{idx:02d}-{endpoint}", dry_run=dry_run)
         steps.append(endpoint)
         if not dry_run:
             ensure_ok(result, endpoint)
-    activate_payload = {"object_type": "PROG", "object_name": payload.get("object_name")}
+    activate_payload = {"object_type": "PROG", "object_name": object_name}
     result = client.call("object_activate", activate_payload, run_dir=run_dir, step="03-object_activate", dry_run=dry_run)
     steps.append("object_activate")
     if not dry_run:
         ensure_ok(result, "object_activate")
-    summary = {"status": "DRY_RUN" if dry_run else "OK", "workflow": "report deploy", "object_name": payload.get("object_name"), "steps": steps, "log_dir": str(run_dir)}
+    if copy_gui and object_name:
+        gui_payload = {
+            "source_program": gui_source_prog.upper(),
+            "source_status": gui_source_status.upper(),
+            "target_program": object_name,
+            "target_status": gui_source_status.upper(),
+            "package": str(payload.get("package") or "").upper(),
+            "transport": str(payload.get("transport") or "").upper(),
+        }
+        gui_result = client.call("gui_status_copy", gui_payload, run_dir=run_dir, step="04-gui_status_copy", dry_run=dry_run)
+        steps.append("gui_status_copy")
+        if not dry_run:
+            ensure_ok(gui_result, "gui_status_copy")
+    summary = {"status": "DRY_RUN" if dry_run else "OK", "workflow": "report deploy", "object_name": object_name, "steps": steps, "log_dir": str(run_dir)}
     write_json(run_dir / "summary.json", summary)
     return summary
 

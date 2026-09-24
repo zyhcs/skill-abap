@@ -97,6 +97,13 @@ def build_parser() -> argparse.ArgumentParser:
     report_sub = report.add_subparsers(dest="action", required=True)
     report_deploy_parser = report_sub.add_parser("deploy")
     report_deploy_parser.add_argument("payload", type=Path)
+    report_copy_gui_parser = report_sub.add_parser("copy-gui", help="Copy standard GUI status (e.g. from SAPLKKBL)")
+    report_copy_gui_parser.add_argument("--target-prog", required=True, help="Target report program name")
+    report_copy_gui_parser.add_argument("--target-status", default="STANDARD_FULLSCREEN", help="Target status name (default STANDARD_FULLSCREEN)")
+    report_copy_gui_parser.add_argument("--source-prog", default="SAPLKKBL", help="Source program name (default SAPLKKBL)")
+    report_copy_gui_parser.add_argument("--source-status", default="STANDARD_FULLSCREEN", help="Source status name (default STANDARD_FULLSCREEN)")
+    report_copy_gui_parser.add_argument("--package", default="", help="Package name (optional)")
+    report_copy_gui_parser.add_argument("--transport", default="", help="Workbench transport request (optional)")
 
     cls = sub.add_parser("class")
     class_sub = cls.add_subparsers(dest="action", required=True)
@@ -189,6 +196,16 @@ def main(argv: list[str] | None = None) -> int:
             result = ddic_deploy(client, load_json_file(args.payload), dry_run=args.dry_run)
         elif args.command == "report" and args.action == "deploy":
             result = report_deploy(client, load_json_file(args.payload), dry_run=args.dry_run)
+        elif args.command == "report" and args.action == "copy-gui":
+            result = client.gui_status_copy(
+                target_program=args.target_prog,
+                target_status=args.target_status,
+                source_program=args.source_prog,
+                source_status=args.source_status,
+                package=args.package,
+                transport=args.transport,
+                dry_run=args.dry_run,
+            )
         elif args.command == "class" and args.action == "deploy":
             result = class_deploy(client, load_json_file(args.payload), dry_run=args.dry_run)
         elif args.command == "class" and args.action == "activation-check":

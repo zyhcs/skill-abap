@@ -4,9 +4,9 @@
 
 ---
 
-## 1. 报表程序开发 (`report deploy`)
+## 1. 报表程序开发 (`report deploy` / `report copy-gui`)
 
-流水线自动执行：**语法检查 -> 保存源码 -> 激活程序**。
+流水线自动执行：**语法检查 -> 保存源码 -> 激活程序 -> 标准 GUI 状态自动拷贝与激活 (`SAPLKKBL/STANDARD_FULLSCREEN`)**。
 
 ### 1.1 准备 Payload 文件 (`payload.json`)
 ```json
@@ -21,9 +21,21 @@
 ```
 > **注意**：非 `$TMP` 包对象必须传入有效 Workbench 请求号 `transport`。
 
-### 1.2 执行部署
+### 1.2 执行部署与自动 GUI 生成
 ```bash
 python3 scripts/sap_ai_mcp_client.py --profile dev200 report deploy payload.json
+```
+
+### 1.3 独立 GUI 状态拷贝 (`report copy-gui`)
+若需单独为已有程序从标准程序（如 `SAPLKKBL`）拷贝并生成 GUI 状态（支持挂载传输请求 `LIMU CUAD`）：
+```bash
+python3 scripts/sap_ai_mcp_client.py --profile dev200 report copy-gui \
+  --target-prog ZREP_AIDEMO \
+  --target-status STANDARD_FULLSCREEN \
+  --source-prog SAPLKKBL \
+  --source-status STANDARD_FULLSCREEN \
+  --package ZPMCP \
+  --transport S4HK912265
 ```
 
 ---
