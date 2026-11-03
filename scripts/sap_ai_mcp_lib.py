@@ -62,6 +62,8 @@ ENDPOINTS = {
     "message_save": {"path": "/message/save", "mode": "write", "defaults": {}},
     "table_read": {"path": "/table/read", "mode": "read", "defaults": {}},
     "gui_status_copy": {"path": "/gui/status/copy", "mode": "write", "defaults": {"source_program": "SAPLKKBL", "source_status": "STANDARD_FULLSCREEN"}},
+    "gui_status_create": {"path": "/gui/status/create", "mode": "write", "defaults": {"status": "STATUS_9000", "standard_keys": True}},
+    "dynpro_import_custom_control": {"path": "/dynpro/import_custom_control", "mode": "write", "defaults": {}},
     "run": {"path": "/run", "mode": "write", "defaults": {}},
     "probe_run": {"path": "/probe/run", "mode": "write", "defaults": {}},
 }
@@ -604,12 +606,20 @@ def report_deploy(
     steps.append("object_activate")
     if not dry_run:
         ensure_ok(result, "object_activate")
-    if copy_gui and object_name:
+    should_copy_gui = bool(payload.get("copy_gui", copy_gui))
+    gui_mode = str(payload.get("gui_mode") or "").upper()
+    
+    if should_copy_gui and object_name:
+        src_prog = str(payload.get("gui_source_prog") or ( "" if gui_mode == "CREATE_BLANK" else gui_source_prog )).upper()
+        src_stat = str(payload.get("gui_source_status") or ( "CREATE_BLANK" if gui_mode == "CREATE_BLANK" else gui_source_status )).upper()
+        tgt_stat = str(payload.get("gui_target_status") or ( "STATUS_9000" if gui_mode == "CREATE_BLANK" else src_stat )).upper()
+        
         gui_payload = {
-            "source_program": gui_source_prog.upper(),
-            "source_status": gui_source_status.upper(),
+            "source_program": src_prog,
+            "source_status": src_stat,
             "target_program": object_name,
-            "target_status": gui_source_status.upper(),
+            "target_status": tgt_stat,
+            "description": str(payload.get("description") or ""),
             "package": str(payload.get("package") or "").upper(),
             "transport": str(payload.get("transport") or "").upper(),
         }

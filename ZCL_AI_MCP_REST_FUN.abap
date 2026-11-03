@@ -319,6 +319,34 @@ CLASS zcl_ai_mcp_rest_fun DEFINITION
     TYPES tt_dynpro_elements TYPE STANDARD TABLE OF ty_dynpro_element WITH EMPTY KEY.
     TYPES tt_dynpro_flow_lines TYPE STANDARD TABLE OF string WITH EMPTY KEY.
 
+    TYPES: BEGIN OF ty_gui_func_def,
+             code      TYPE string,
+             text      TYPE string,
+             icon_name TYPE string,
+             icon_text TYPE string,
+             quickinfo TYPE string,
+             type      TYPE string,
+             fkey      TYPE string,
+           END OF ty_gui_func_def.
+    TYPES tt_gui_func_defs TYPE STANDARD TABLE OF ty_gui_func_def WITH EMPTY KEY.
+
+    TYPES: BEGIN OF ty_gui_title_def,
+             code TYPE string,
+             text TYPE string,
+           END OF ty_gui_title_def.
+    TYPES tt_gui_title_defs TYPE STANDARD TABLE OF ty_gui_title_def WITH EMPTY KEY.
+
+    TYPES: BEGIN OF ty_gui_status_create_request,
+             program       TYPE string,
+             status        TYPE string,
+             description   TYPE string,
+             standard_keys TYPE abap_bool,
+             functions     TYPE tt_gui_func_defs,
+             titles        TYPE tt_gui_title_defs,
+             package       TYPE string,
+             transport     TYPE string,
+           END OF ty_gui_status_create_request.
+
     TYPES: BEGIN OF ty_gui_status_copy_request,
              source_program TYPE string,
              source_status  TYPE string,
@@ -1425,6 +1453,7 @@ CLASS ZCL_AI_MCP_REST_FUN IMPLEMENTATION.
               '"include_source_save":true,' &&
               '"textpool_save":true,' &&
               '"gui_status_copy":true,' &&
+              '"gui_status_create":true,' &&
               '"dynpro_import_screen":true,' &&
               '"dynpro_import_layout":true,' &&
               '"class_method_read":true,' &&
@@ -4600,7 +4629,7 @@ CLASS ZCL_AI_MCP_REST_FUN IMPLEMENTATION.
             handle_transport_import( server ).
           WHEN '/transport/search'.
             handle_transport_search( server ).
-          WHEN '/gui/status/copy' OR '/gui/copy'.
+          WHEN '/gui/status/copy' OR '/gui/copy' OR '/gui/status/create' OR '/gui/create'.
             handle_gui_status_copy( server ).
 
 
@@ -10396,13 +10425,44 @@ escape( val = lv_message format = cl_abap_format=>e_json_string ) }"\}|.
 * | [<-()] RV_JSON                        TYPE        STRING
 * +--------------------------------------------------------------------------------------</SIGNATURE>
   METHOD gui_status_copy_from_json.
-    DATA ls_request TYPE ty_gui_status_copy_request.
-    DATA lv_source_program TYPE trdir-name.
-    DATA lv_source_status  TYPE rsmpe-status.
-    DATA lv_target_program TYPE trdir-name.
-    DATA lv_target_status  TYPE rsmpe-status.
+    TYPES: BEGIN OF ty_local_request,
+             program        TYPE string,
+             status         TYPE string,
+             description    TYPE string,
+             source_program TYPE string,
+             source_status  TYPE string,
+             target_program TYPE string,
+             target_status  TYPE string,
+             package        TYPE string,
+             transport      TYPE string,
+           END OF ty_local_request.
+    DATA ls_request TYPE ty_local_request.
+    DATA lv_source_program TYPE syrepid.
+    DATA lv_source_status  TYPE rsmpe_stat-code.
+    DATA lv_target_program TYPE syrepid.
+    DATA lv_target_status  TYPE rsmpe_stat-code.
     DATA lv_transport      TYPE trkorr.
     DATA lv_cts_json       TYPE string VALUE 'null'.
+    DATA lv_title_code     TYPE c LENGTH 20 VALUE 'TITLE_9000'.
+
+    DATA ls_adm TYPE rsmpe_adm.
+    DATA lt_sta TYPE STANDARD TABLE OF rsmpe_stat WITH DEFAULT KEY.
+    DATA lt_fun TYPE STANDARD TABLE OF rsmpe_funt WITH DEFAULT KEY.
+    DATA lt_men TYPE STANDARD TABLE OF rsmpe_men WITH DEFAULT KEY.
+    DATA lt_mtx TYPE STANDARD TABLE OF rsmpe_mnlt WITH DEFAULT KEY.
+    DATA lt_act TYPE STANDARD TABLE OF rsmpe_act WITH DEFAULT KEY.
+    DATA lt_but TYPE STANDARD TABLE OF rsmpe_but WITH DEFAULT KEY.
+    DATA lt_pfk TYPE STANDARD TABLE OF rsmpe_pfk WITH DEFAULT KEY.
+    DATA lt_set TYPE STANDARD TABLE OF rsmpe_staf WITH DEFAULT KEY.
+    DATA lt_doc TYPE STANDARD TABLE OF rsmpe_atrt WITH DEFAULT KEY.
+    DATA lt_tit TYPE STANDARD TABLE OF rsmpe_titt WITH DEFAULT KEY.
+    DATA lt_biv TYPE STANDARD TABLE OF rsmpe_buts WITH DEFAULT KEY.
+
+    DATA ls_sta TYPE rsmpe_stat.
+    DATA ls_fun TYPE rsmpe_funt.
+    DATA ls_act TYPE rsmpe_act.
+    DATA ls_pfk TYPE rsmpe_pfk.
+    DATA ls_tit TYPE rsmpe_titt.
 
     TRY.
         /ui2/cl_json=>deserialize(
@@ -10414,55 +10474,209 @@ escape( val = lv_message format = cl_abap_format=>e_json_string ) }"\}|.
         RETURN.
     ENDTRY.
 
-    lv_source_program = to_upper( ls_request-source_program ).
-    IF lv_source_program IS INITIAL.
-      lv_source_program = 'SAPLKKBL'.
+    lv_target_program = to_upper( ls_request-program ).
+    IF lv_target_program IS INITIAL.
+      lv_target_program = to_upper( ls_request-target_program ).
     ENDIF.
-
-    lv_source_status = to_upper( ls_request-source_status ).
-    IF lv_source_status IS INITIAL.
-      lv_source_status = 'STANDARD_FULLSCREEN'.
-    ENDIF.
-
-    lv_target_program = to_upper( ls_request-target_program ).
     IF lv_target_program IS INITIAL.
       rv_json = '{"status":"ERROR","message":"target_program is required"}'.
       RETURN.
     ENDIF.
 
-    lv_target_status = to_upper( ls_request-target_status ).
+    lv_target_status = to_upper( ls_request-status ).
     IF lv_target_status IS INITIAL.
-      lv_target_status = lv_source_status.
+      lv_target_status = to_upper( ls_request-target_status ).
+    ENDIF.
+    IF lv_target_status IS INITIAL.
+      lv_target_status = 'STATUS_9000'.
     ENDIF.
 
     lv_transport = to_upper( ls_request-transport ).
 
-    CALL FUNCTION 'RS_CUA_COPY_STA'
-      EXPORTING
-        im_program             = lv_source_program
-        im_status              = lv_source_status
-        im_tprogram            = lv_target_program
-        im_tstatus             = lv_target_status
-        suppress_dialog        = 'X'
-        generate               = 'X'
-      EXCEPTIONS
-        not_executed           = 1
-        insufficient_parameters = 2
-        unknown_version        = 3
-        s_program_not_found    = 4
-        t_program_not_found    = 5
-        s_status_not_found     = 6
-        t_status_found         = 7
-        wrong_program_type     = 8
-        invalid_status_name    = 9
-        permission_failure     = 10
-        generation_failure     = 11
-        OTHERS                 = 12.
+    IF ls_request-source_program IS NOT INITIAL AND ls_request-source_program <> 'BLANK'.
+      " 模式 1: 模板复制模式
+      lv_source_program = to_upper( ls_request-source_program ).
+      lv_source_status  = to_upper( ls_request-source_status ).
+      IF lv_source_status IS INITIAL.
+        lv_source_status = 'STANDARD_FULLSCREEN'.
+      ENDIF.
 
-    IF sy-subrc <> 0 AND sy-subrc <> 7.
-      rv_json = |\{"status":"ERROR","stage":"CUA_COPY","subrc":{ sy-subrc },| &&
-                |"message":"Failed to copy GUI status from { lv_source_program }/{ lv_source_status } to { lv_target_program }/{ lv_target_status }"\}|.
-      RETURN.
+      CALL FUNCTION 'RS_CUA_COPY_STA'
+        EXPORTING
+          im_program              = lv_source_program
+          im_status               = lv_source_status
+          im_tprogram             = lv_target_program
+          im_tstatus              = lv_target_status
+          suppress_dialog         = 'X'
+          generate                = 'X'
+        EXCEPTIONS
+          not_executed            = 1
+          insufficient_parameters = 2
+          unknown_version         = 3
+          s_program_not_found     = 4
+          t_program_not_found     = 5
+          s_status_not_found      = 6
+          t_status_found          = 7
+          wrong_program_type      = 8
+          invalid_status_name     = 9
+          permission_failure      = 10
+          generation_failure      = 11
+          OTHERS                  = 12.
+
+      IF sy-subrc <> 0 AND sy-subrc <> 7.
+        rv_json = |\{"status":"ERROR","stage":"CUA_COPY","subrc":{ sy-subrc },| &&
+                  |"message":"Failed to copy GUI status from { lv_source_program }/{ lv_source_status } to { lv_target_program }/{ lv_target_status }"\}|.
+        RETURN.
+      ENDIF.
+    ELSE.
+      " 模式 2: 原生新建纯净空白 GUI 状态 (仅标准返回、退出、取消与标题)
+      CALL FUNCTION 'RS_CUA_INTERNAL_FETCH'
+        EXPORTING
+          program  = lv_target_program
+          language = sy-langu
+        IMPORTING
+          adm      = ls_adm
+        TABLES
+          sta      = lt_sta
+          fun      = lt_fun
+          men      = lt_men
+          mtx      = lt_mtx
+          act      = lt_act
+          but      = lt_but
+          pfk      = lt_pfk
+          set      = lt_set
+          doc      = lt_doc
+          tit      = lt_tit
+          biv      = lt_biv
+        EXCEPTIONS
+          OTHERS   = 0.
+
+      IF ls_adm-actcode IS INITIAL.
+        ls_adm-actcode = '000001'.
+      ENDIF.
+      IF ls_adm-mencode IS INITIAL.
+        ls_adm-mencode = '000001'.
+      ENDIF.
+      IF ls_adm-pfkcode IS INITIAL.
+        ls_adm-pfkcode = '000001'.
+      ENDIF.
+
+      " 1. 状态定义
+      DELETE lt_sta WHERE code = lv_target_status.
+      CLEAR ls_sta.
+      ls_sta-code     = lv_target_status.
+      ls_sta-modal    = 'D'. " 对话框状态 / 独立全屏
+      ls_sta-actcode  = '000001'.
+      ls_sta-pfkcode  = '000001'.
+      ls_sta-int_note = COND #( WHEN ls_request-description IS NOT INITIAL THEN ls_request-description ELSE |GUI Status for { lv_target_status }| ).
+      APPEND ls_sta TO lt_sta.
+
+      " 2. 注册标准功能码 BACK, EXIT, CANCEL
+      DELETE lt_fun WHERE code = 'BACK'
+                       OR code = 'EXIT'
+                       OR code = 'CANCEL'
+                       OR code = '&F03'
+                       OR code = '&F15'
+                       OR code = '&F12'.
+
+      CLEAR ls_fun.
+      ls_fun-code      = 'BACK'.
+      ls_fun-textno    = '001'.
+      ls_fun-fun_text  = '返回'.
+      ls_fun-info_text = '返回 (F3)'.
+      APPEND ls_fun TO lt_fun.
+
+      CLEAR ls_fun.
+      ls_fun-code      = 'EXIT'.
+      ls_fun-textno    = '001'.
+      ls_fun-type      = 'E'.
+      ls_fun-fun_text  = '退出'.
+      ls_fun-info_text = '退出 (Shift+F3)'.
+      APPEND ls_fun TO lt_fun.
+
+      CLEAR ls_fun.
+      ls_fun-code      = 'CANCEL'.
+      ls_fun-textno    = '001'.
+      ls_fun-type      = 'A'.
+      ls_fun-fun_text  = '取消'.
+      ls_fun-info_text = '取消 (F12)'.
+      APPEND ls_fun TO lt_fun.
+
+      " 3. 标准快捷键映射表 (PFK)
+      DELETE lt_pfk WHERE code = '000001'
+                      AND ( pfno = '03' OR pfno = '12' OR pfno = '15' ).
+
+      CLEAR ls_pfk.
+      ls_pfk-code    = '000001'.
+      ls_pfk-pfno    = '03'.
+      ls_pfk-funcode = 'BACK'.
+      ls_pfk-funno   = '001'.
+      APPEND ls_pfk TO lt_pfk.
+
+      CLEAR ls_pfk.
+      ls_pfk-code    = '000001'.
+      ls_pfk-pfno    = '15'.
+      ls_pfk-funcode = 'EXIT'.
+      ls_pfk-funno   = '001'.
+      APPEND ls_pfk TO lt_pfk.
+
+      CLEAR ls_pfk.
+      ls_pfk-code    = '000001'.
+      ls_pfk-pfno    = '12'.
+      ls_pfk-funcode = 'CANCEL'.
+      ls_pfk-funno   = '001'.
+      APPEND ls_pfk TO lt_pfk.
+
+      " 4. 标准激活快捷键集合 (ACT)
+      DELETE lt_act WHERE code = '000001'
+                      AND ( no = '01' OR no = '02' OR no = '03' ).
+      CLEAR ls_act.
+      ls_act-code = '000001'.
+      ls_act-no   = '01'.
+      APPEND ls_act TO lt_act.
+      ls_act-no   = '02'.
+      APPEND ls_act TO lt_act.
+      ls_act-no   = '03'.
+      APPEND ls_act TO lt_act.
+
+      " 5. 标题定义 (默认创建 TITLE_9000)
+      lv_title_code = 'TITLE_9000'.
+      IF ls_request-status IS NOT INITIAL AND strlen( ls_request-status ) >= 10.
+        lv_title_code = |TITLE_{ ls_request-status+7(4) }|.
+      ENDIF.
+      DELETE lt_tit WHERE code = lv_title_code.
+      CLEAR ls_tit.
+      ls_tit-code = lv_title_code.
+      ls_tit-text = COND #( WHEN ls_request-description IS NOT INITIAL THEN ls_request-description ELSE '物料主数据综合查询表' ).
+      APPEND ls_tit TO lt_tit.
+
+      " 6. 写入 CUA 内部表
+      DATA ls_trkey TYPE trkey.
+      ls_trkey-obj_type = 'PROG'.
+      ls_trkey-obj_name = lv_target_program.
+      ls_trkey-devclass = COND #( WHEN ls_request-package IS NOT INITIAL THEN ls_request-package ELSE 'ZPMCP' ).
+
+      CALL FUNCTION 'RS_CUA_INTERNAL_WRITE'
+        EXPORTING
+          program   = lv_target_program
+          language  = sy-langu
+          tr_key    = ls_trkey
+          adm       = ls_adm
+          state     = '4'
+        TABLES
+          sta       = lt_sta
+          fun       = lt_fun
+          men       = lt_men
+          mtx       = lt_mtx
+          act       = lt_act
+          but       = lt_but
+          pfk       = lt_pfk
+          set       = lt_set
+          doc       = lt_doc
+          tit       = lt_tit
+          biv       = lt_biv
+        EXCEPTIONS
+          OTHERS    = 0.
     ENDIF.
 
     " 显式调用 CUA 生成与激活
@@ -10503,12 +10717,11 @@ escape( val = lv_message format = cl_abap_format=>e_json_string ) }"\}|.
     ENDIF.
 
     rv_json = |\{"status":"OK",| &&
-              |"source_program":"{ lv_source_program }",| &&
-              |"source_status":"{ lv_source_status }",| &&
+              |"mode":"{ COND string( WHEN ls_request-source_program IS INITIAL OR ls_request-source_program = 'BLANK' THEN 'CREATE_BLANK' ELSE 'COPY' ) }",| &&
               |"target_program":"{ lv_target_program }",| &&
               |"target_status":"{ lv_target_status }",| &&
               |"cts":{ lv_cts_json },| &&
-              |"message":"GUI status copied and generated successfully"\}|.
+              |"message":"GUI status created and generated successfully"\}|.
   ENDMETHOD.
 
 
