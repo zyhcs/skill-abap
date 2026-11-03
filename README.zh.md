@@ -134,18 +134,49 @@ sap-abap-mcp/
 
 ---
 
-## 🤖 接入 AI Coding Agent
+## 🤖 跨 AI 客户端接入指南 (AI Agent Setup Guide)
 
-本项目可作为 **Skill / Playbook / 自动化工具** 无缝接入主流 AI 编程助手：
+本项目天然支持作为 **Agent Skill** 无缝接入主流 AI 编程助手。
 
-### 1. 接入 Claude Code / Cursor / Windsurf / Antigravity
-直接将本目录复制或软链接至 Agent 的 Skills / Rules 目录，并在 Agent 系统提示词中引入：
-```text
-SAP ABAP 开发请严格遵守 sap-abap-mcp skill 规范：
-1. 所有与 SAP 的交互必须通过 scripts/sap_ai_mcp_client.py 进行。
-2. 对象创建与修改必须关联有效的 Workbench 传输请求。
-3. 严格遵循 rules/golden_rules.md 命名与性能规范。
+> 📌 **核心提示**：针对所有 AI Agent，我们提供了专门的引导规范文档 **[`AGENT_GUIDE.md`](./AGENT_GUIDE.md)**。您可以直接将其作为系统提示词或 Rules 载入，让 AI 具备自主分析、调用客户端与安全防范的能力。
+
+### 1. Claude Code
+在您的项目根目录下创建或编辑 `CLAUDE.md`：
+```markdown
+# SAP ABAP 交互准则
+所有与 SAP 的操作请阅读并遵守 `AGENT_GUIDE.md`：
+- 唯一交互工具：`python3 scripts/sap_ai_mcp_client.py --profile <env> <command>`
+- 开发部署使用 `--profile dev`，对象修改必须指定传输请求（`transport`）
+- 测试机传输导入使用 `--profile qas transport import`
+- 变量与命名遵循 `rules/golden_rules.md`
 ```
+
+### 2. Cursor
+在项目根目录创建 `.cursor/rules/sap-abap.mdc`（或根目录 `.cursorrules`）：
+```markdown
+---
+description: SAP ABAP 开发与交互规则
+globs: ["*.abap", "*.json"]
+---
+You are an expert SAP ABAP Developer.
+- All SAP operations must be routed via `python3 scripts/sap_ai_mcp_client.py`.
+- Strictly follow the workflows and guardrails defined in `AGENT_GUIDE.md`.
+- Never write to non-DEV systems. Enforce Workbench Transport Requests for non-local packages.
+- Always apply Hungarian notation (lv_, lt_, ls_) from `rules/golden_rules.md`.
+```
+
+### 3. Windsurf
+在工作区根目录下创建 `.windsurfrules`，粘贴与 Cursor 相同的配置内容。
+
+### 4. Cline / Roo Code (VS Code 扩展)
+在工作区根目录创建 `.clinerules`，添加上述指令作为自定义技能规则。
+
+### 5. Google Antigravity / Gemini Code Assist
+直接通过软链接将本仓库挂载到 Agent Skills 目录：
+```bash
+ln -s /path/to/skill-abap ~/.gemini/config/skills/sap-ai-mcp-rest-api
+```
+Agent 会自动扫描识别根目录的 [`SKILL.md`](./SKILL.md) 与相关 Playbooks。
 
 ---
 

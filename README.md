@@ -134,18 +134,49 @@ sap-abap-mcp/
 
 ---
 
-## 🤖 AI Agent Integration
+## 🤖 Cross-AI Agent Integration Guide
 
-This repository can be easily loaded as a **Skill**, **Playbook**, or **CLI Tool** into any AI coding assistant:
+This repository natively functions as an **Agent Skill** across major modern AI coding assistants.
 
-### Integration with Claude Code / Cursor / Windsurf / Antigravity
-Copy or symlink this directory into your agent's skills or configuration folder, then reference it in your workspace system instructions:
-```text
-When working with SAP ABAP, strictly follow the sap-abap-mcp skill instructions:
-1. Always route SAP operations through scripts/sap_ai_mcp_client.py.
-2. Any non-local package creation or modification must specify an active Workbench transport request.
-3. Adhere to rules/golden_rules.md for naming conventions and SQL safeguards.
+> 📌 **Dedicated Agent Prompt**: We provide **[`AGENT_GUIDE.md`](./AGENT_GUIDE.md)** specifically formatted for AI Agents to ingest. Load it as system instructions or workspace rules to equip your agent with autonomous execution and safety boundary awareness.
+
+### 1. Claude Code
+Create or edit `CLAUDE.md` in your project root:
+```markdown
+# SAP ABAP Development Guidelines
+For all SAP operations, read and strictly adhere to `AGENT_GUIDE.md`:
+- Unified execution tool: `python3 scripts/sap_ai_mcp_client.py --profile <env> <command>`
+- Development & deployment must use `--profile dev` with an active transport request (`transport`)
+- Quality system imports must use `--profile qas transport import`
+- Naming & variable structure must follow `rules/golden_rules.md`
 ```
+
+### 2. Cursor
+Create `.cursor/rules/sap-abap.mdc` (or root `.cursorrules`):
+```markdown
+---
+description: SAP ABAP Development & Tooling Rules
+globs: ["*.abap", "*.json"]
+---
+You are an expert SAP ABAP Developer.
+- All SAP operations must be routed through `python3 scripts/sap_ai_mcp_client.py`.
+- Strictly follow the workflows and guardrails defined in `AGENT_GUIDE.md`.
+- Never modify code on non-DEV systems. Always require Workbench transport requests for non-local packages.
+- Enforce Hungarian notation (lv_, lt_, ls_) from `rules/golden_rules.md`.
+```
+
+### 3. Windsurf
+Create `.windsurfrules` in your workspace root with the same instructions as Cursor.
+
+### 4. Cline / Roo Code (VS Code Extension)
+Create `.clinerules` in your workspace root and paste the prompt block above.
+
+### 5. Google Antigravity / Gemini Code Assist
+Symlink this repository directly into your Agent skills directory:
+```bash
+ln -s /path/to/skill-abap ~/.gemini/config/skills/sap-ai-mcp-rest-api
+```
+The agent automatically detects root [`SKILL.md`](./SKILL.md) and indexes all Playbooks.
 
 ---
 
