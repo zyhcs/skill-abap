@@ -49,3 +49,15 @@ description: 使用自定义 SAP AI MCP REST 接口实现 SAP ABAP 与 DDIC 对�
 * **深层语法手册 (严禁全量加载，仅按需行切片查看)**：
   - 经典语法：`rules/abap_syntax_guide_classic.md`
   - S/4HANA 7.5+ 语法：`rules/abap_syntax_guide_s4hana.md`
+
+---
+
+## 5. 专精子技能 (Specialized ALV Report Sub-skills)
+
+针对企业级 ALV 报表开发，本 Skill 内置了两套开箱即用的专业子技能：
+
+| 专精子技能 | 适用场景 | 说明与指引路径 |
+| :--- | :--- | :--- |
+| **`sap-create-oo-alv-report`** | 面向对象单屏 OO ALV 报表 | 支持 Screen 9000、Custom Container 自动挂载与纯净 GUI Status 创建。<br>详情阅读：`skills/sap-create-oo-alv-report/SKILL.md` |
+| **`sap-create-fm-alv-report`** | 经典函数式 FM ALV 报表 | 基于 `REUSE_ALV_GRID_DISPLAY_LVC` 的标准化查询台账一键部署。<br>详情阅读：`skills/sap-create-fm-alv-report/SKILL.md` |
+

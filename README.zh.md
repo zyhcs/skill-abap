@@ -61,7 +61,13 @@ sap-abap-mcp/
 │   ├── examples.md                   # 常用操作快速实战范例
 │   ├── policy.md                     # 权限边界与安全策略
 │   └── troubleshooting.md            # 常见错误排查与自愈手册
-├── templates/                        # 代码与数据模板
+├── skills/                           # 内置专精子技能库 (Sub-skills)
+│   ├── sap-create-oo-alv-report/     # 1) 企业级单屏 OO ALV 报表生成 (Screen 9000 + Blank Status)
+│   └── sap-create-fm-alv-report/     # 2) 标准函数式 FM ALV 报表生成 (REUSE_ALV_GRID_DISPLAY_LVC)
+├── templates/                        # 代码与数据模板库
+│   ├── oo_alv_template.abap          # 面向对象 OO ALV 标准报表模板
+│   ├── dynpro_9000_template.json     # Screen 9000 容器屏幕布局模板
+│   ├── fm_alv_template.abap          # 经典 FM ALV 标准报表模板
 │   ├── abap_header.txt               # 标准程序/类 Header 注释模板
 │   └── table_audit_fields.json       # 透明表审计字段模板
 └── scripts/                          # 客户端驱动工具与 SDK

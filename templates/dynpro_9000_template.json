@@ -1,0 +1,32 @@
+{
+  "program": "[PROGRAM_NAME]",
+  "dynpro_number": "09000",
+  "screen_type": "N",
+  "description": "[DESCRIPTION] ALV主展示屏幕",
+  "next_screen": "09000",
+  "package": "[PACKAGE_NAME]",
+  "transport": "[TRANSPORT_REQ]",
+  "flow_logic": [
+    "PROCESS BEFORE OUTPUT.",
+    "  MODULE status_9000.",
+    "",
+    "PROCESS AFTER INPUT.",
+    "  MODULE user_command_9000."
+  ],
+  "controls": [
+    {
+      "name": "ALV_CONTAINER",
+      "type": "CUST",
+      "line": 1,
+      "col": 1,
+      "length": 120,
+      "height": 26,
+      "resizing": {
+        "vert_resize": true,
+        "hor_resize": true,
+        "min_lines": 5,
+        "min_cols": 20
+      }
+    }
+  ]
+}

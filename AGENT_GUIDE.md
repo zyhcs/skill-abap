@@ -56,7 +56,8 @@ Map the user's intent to the corresponding action below:
   ```bash
   python3 scripts/sap_ai_mcp_client.py --profile dev report check --file <path_to_file.abap>
   ```
-* **Deploy Standard FM ALV Report (with standard GUI Status clone)**:
+* **Deploy Standard FM ALV Report (Sub-skill: `skills/sap-create-fm-alv-report`)**:
+  Template: `templates/fm_alv_template.abap`
   ```bash
   python3 scripts/sap_ai_mcp_client.py --profile dev report deploy \
     --name <PROG_NAME> \
@@ -65,7 +66,8 @@ Map the user's intent to the corresponding action below:
     --file <path_to_file.abap> \
     --copy-gui
   ```
-* **Deploy Enterprise OO ALV Report (Screen 9000 + Blank Status)**:
+* **Deploy Enterprise OO ALV Report (Sub-skill: `skills/sap-create-oo-alv-report`)**:
+  Template: `templates/oo_alv_template.abap` & Dynpro: `templates/dynpro_9000_template.json`
   Use Python SDK or payload JSON with:
   ```json
   {
@@ -78,7 +80,7 @@ Map the user's intent to the corresponding action below:
     "gui_target_status": "STATUS_9000"
   }
   ```
-* *Deep SOP*: Refer to `references/playbook_develop_and_deploy.md`.
+* *Deep SOP*: Refer to `references/playbook_develop_and_deploy.md`, `skills/sap-create-oo-alv-report/SKILL.md`, and `skills/sap-create-fm-alv-report/SKILL.md`.
 
 ---
 

@@ -61,7 +61,13 @@ sap-abap-mcp/
 │   ├── examples.md                   # Real-world usage examples
 │   ├── policy.md                     # Security policy and access boundary
 │   └── troubleshooting.md            # Troubleshooting & self-healing guide
-├── templates/                        # Reusable templates
+├── skills/                           # Built-in specialized report sub-skills
+│   ├── sap-create-oo-alv-report/     # 1) Enterprise OO ALV Report Generator (Screen 9000 + Blank Status)
+│   └── sap-create-fm-alv-report/     # 2) Standard FM ALV Report Generator (REUSE_ALV_GRID_DISPLAY_LVC)
+├── templates/                        # Reusable template library
+│   ├── oo_alv_template.abap          # Enterprise OO ALV report template
+│   ├── dynpro_9000_template.json     # Screen 9000 custom container layout template
+│   ├── fm_alv_template.abap          # Standard functional FM ALV report template
 │   ├── abap_header.txt               # Standard report/class header comment template
 │   └── table_audit_fields.json       # Audit fields template for transparent tables
 └── scripts/                          # Client-side SDK and CLI tools
